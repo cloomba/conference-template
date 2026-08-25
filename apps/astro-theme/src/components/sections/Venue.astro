@@ -1,0 +1,33 @@
+---
+import SectionHeading from '@/components/ui/SectionHeading.astro'
+import { loadEvent } from '@/lib/data'
+
+const event = await loadEvent()
+const { location } = event
+const hasVenue = Boolean(location.name || location.address || location.city)
+const mapsHref =
+    location.lat != null && location.lng != null
+        ? `https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lng}`
+        : location.address
+          ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location.address)}`
+          : null
+---
+
+{
+    hasVenue && (
+        <section class='mx-auto max-w-5xl px-4 py-14'>
+            <SectionHeading title='Venue' />
+            <div class='rounded-card border border-text/10 p-6'>
+                {location.name && <h3 class='font-medium'>{location.name}</h3>}
+                <p class='mt-1 text-text-muted'>
+                    {[location.address, location.city, location.country].filter(Boolean).join(', ')}
+                </p>
+                {mapsHref && (
+                    <a href={mapsHref} rel='noopener' class='mt-4 inline-block text-sm text-primary hover:underline'>
+                        Get directions →
+                    </a>
+                )}
+            </div>
+        </section>
+    )
+}

@@ -1,0 +1,13 @@
+# deps / builds
+node_modules/
+dist/
+.astro/
+.output/
+
+# local environment — holds the CLOOMBA_API_KEY, never committed
+.env
+.env.*
+!.env.example
+
+# os / editor noise
+.DS_Store

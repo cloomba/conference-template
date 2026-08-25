@@ -1,0 +1,40 @@
+---
+import { getCollection, render } from 'astro:content'
+
+// Alternating [image][text] / [text][image] splits from
+// src/content/highlights/ — even entries put the image left, odd right.
+const entries = (await getCollection('highlights')).sort((a, b) => a.data.order - b.data.order)
+const rendered = await Promise.all(entries.map(async (entry) => ({ entry, Content: (await render(entry)).Content })))
+---
+
+{
+    rendered.length > 0 && (
+        <section class='mx-auto max-w-5xl space-y-16 px-4 py-14'>
+            {rendered.map(({ entry, Content }, index) => (
+                <div class='grid items-center gap-8 md:grid-cols-2'>
+                    <img
+                        draggable='false'
+                        src={entry.data.image}
+                        alt={entry.data.image_alt}
+                        class={`w-full rounded-card object-cover ${index % 2 === 1 ? 'md:order-2' : ''}`}
+                        loading='lazy'
+                    />
+                    <div>
+                        <h3 class='font-display text-2xl font-semibold tracking-tight'>{entry.data.title}</h3>
+                        <div class='prose-content mt-3 text-text-muted'>
+                            <Content />
+                        </div>
+                        {entry.data.cta_href && (
+                            <a
+                                href={entry.data.cta_href}
+                                class='mt-4 inline-block rounded-card border border-text/15 px-5 py-2.5 font-medium transition-colors hover:bg-surface-alt'
+                            >
+                                {entry.data.cta_label ?? 'Learn more'}
+                            </a>
+                        )}
+                    </div>
+                </div>
+            ))}
+        </section>
+    )
+}

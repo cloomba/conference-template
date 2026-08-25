@@ -1,0 +1,23 @@
+---
+import { socialIconFor } from '@/lib/socials'
+
+interface Props {
+    href: string
+    // Icon-only round button (footer / person rows).
+    size?: 'sm' | 'md'
+}
+const { href, size = 'md' } = Astro.props
+const icon = socialIconFor(href)
+---
+
+<a
+    href={href}
+    rel='noopener'
+    aria-label={icon.title}
+    title={icon.title}
+    class={`inline-flex items-center justify-center rounded-card text-text-muted transition-colors hover:bg-surface-alt hover:text-text ${size === 'sm' ? 'size-8' : 'size-9'}`}
+>
+    <svg class={size === 'sm' ? 'size-4' : 'size-5'} viewBox='0 0 24 24' fill='currentColor'>
+        <path d={icon.path}></path>
+    </svg>
+</a>

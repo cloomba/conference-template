@@ -1,0 +1,43 @@
+---
+import { siGithub } from 'simple-icons'
+
+// The band above the footer: this site is itself the pitch. Organizers who
+// like what they see get the three doors — how it works, the code, the
+// platform. Config-gated (`cloomba_promo: false` hides it — nothing to
+// delete).
+---
+
+<aside class=''>
+    <div class='mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-4 py-6 bg-primary/10 rounded-xl'>
+        <p class='text-sm text-text-muted'>
+            <span class='font-medium text-text'>Organizing an event?</span><br/>
+            This whole site — agenda, speakers, tickets, registration — is an open-source template running on
+            Cloomba.<br/>
+            Yours could look like this by the weekend.
+        </p>
+        <div class='flex flex-wrap gap-2'>
+            <a
+                href='/cloomba-for-conferences'
+                class='rounded-card bg-primary px-4 py-2 text-sm font-medium text-primary-content transition-opacity hover:opacity-90'
+            >
+                How it works
+            </a>
+            <a
+                href='https://github.com/cloomba/conference-template'
+                rel='noopener'
+                class='inline-flex items-center gap-2 rounded-card border border-text/15 px-4 py-2 text-sm font-medium transition-colors hover:bg-surface-alt'
+            >
+                <svg class='size-4' viewBox='0 0 24 24' fill='currentColor'><path d={siGithub.path}></path></svg>
+                GitHub
+            </a>
+            <a
+                href='https://cloomba.com'
+                rel='noopener'
+                class='inline-flex items-center gap-2 rounded-card border border-text/15 px-4 py-2 text-sm font-medium transition-colors hover:bg-surface-alt'
+            >
+                <img draggable='false' src='/cloomba-mark.svg' alt='' class='size-4' />
+                cloomba.com
+            </a>
+        </div>
+    </div>
+</aside>

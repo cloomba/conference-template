@@ -1,0 +1,42 @@
+---
+import SectionHeading from '@/components/ui/SectionHeading.astro'
+import SocialLink from '@/components/ui/SocialLink.astro'
+import { loadFeatured } from '@/lib/data'
+
+// The organizing team — featured entries with kind 'host'.
+const hosts = (await loadFeatured()).items.filter((f) => f.kind === 'host')
+---
+
+{
+    hosts.length > 0 && (
+        <section class='mx-auto max-w-5xl px-4 py-14'>
+            <SectionHeading title='The team' />
+            <ul class='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'>
+                {hosts.map((host) => (
+                    <li class='rounded-card border border-text/10 p-6'>
+                        <div class='flex items-center gap-4'>
+                            {host.image_url ? (
+                                <img
+                                    draggable='false'
+                                    src={host.image_url}
+                                    alt={host.name ?? ''}
+                                    class='size-14 rounded-full object-cover'
+                                />
+                            ) : (
+                                <div class='flex size-14 items-center justify-center rounded-full bg-surface-alt font-display text-xl text-text-muted'>
+                                    {(host.name ?? '?').slice(0, 1)}
+                                </div>
+                            )}
+                            <div class='min-w-0 flex-1'>
+                                <h3 class='font-medium'>{host.name}</h3>
+                                {host.headline && <p class='text-sm text-text-muted'>{host.headline}</p>}
+                            </div>
+                            {host.link && <SocialLink href={host.link} size='sm' />}
+                        </div>
+                        {host.bio && <p class='mt-4 text-sm text-text-muted'>{host.bio}</p>}
+                    </li>
+                ))}
+            </ul>
+        </section>
+    )
+}

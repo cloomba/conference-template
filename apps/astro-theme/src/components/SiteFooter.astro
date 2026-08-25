@@ -1,0 +1,57 @@
+---
+import SocialLink from '@/components/ui/SocialLink.astro'
+import { config } from '@/lib/config'
+import { footerColumns } from '@/lib/nav'
+
+const columns = await footerColumns()
+const year = new Date().getFullYear()
+---
+
+<footer class='mt-20 bg-surface-alt'>
+    <div class='mx-auto max-w-5xl px-4 py-12'>
+        <div class='grid gap-10 sm:grid-cols-[1.2fr_repeat(var(--cols),1fr)]' style={`--cols: ${columns.length}`}>
+            <div>
+                <a href='/' class='flex items-center gap-2.5 font-display text-lg font-semibold tracking-tight'>
+                    {config.site.logo && <img draggable='false' src={config.site.logo} alt='' class='h-7 w-auto' />}
+                    {config.site.name}
+                </a>
+                {config.site.description && <p class='mt-3 text-sm text-text-muted'>{config.site.description}</p>}
+                {
+                    config.socials.length > 0 && (
+                        <div class='mt-4 flex gap-1'>
+                            {config.socials.map((href) => (
+                                <SocialLink href={href} size='sm' />
+                            ))}
+                        </div>
+                    )
+                }
+            </div>
+            {
+                columns.map((column) => (
+                    <nav>
+                        <h3 class='text-sm font-semibold'>{column.title}</h3>
+                        <ul class='mt-3 space-y-2 text-sm'>
+                            {column.links.map((link) => (
+                                <li>
+                                    <a href={link.href} class='text-text-muted hover:text-text'>
+                                        {link.label}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </nav>
+                ))
+            }
+        </div>
+        <div
+            class='mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-text/10 pt-6 text-sm text-text-muted'
+        >
+            <p>
+                {/* Explicit {' '} — a bare newline between expressions collapses to nothing. */}
+                © {year}{' '}{config.site.name}
+                {config.footer.text && <span> · {config.footer.text}</span>}
+            </p>
+            <a href='https://cloomba.com' class='hover:text-text' rel='noopener'>Powered by Cloomba</a>
+        </div>
+    </div>
+</footer>

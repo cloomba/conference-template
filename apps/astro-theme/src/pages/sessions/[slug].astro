@@ -1,0 +1,78 @@
+---
+import { formatDayHeading, formatTimeRange } from '@cloomba/core'
+
+import PageHeader from '@/components/PageHeader.astro'
+import Base from '@/layouts/Base.astro'
+import { config } from '@/lib/config'
+import { loadEvent, loadSessions } from '@/lib/data'
+import { renderMarkdown } from '@/lib/markdown'
+import { detailSlug, speakerPath } from '@/lib/slugs'
+
+export async function getStaticPaths() {
+    const sessions = await loadSessions()
+    return sessions.map((session) => ({
+        params: { slug: detailSlug(session.title, session.hash) },
+        props: { session },
+    }))
+}
+
+const { session } = Astro.props
+const event = await loadEvent()
+const locale = config.site.language
+
+// Sub-Event structured data: the talk, nested under the conference.
+const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Event',
+    name: session.title,
+    startDate: session.starts_at.toISOString(),
+    endDate: session.ends_at.toISOString(),
+    ...(session.location ? { location: { '@type': 'Place', name: session.location } } : {}),
+    performer: session.speakers.filter((s) => s.name).map((s) => ({ '@type': 'Person', name: s.name })),
+    superEvent: { '@type': 'Event', name: event.title, startDate: event.starts_at },
+}
+---
+
+<Base title={session.title}>
+    <script type='application/ld+json' set:html={JSON.stringify(jsonLd)} is:inline />
+    <PageHeader title={session.title} back={{ href: '/agenda', label: 'Agenda' }}>
+        <p class='mt-2 text-text-muted'>
+            {formatDayHeading(session.starts_at, event.timezone, locale)} ·{' '}
+            {formatTimeRange(session.starts_at, session.ends_at, event.timezone, locale)}
+            {session.location && ` · ${session.location}`}
+        </p>
+    </PageHeader>
+    <article class='mx-auto max-w-5xl px-4 py-8'>
+        {
+            session.speakers.length > 0 && (
+                <ul class='flex flex-wrap gap-3'>
+                    {session.speakers.map((speaker) => (
+                        <li>
+                            <a
+                                href={speakerPath(speaker)}
+                                class='flex items-center gap-2 rounded-card border border-text/10 py-1.5 pl-1.5 pr-3 text-sm hover:bg-surface-alt'
+                            >
+                                {speaker.image_url && (
+                                    <img
+                                        draggable='false'
+                                        src={speaker.image_url}
+                                        alt=''
+                                        class='size-7 rounded-full object-cover'
+                                    />
+                                )}
+                                <span class='font-medium'>{speaker.name}</span>
+                                {speaker.headline && <span class='text-text-muted'>{speaker.headline}</span>}
+                            </a>
+                        </li>
+                    ))}
+                </ul>
+            )
+        }
+
+        {
+            session.description && (
+                <div class='prose-content mt-8 max-w-3xl' set:html={renderMarkdown(session.description)} />
+            )
+        }
+    </article>
+</Base>

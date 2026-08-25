@@ -1,0 +1,132 @@
+@import 'tailwindcss';
+
+/* The display font's @font-face lives in Base.astro (inline in <head> with a
+   preload and font-display: optional) — NOT imported here — so it beats first
+   paint even in dev mode and can never swap mid-view. */
+
+/* Map Tailwind's theme onto the RUNTIME tokens that @cloomba/core's
+   themeCss() defines on :root (--t-*). `inline` makes utilities reference the
+   var directly (bg-primary → background-color: var(--t-primary)), so light /
+   dark / visitor-toggle all work by swapping token VALUES — components never
+   use dark: variants. This is the whole theming contract; see AGENTS.md. */
+@theme inline {
+    --color-primary: var(--t-primary);
+    --color-primary-content: var(--t-primary-content);
+    --color-accent: var(--t-accent);
+    --color-surface: var(--t-surface);
+    --color-surface-alt: var(--t-surface-alt);
+    --color-text: var(--t-text);
+    --color-text-muted: var(--t-text-muted);
+    --font-display: var(--t-font-display);
+    --font-body: var(--t-font-body);
+    --radius-card: var(--t-radius);
+}
+
+/* Reserve the scrollbar gutter so short pages don't shift the layout
+   horizontally against long ones. */
+html {
+    scrollbar-gutter: stable;
+    scroll-behavior: smooth;
+}
+
+/* Anchor targets (#register, agenda day anchors, …) scroll to sit below the
+   sticky header with breathing room, not underneath it. */
+[id] {
+    scroll-margin-top: 5.5rem;
+}
+
+body {
+    background-color: var(--t-surface);
+    color: var(--t-text);
+    font-family: var(--t-font-body);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Keyboard focus: a visible ring on every interactive element, only for
+   keyboard navigation (:focus-visible), in the brand color. */
+:focus-visible {
+    outline: 2px solid var(--t-primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Skip link — visually hidden until focused. */
+.skip-link {
+    position: absolute;
+    left: 1rem;
+    top: -3rem;
+    z-index: 100;
+    padding: 0.5rem 1rem;
+    border-radius: var(--t-radius);
+    background: var(--t-primary);
+    color: var(--t-primary-content);
+    transition: top 0.15s;
+}
+.skip-link:focus {
+    top: 1rem;
+}
+
+/* Markdown-rendered content (event description, custom pages, FAQ answers). */
+.prose-content {
+    line-height: 1.7;
+}
+.prose-content h2 {
+    font-family: var(--t-font-display);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 2rem 0 0.75rem;
+}
+.prose-content h3 {
+    font-size: 1.17rem;
+    font-weight: 600;
+    margin: 1.5rem 0 0.5rem;
+}
+.prose-content p {
+    margin: 0.75rem 0;
+}
+.prose-content a {
+    color: var(--t-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+.prose-content ul,
+.prose-content ol {
+    margin: 0.75rem 0;
+    padding-left: 1.5rem;
+}
+.prose-content ul {
+    list-style: disc;
+}
+.prose-content ol {
+    list-style: decimal;
+}
+.prose-content li {
+    margin: 0.25rem 0;
+}
+.prose-content blockquote {
+    border-left: 3px solid var(--t-primary);
+    padding-left: 1rem;
+    color: var(--t-text-muted);
+    margin: 1rem 0;
+}
+.prose-content code {
+    background: var(--t-surface-alt);
+    border-radius: 0.25rem;
+    padding: 0.125rem 0.375rem;
+    font-size: 0.9em;
+}
+.prose-content pre {
+    background: var(--t-surface-alt);
+    border-radius: var(--t-radius);
+    padding: 1rem;
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+.prose-content pre code {
+    background: none;
+    padding: 0;
+}
+.prose-content img {
+    max-width: 100%;
+    border-radius: var(--t-radius);
+}

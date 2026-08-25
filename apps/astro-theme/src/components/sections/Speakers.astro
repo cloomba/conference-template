@@ -1,0 +1,43 @@
+---
+import SectionHeading from '@/components/ui/SectionHeading.astro'
+import { loadSpeakers } from '@/lib/data'
+import { speakerPath } from '@/lib/slugs'
+
+const speakers = await loadSpeakers()
+const preview = speakers.slice(0, 12)
+---
+
+{
+    preview.length > 0 && (
+        <section class='mx-auto max-w-5xl px-4 py-14'>
+            <SectionHeading
+                title='Speakers'
+                href={speakers.length > preview.length ? '/speakers' : undefined}
+                linkLabel={`All ${speakers.length}`}
+            />
+            <ul class='grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4'>
+                {preview.map((speaker) => (
+                    <li>
+                        <a href={speakerPath(speaker)} class='group block'>
+                            {speaker.image_url ? (
+                                <img
+                                    draggable='false'
+                                    src={speaker.image_url}
+                                    alt={speaker.name ?? ''}
+                                    class='mb-3 aspect-square w-full rounded-card object-cover'
+                                    loading='lazy'
+                                />
+                            ) : (
+                                <div class='mb-3 flex aspect-square w-full items-center justify-center rounded-card bg-surface-alt font-display text-3xl text-text-muted'>
+                                    {(speaker.name ?? '?').slice(0, 1)}
+                                </div>
+                            )}
+                            <h3 class='font-medium group-hover:text-primary'>{speaker.name}</h3>
+                            {speaker.headline && <p class='mt-0.5 text-sm text-text-muted'>{speaker.headline}</p>}
+                        </a>
+                    </li>
+                ))}
+            </ul>
+        </section>
+    )
+}

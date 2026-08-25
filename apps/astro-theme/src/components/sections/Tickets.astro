@@ -1,0 +1,104 @@
+---
+import { formatMoney } from '@cloomba/core'
+
+import SectionHeading from '@/components/ui/SectionHeading.astro'
+import { config } from '@/lib/config'
+import { loadTicketTypes } from '@/lib/data'
+import { browserBaseUrl } from '@/lib/env'
+
+interface Props {
+    // The dedicated /tickets page provides its own PageHeader title.
+    plain?: boolean
+}
+const { plain = false } = Astro.props
+
+const { items } = await loadTicketTypes()
+const tiers = items.filter((t) => t.visibility === 'public')
+const locale = config.site.language
+
+// "Only N left" once a capped tier runs low.
+const FEW_LEFT = 10
+
+const browserBase = browserBaseUrl
+const slug = config.event.slug
+
+// Exactly four tiers read best as 2×2 — three-up leaves an orphan row.
+const gridCols = tiers.length === 4 ? 'sm:grid-cols-2' : 'sm:grid-cols-2 lg:grid-cols-3'
+---
+
+{
+    tiers.length > 0 && (
+        <section class={`mx-auto max-w-5xl px-4 ${plain ? 'py-8' : 'py-14'}`}>
+            {!plain && <SectionHeading title='Tickets' />}
+            <ul class={`grid gap-6 ${gridCols}`}>
+                {tiers.map((tier) => (
+                    <li class='flex flex-col rounded-card border border-text/10 p-6' data-tier={tier.hash}>
+                        <h3 class='font-medium'>{tier.name}</h3>
+                        <p class='mt-2 font-display text-3xl font-semibold'>
+                            {tier.price_cents === 0 ? 'Free' : formatMoney(tier.price_cents, tier.currency, locale)}
+                        </p>
+                        {tier.description && <p class='mt-3 text-sm text-text-muted'>{tier.description}</p>}
+                        <div class='mt-auto pt-6'>
+                            <span
+                                data-role='soldout'
+                                class='inline-block rounded-card bg-surface-alt px-4 py-2 text-sm text-text-muted'
+                                hidden={!tier.sold_out}
+                            >
+                                Sold out
+                            </span>
+                            <a
+                                data-role='register'
+                                href='/tickets#register'
+                                class='inline-block rounded-card bg-primary px-5 py-2.5 font-medium text-primary-content transition-opacity hover:opacity-90'
+                                hidden={tier.sold_out}
+                            >
+                                Register
+                            </a>
+                            <p
+                                data-role='spots'
+                                class='mt-2 text-xs text-text-muted'
+                                hidden={tier.sold_out || tier.spots_left === null || tier.spots_left > FEW_LEFT}
+                            >
+                                Only <span data-role='spots-count'>{tier.spots_left}</span> left
+                            </p>
+                        </div>
+                    </li>
+                ))}
+            </ul>
+        </section>
+    )
+}
+
+{
+    /* Live availability: refresh sold-out / few-left from the anonymous
+    CORS-open endpoint, so a tier selling out between rebuilds shows
+    truthfully. A badge swap doesn't warrant a React island — this is the
+    ThemeToggle pattern: a few lines of vanilla DOM. Top-level because
+    prettier-plugin-astro can't parse <script> inside an expression block;
+    it no-ops when no tier cards rendered. */
+}
+<script is:inline define:vars={{ browserBase, slug, FEW_LEFT }}>
+    if (document.querySelector('[data-tier]')) {
+        fetch(`${browserBase}/events/${encodeURIComponent(slug)}/ticket-types`)
+            .then((response) => (response.ok ? response.json() : null))
+            .then((body) => {
+                const items = (body && body.items) || []
+                for (const tier of items) {
+                    const card = document.querySelector(`[data-tier="${tier.hash}"]`)
+                    if (!card) continue
+                    const soldout = card.querySelector('[data-role="soldout"]')
+                    const register = card.querySelector('[data-role="register"]')
+                    const spots = card.querySelector('[data-role="spots"]')
+                    const count = card.querySelector('[data-role="spots-count"]')
+                    if (soldout) soldout.hidden = !tier.sold_out
+                    if (register) register.hidden = Boolean(tier.sold_out)
+                    if (spots) {
+                        const few = !tier.sold_out && tier.spots_left !== null && tier.spots_left <= FEW_LEFT
+                        spots.hidden = !few
+                        if (few && count) count.textContent = String(tier.spots_left)
+                    }
+                }
+            })
+            .catch(() => {})
+    }
+</script>

@@ -1,0 +1,27 @@
+---
+import { getCollection, render } from 'astro:content'
+
+import PageHeader from '@/components/PageHeader.astro'
+import Base from '@/layouts/Base.astro'
+
+// Custom pages: every markdown file in src/content/pages becomes a root-level
+// route (travel.md → /travel). Astro gives file-defined routes priority over
+// this dynamic one, so reserved paths can't be shadowed.
+
+export async function getStaticPaths() {
+    const pages = await getCollection('pages')
+    return pages.map((page) => ({ params: { slug: page.id }, props: { page } }))
+}
+
+const { page } = Astro.props
+const { Content } = await render(page)
+---
+
+<Base title={page.data.title} description={page.data.description}>
+    <PageHeader title={page.data.title} />
+    <article class='mx-auto max-w-5xl px-4 py-8'>
+        <div class='prose-content max-w-3xl'>
+            <Content />
+        </div>
+    </article>
+</Base>

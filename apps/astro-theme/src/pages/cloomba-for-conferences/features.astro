@@ -1,0 +1,113 @@
+---
+import PageHeader from '@/components/PageHeader.astro'
+import Base from '@/layouts/Base.astro'
+
+// Benefit-led feature overview — every claim on this page is demonstrated by
+// the site around it. Copy rule: present tense, no roadmap language.
+const GROUPS = [
+    {
+        title: 'The website',
+        intro: 'Everything a conference site needs, already built — you saw it on the way here.',
+        items: [
+            [
+                'Multi-day, multi-stage agenda',
+                'A time grid where parallel talks line up by the clock, breaks span every stage, and a filter narrows to one stage — without a line of JavaScript.',
+            ],
+            [
+                'Speaker & session pages',
+                'Every speaker and every talk gets its own page with readable URLs — shareable, searchable, linkable from your announcements.',
+            ],
+            ['Sponsors by tier', 'Platinum to community, ordered and grouped automatically from your event data.'],
+            [
+                'Custom pages in markdown',
+                'Travel, visa letters, code of conduct — drop a file in a folder, get a page in the navigation.',
+            ],
+            [
+                'Light and dark, your colors',
+                'Two palettes from a handful of color tokens; visitors get their preferred mode with a toggle that remembers.',
+            ],
+            [
+                'Fast by construction',
+                'Static HTML on a CDN — no server to slow down or fall over during the registration rush.',
+            ],
+        ],
+    },
+    {
+        title: 'The platform underneath',
+        intro: 'Cloomba runs the parts you never want to build: money, identity, the door.',
+        items: [
+            [
+                'Registration & paid tickets',
+                'Tiers, early-bird windows, hidden tiers behind access codes, coupons — sold through the embedded widget, so your site never touches a card number.',
+            ],
+            [
+                'QR tickets & wallet passes',
+                'Every attendee gets a QR ticket and an Apple/Google wallet pass the moment they register.',
+            ],
+            [
+                'Check-in at the door',
+                'Your team scans tickets with the Cloomba app — live counts, no spreadsheets, works on a phone.',
+            ],
+            [
+                'Registration questions',
+                'Text, options, checkboxes, terms consent, company, role — collected at registration, exported when you need them.',
+            ],
+            ['EU-hosted data', 'Attendee data lives on Cloomba’s EU infrastructure; the static site holds none of it.'],
+        ],
+    },
+    {
+        title: 'Found and shared',
+        intro: 'The site works as hard on search and social as it does on screen.',
+        items: [
+            [
+                'Event rich results',
+                'schema.org Event markup with dates, venue, and ticket offers — the format Google builds event results from.',
+            ],
+            [
+                'Sitemap, canonical URLs, social cards',
+                'Generated at build; every shared link unfurls with an image and a real description.',
+            ],
+            [
+                'Live where it matters',
+                'Ticket availability and the "now / next" agenda strip refresh in the browser — the rest is instant static.',
+            ],
+        ],
+    },
+]
+---
+
+<Base
+    title='Features'
+    description='What the Cloomba conference template delivers: agenda, speakers, tickets, registration, SEO — demonstrated live on this site.'
+>
+    <PageHeader
+        title='Everything on this site, itemized'
+        subtitle='No feature on this page is a promise — each one is running around you right now.'
+        back={{ href: '/cloomba-for-conferences', label: 'Cloomba for conferences' }}
+    />
+    <article class='mx-auto max-w-5xl px-4 py-8'>
+        {
+            GROUPS.map((group) => (
+                <section class='mb-12'>
+                    <h2 class='font-display text-2xl font-semibold tracking-tight'>{group.title}</h2>
+                    <p class='mt-1 text-text-muted'>{group.intro}</p>
+                    <ul class='mt-6 grid gap-6 sm:grid-cols-2'>
+                        {group.items.map(([title, body]) => (
+                            <li class='rounded-card border border-text/10 p-5'>
+                                <h3 class='font-medium'>{title}</h3>
+                                <p class='mt-1.5 text-sm text-text-muted'>{body}</p>
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+            ))
+        }
+        <p class='text-sm text-text-muted'>
+            Ready to try it? Start with{' '}
+            <a href='/cloomba-for-conferences' class='text-primary hover:underline'>your options</a> or go straight to{
+                ' '
+            }
+            <a href='/cloomba-for-conferences/deployment' class='text-primary hover:underline'>deployment</a>.
+        </p>
+    </article>
+</Base>

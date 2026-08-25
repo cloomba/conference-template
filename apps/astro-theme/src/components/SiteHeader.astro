@@ -1,0 +1,59 @@
+---
+import ThemeToggle from '@/components/ThemeToggle.astro'
+import { config } from '@/lib/config'
+import { headerLinks } from '@/lib/nav'
+
+const links = await headerLinks()
+---
+
+<header class='sticky top-0 z-40 bg-surface/90 backdrop-blur'>
+    <div class='mx-auto flex h-14 max-w-5xl items-center gap-6 px-4'>
+        <a href='/' class='flex items-center gap-2.5 font-display text-lg font-semibold tracking-tight'>
+            {config.site.logo && <img draggable='false' src={config.site.logo} alt='' class='h-7 w-auto' />}
+            {config.site.name}
+        </a>
+        {/* Right side as ONE wrapper so ml-auto works with the desktop nav hidden. */}
+        <div class='ml-auto flex items-center gap-2'>
+            <nav class='hidden items-center gap-5 text-sm sm:flex'>
+                {
+                    links.map((link) => (
+                        <a href={link.href} class='text-text-muted transition-colors hover:text-text'>
+                            {link.label}
+                        </a>
+                    ))
+                }
+            </nav>
+            {config.theme.mode === 'auto' && <ThemeToggle />}
+            {
+                /* Native popover: light-dismiss (outside click / Esc) with zero
+                JS. Fixed position works because the header is sticky. */
+            }
+            <button
+                type='button'
+                popovertarget='mobile-menu'
+                class='flex size-9 cursor-pointer items-center justify-center rounded-card hover:bg-surface-alt sm:hidden'
+                aria-label='Menu'
+            >
+                <svg class='size-5' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'>
+                    <path stroke-linecap='round' d='M4 7h16M4 12h16M4 17h16'></path>
+                </svg>
+            </button>
+            <nav
+                id='mobile-menu'
+                popover
+                class='fixed inset-auto right-4 top-14 m-0 w-48 rounded-card border border-text/10 bg-surface py-2 shadow-lg'
+            >
+                {
+                    links.map((link) => (
+                        <a
+                            href={link.href}
+                            class='block px-4 py-2 text-sm text-text-muted hover:bg-surface-alt hover:text-text'
+                        >
+                            {link.label}
+                        </a>
+                    ))
+                }
+            </nav>
+        </div>
+    </div>
+</header>

@@ -1,0 +1,30 @@
+---
+import { getCollection } from 'astro:content'
+
+import SectionHeading from '@/components/ui/SectionHeading.astro'
+import { config } from '@/lib/config'
+
+const posts = (await getCollection('news')).sort((a, b) => b.data.date.getTime() - a.data.date.getTime()).slice(0, 3)
+const dateFormat = new Intl.DateTimeFormat(config.site.language, { dateStyle: 'long' })
+---
+
+{
+    posts.length > 0 && (
+        <section class='mx-auto max-w-5xl px-4 py-14'>
+            <SectionHeading title='News' href='/news' linkLabel='All news' />
+            <ul class='grid gap-6 sm:grid-cols-3'>
+                {posts.map((post) => (
+                    <li>
+                        <a href={`/news/${post.id}`} class='group block rounded-card border border-text/10 p-5'>
+                            <time class='text-sm text-text-muted'>{dateFormat.format(post.data.date)}</time>
+                            <h3 class='mt-2 font-medium group-hover:text-primary'>{post.data.title}</h3>
+                            {post.data.description && (
+                                <p class='mt-2 text-sm text-text-muted'>{post.data.description}</p>
+                            )}
+                        </a>
+                    </li>
+                ))}
+            </ul>
+        </section>
+    )
+}

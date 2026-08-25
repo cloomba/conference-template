@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+    <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#173a24"/>
+            <stop offset="0.55" stop-color="#2c5a3a"/>
+            <stop offset="1" stop-color="#6f9a6d"/>
+        </linearGradient>
+        <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#9fc3a8"/>
+            <stop offset="1" stop-color="#5d8a68"/>
+        </linearGradient>
+    </defs>
+    <rect width="1600" height="900" fill="url(#sky)"/>
+    <circle cx="1180" cy="240" r="110" fill="#f4c95d" opacity="0.9"/>
+    <circle cx="1180" cy="240" r="150" fill="#f4c95d" opacity="0.15"/>
+
+    <!-- distant hills -->
+    <ellipse cx="300" cy="560" rx="700" ry="180" fill="#1d4029" opacity="0.8"/>
+    <ellipse cx="1350" cy="590" rx="750" ry="190" fill="#234a30" opacity="0.8"/>
+
+    <!-- trees -->
+    <g fill="#12301c">
+        <rect x="185" y="360" width="14" height="120" rx="6"/>
+        <ellipse cx="192" cy="340" rx="90" ry="34"/>
+        <rect x="1435" y="390" width="12" height="100" rx="6"/>
+        <ellipse cx="1441" cy="374" rx="74" ry="28"/>
+    </g>
+
+    <!-- watering hole -->
+    <ellipse cx="800" cy="760" rx="640" ry="130" fill="url(#water)"/>
+    <ellipse cx="800" cy="760" rx="640" ry="130" fill="#ffffff" opacity="0.05"/>
+    <ellipse cx="1130" cy="735" rx="140" ry="16" fill="#ffffff" opacity="0.18"/>
+    <ellipse cx="520" cy="780" rx="180" ry="18" fill="#ffffff" opacity="0.12"/>
+
+    <!-- elephant silhouette -->
+    <g fill="#0e2416">
+        <path d="M330 700 q-10 -90 60 -110 q20 -60 90 -58 q70 2 84 56 q10 40 -6 66 l4 46 h-28 l-6 -38 q-30 12 -62 6 l-4 32 h-28 l-2 -36 q-20 -6 -30 -20 q-4 34 -14 56 h-26 q6 -28 4 -60 q-22 24 -36 60 Z"/>
+        <path d="M300 690 q-24 10 -22 44 q0 10 12 10 q10 0 10 -10 q-2 -22 12 -32 Z"/>
+    </g>
+
+    <!-- giraffe silhouette -->
+    <g fill="#0e2416">
+        <path d="M1210 720 l6 -150 q2 -34 26 -40 l6 -70 q2 -14 12 -14 q10 0 12 14 l4 44 q22 4 24 30 l2 36 q30 10 34 60 l6 90 h-24 l-8 -84 q-8 -28 -34 -30 l-6 114 Z"/>
+        <ellipse cx="1258" cy="446" rx="16" ry="10"/>
+    </g>
+
+    <!-- birds -->
+    <g stroke="#0e2416" stroke-width="5" fill="none" stroke-linecap="round">
+        <path d="M560 240 q18 -16 36 0 M596 240 q18 -16 36 0"/>
+        <path d="M700 200 q14 -12 28 0 M728 200 q14 -12 28 0"/>
+        <path d="M880 260 q12 -10 24 0 M904 260 q12 -10 24 0"/>
+    </g>
+</svg>

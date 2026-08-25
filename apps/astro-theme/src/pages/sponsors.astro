@@ -1,0 +1,27 @@
+---
+import CallBanner from '@/components/CallBanner.astro'
+import PageHeader from '@/components/PageHeader.astro'
+import Sponsors from '@/components/sections/Sponsors.astro'
+import Base from '@/layouts/Base.astro'
+import { config } from '@/lib/config'
+import { callsOpen } from '@/lib/data'
+
+const sponsorCallOpen = await callsOpen()
+---
+
+<Base title='Sponsors' description={`Sponsors of ${config.site.name}.`}>
+    <PageHeader title='Sponsors' />
+    <Sponsors plain />
+    {
+        sponsorCallOpen && (
+            <div class='mx-auto max-w-5xl px-4 pb-8'>
+                <CallBanner
+                    title='Your logo belongs up there'
+                    body='Sponsorship tiers for every size of den — and every tier helps keep the Community Pass free.'
+                    href='/become-a-sponsor'
+                    label='Become a sponsor'
+                />
+            </div>
+        )
+    }
+</Base>

@@ -1,0 +1,80 @@
+---
+import PageHeader from '@/components/PageHeader.astro'
+import Base from '@/layouts/Base.astro'
+---
+
+<Base title='Customization' description='Content, colors, imagery — how to make the template yours.'>
+    <PageHeader
+        title='Customizing your site'
+        subtitle='Content is markdown, look is tokens, data comes from your event.'
+        back={{ href: '/cloomba-for-conferences', label: 'Cloomba for conferences' }}
+    />
+    <article class='mx-auto max-w-5xl px-4 py-8'>
+        <div class='prose-content max-w-3xl'>
+            <h2>Content — markdown files, no code</h2>
+            <p>Everything editorial lives in <code>src/content/</code>:</p>
+            <ul>
+                <li>
+                    <strong>pages/</strong> — each file becomes a page at its own URL (<code>travel.md</code> → <code
+                        >/travel</code
+                    >). Frontmatter <code>nav: header</code> or <code>nav: footer</code> adds it to the navigation.
+                </li>
+                <li><strong>faq/</strong> — one question per file; the body is the answer.</li>
+                <li><strong>news/</strong> — dated posts, listed newest first at <code>/news</code>.</li>
+                <li><strong>features/</strong> — the three-up cards on the home page.</li>
+                <li>
+                    <strong>highlights/</strong> — the alternating image/text splits, each with an optional CTA button.
+                </li>
+            </ul>
+
+            <h2>Event data — edited on Cloomba, not in the repo</h2>
+            <p>
+                Agenda, speakers and their photos, sponsors and their logos, ticket tiers, coupons, the cover image, and
+                the organizing team all come from your Cloomba event. Edit them in the event admin, rebuild, done — the
+                site picks up everything, including speaker portraits replacing the initial-letter placeholders
+                automatically.
+            </p>
+
+            <h2>Look — tokens in the config</h2>
+            <p>
+                Colors, fonts, and corner radius are <a href='/cloomba-for-conferences/configuration'>config values</a>,
+                with separate light and dark palettes. Components only ever use semantic tokens, so a palette change
+                restyles the whole site consistently — there is no per-component color to chase.
+            </p>
+
+            <h2>Images inside markdown pages</h2>
+            <p>
+                Drop the image next to the markdown file and reference it relatively —
+                <code>![The venue](./venue.jpg)</code>. The build optimizes it automatically: converted to WebP,
+                content-hashed for caching, and emitted with its real dimensions so the page never shifts while loading.
+                Images from <code>public/</code> (<code>![Map](/images/map.png)</code>) and remote URLs also work,
+                served exactly as-is — use the relative form when you can.
+            </p>
+
+            <h2>Images shipped with the site</h2>
+            <ul>
+                <li>
+                    <code>public/logo.svg</code> — the header/footer mark; <code>public/favicon.svg</code> — the browser tab.
+                </li>
+                <li>
+                    <code>public/placeholders/</code> — the hero scene and the split illustrations; replace them with your
+                    own photos or art (any format, same paths — or new paths referenced from the highlight files).
+                </li>
+            </ul>
+
+            <h2>Going further</h2>
+            <p>
+                It's your repository — every section is a small component under
+                <code>src/components/sections/</code>, and the home page is a list mapping config names to them. Add a
+                section type by writing a component and one map entry. The repo's <code>AGENTS.md</code>
+                carries the few layout rules that keep everything aligned (one page width, semantic tokens only) — they apply
+                to humans and AI assistants alike.
+            </p>
+
+            <p>
+                Next: <a href='/cloomba-for-conferences/configuration'>configuration</a> ·{' '}
+                <a href='/cloomba-for-conferences/deployment'>deployment</a>
+            </p>
+        </div>
+    </article>
+</Base>

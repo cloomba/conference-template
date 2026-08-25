@@ -1,0 +1,86 @@
+---
+import PageHeader from '@/components/PageHeader.astro'
+import Base from '@/layouts/Base.astro'
+---
+
+<Base title='Configuration' description='Every option in site.config.ts, explained.'>
+    <PageHeader
+        title='Configuring your site'
+        subtitle='One file drives everything: site.config.ts.'
+        back={{ href: '/cloomba-for-conferences', label: 'Cloomba for conferences' }}
+    />
+    <article class='mx-auto max-w-5xl px-4 py-8'>
+        <div class='prose-content max-w-3xl'>
+            <p>
+                The template is configured by a single typed file, <code>site.config.ts</code>. It ships as a complete
+                reference — every option is present, the unused ones commented out with their defaults — so configuring
+                is mostly uncommenting. A typo or wrong value fails the build with a readable message before anything
+                deploys.
+            </p>
+
+            <h2>The blocks</h2>
+            <ul>
+                <li>
+                    <strong>site</strong> — name, logo, absolute URL (canonical tags + sitemap), description, language, and
+                    <code>noindex</code> for staging deploys.
+                </li>
+                <li>
+                    <strong>event</strong> — the Cloomba event slug this site renders. One event per site; a satellite event
+                    is a second deployment.
+                </li>
+                <li>
+                    <strong>theme</strong> — <code>mode</code> (<code>auto</code> follows the visitor's system with a toggle;
+                    <code>light</code>/<code>dark</code> pin one), font stacks, corner radius, and the color tokens per mode:
+                    <code>primary</code>, <code>primary_content</code>, <code>accent</code>, <code>surface</code>, <code
+                        >surface_alt</code
+                    >, <code>text</code>, <code>text_muted</code>. Set any subset — the rest keep sensible defaults.
+                </li>
+                <li>
+                    <strong>sections</strong> — the home page as a list: order is display order, removing a line removes the
+                    section. Fourteen block types, from <code>hero</code> and <code>stats</code> to <code>faq</code> and the
+                    closing <code>cta</code>.
+                </li>
+                <li>
+                    <strong>header / footer</strong> — omit them and navigation derives itself from the enabled sections and
+                    your custom pages; set them to take full control. The footer also carries app links and privacy/terms
+                    URLs.
+                </li>
+                <li><strong>socials</strong> — profile URLs; icons are detected from the domain automatically.</li>
+                <li>
+                    <strong>analytics</strong> — a self-hosted Umami script (cookieless — no consent banner needed), plus
+                    <code>head_html</code> for anything else: Google Analytics, a Meta pixel, any snippet, injected verbatim
+                    into <code>&lt;head&gt;</code>. Cookie-based trackers make you responsible for a consent banner —
+                    the template ships none.
+                </li>
+                <li>
+                    <strong>cloomba_promo</strong> — the "built with Cloomba" band above the footer. Set <code
+                        >false</code
+                    > to hide it.
+                </li>
+            </ul>
+
+            <h2>Secrets live in .env, not in the config</h2>
+            <p>
+                The committed config holds production endpoints only. Your API key — and any local-development overrides
+                — go in <code>.env</code> (gitignored; see <code>.env.example</code>):
+            </p>
+            <ul>
+                <li>
+                    <code>CLOOMBA_API_KEY</code> — a free read-only key from <a
+                        href='https://cloomba.com/me/developers'
+                        rel='noopener'>cloomba.com/me/developers</a
+                    >. Build-time only; it never reaches the browser.
+                </li>
+                <li>
+                    <code>CLOOMBA_API_URL</code>, <code>CLOOMBA_BROWSER_API_URL</code>, <code>CLOOMBA_EMBED_ORIGIN</code
+                    > — optional overrides for developing against a non-production Cloomba.
+                </li>
+            </ul>
+
+            <p>
+                Next: <a href='/cloomba-for-conferences/customization'>customizing content and look</a> ·{' '}
+                <a href='/cloomba-for-conferences/deployment'>deploying</a>
+            </p>
+        </div>
+    </article>
+</Base>

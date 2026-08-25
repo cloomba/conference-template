@@ -1,0 +1,38 @@
+---
+import { groupByDay } from '@cloomba/core'
+
+import { loadEvent, loadSessions, loadSpeakers, loadSponsors } from '@/lib/data'
+
+// Quick numbers, straight from the event data at build time.
+const [event, sessions, speakers, sponsors] = await Promise.all([
+    loadEvent(),
+    loadSessions(),
+    loadSpeakers(),
+    loadSponsors(),
+])
+
+const days = groupByDay(sessions, event.timezone).length
+const talks = sessions.filter((s) => s.location !== null).length
+const guests = event.guest_counts.confirmed.guests
+
+const stats = [
+    { value: speakers.length, label: 'Speakers' },
+    { value: talks, label: 'Sessions' },
+    { value: sponsors.length, label: 'Sponsors' },
+    { value: days, label: days === 1 ? 'Day' : 'Days' },
+    ...(guests > 0 ? [{ value: guests, label: 'Registered' }] : []),
+]
+---
+
+<section class='mx-auto max-w-5xl px-4 py-10'>
+    <dl class='grid grid-cols-2 gap-6 rounded-card border border-text/10 p-8 text-center sm:grid-cols-4'>
+        {
+            stats.slice(0, 4).map((stat) => (
+                <div>
+                    <dd class='font-display text-4xl font-bold text-primary'>{stat.value}</dd>
+                    <dt class='mt-1 text-sm uppercase tracking-widest text-text-muted'>{stat.label}</dt>
+                </div>
+            ))
+        }
+    </dl>
+</section>

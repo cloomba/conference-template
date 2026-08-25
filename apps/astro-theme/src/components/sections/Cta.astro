@@ -1,0 +1,38 @@
+---
+import { formatDateSpan } from '@cloomba/core'
+
+import { config } from '@/lib/config'
+import { loadEvent } from '@/lib/data'
+
+const event = await loadEvent()
+const dates = formatDateSpan(
+    new Date(event.starts_at),
+    new Date(event.ends_at ?? event.starts_at),
+    event.timezone,
+    config.site.language
+)
+const place = [event.location.city, event.location.country].filter(Boolean).join(', ')
+---
+
+<section class='mx-auto max-w-5xl px-4 py-14'>
+    <div class='rounded-card bg-primary px-8 py-12 text-center text-primary-content'>
+        <h2 class='font-display text-3xl font-bold tracking-tight'>Be there when the whole kingdom gathers</h2>
+        <p class='mt-2 opacity-90'>
+            {event.title} · {dates}{place && ` · ${place}`}
+        </p>
+        <div class='mt-8 flex flex-wrap justify-center gap-3'>
+            <a
+                href='/tickets'
+                class='rounded-card bg-surface px-6 py-3 font-medium text-text transition-opacity hover:opacity-90'
+            >
+                Register
+            </a>
+            <a
+                href='/become-a-sponsor'
+                class='rounded-card border border-primary-content/40 px-6 py-3 font-medium transition-colors hover:bg-primary-content/10'
+            >
+                Become a sponsor
+            </a>
+        </div>
+    </div>
+</section>

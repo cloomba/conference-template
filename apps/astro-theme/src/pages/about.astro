@@ -1,0 +1,21 @@
+---
+import PageHeader from '@/components/PageHeader.astro'
+import Team from '@/components/sections/Team.astro'
+import Base from '@/layouts/Base.astro'
+import { config } from '@/lib/config'
+import { loadEvent } from '@/lib/data'
+import { renderMarkdown } from '@/lib/markdown'
+
+// The event's full description (markdown from Cloomba) — the home page shows
+// only its first paragraph as a teaser. The organizing team ALWAYS renders
+// here (no cutoff — unlike the call banners).
+const event = await loadEvent()
+---
+
+<Base title='About' description={config.site.description}>
+    <PageHeader title={`About ${config.site.name}`} />
+    <article class='mx-auto max-w-5xl px-4 py-8'>
+        {event.description && <div class='prose-content max-w-3xl' set:html={renderMarkdown(event.description)} />}
+    </article>
+    <Team />
+</Base>

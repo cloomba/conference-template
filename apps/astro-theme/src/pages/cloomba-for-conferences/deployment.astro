@@ -1,0 +1,63 @@
+---
+import PageHeader from '@/components/PageHeader.astro'
+import Base from '@/layouts/Base.astro'
+---
+
+<Base title='Deployment' description='Build the site and put it on any static host.'>
+    <PageHeader
+        title='Deploying your site'
+        subtitle='The build is plain static files — any host that serves HTML works.'
+        back={{ href: '/cloomba-for-conferences', label: 'Cloomba for conferences' }}
+    />
+    <article class='mx-auto max-w-5xl px-4 py-8'>
+        <div class='prose-content max-w-3xl'>
+            <h2>Build</h2>
+            <pre><code>yarn install
+cp .env.example .env   # add your CLOOMBA_API_KEY
+yarn build             # → apps/astro-theme/dist/</code></pre>
+            <p>
+                The build pulls your event's agenda, speakers, sponsors, and tickets from the Cloomba API and bakes them
+                into static pages. <code>dist/</code> is the whole site.
+            </p>
+
+            <h2>Hosting</h2>
+            <p>
+                <strong>Cloudflare Pages</strong> (what the demo runs on): connect the repository, set the build command to
+                <code>yarn build</code>, the output directory to <code>apps/astro-theme/dist</code>, and add <code
+                    >CLOOMBA_API_KEY</code
+                > as a build environment variable. Attach your custom domain in the Pages settings.
+            </p>
+            <p>
+                Netlify and Vercel work identically (same command, same output path, same env var). GitHub Pages works
+                with any static-deploy action. Or run <code>yarn build</code> locally and upload
+                <code>dist/</code> to any web server — nothing about the site needs a runtime.
+            </p>
+
+            <h2>Keeping it fresh</h2>
+            <ul>
+                <li>
+                    <strong>Live by itself:</strong> the agenda's Now/Next strip and ticket availability refresh in the visitor's
+                    browser — a tier selling out shows without any rebuild.
+                </li>
+                <li>
+                    <strong>Everything else</strong> (a new speaker, a session moved, edited copy) appears on the next build.
+                    Every host above has a deploy-hook URL — trigger it after editing your event, or put it on a schedule.
+                </li>
+            </ul>
+
+            <h2>After the first deploy</h2>
+            <ul>
+                <li>
+                    Set <code>site.url</code> in the config to your real domain — it drives canonical tags, the sitemap, and
+                    the iCal link.
+                </li>
+                <li>Submit <code>/sitemap-index.xml</code> in Google Search Console once.</li>
+            </ul>
+
+            <p>
+                Next: <a href='/cloomba-for-conferences/configuration'>configuration</a> ·{' '}
+                <a href='/cloomba-for-conferences/customization'>customization</a>
+            </p>
+        </div>
+    </article>
+</Base>

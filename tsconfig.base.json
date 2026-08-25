@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        // tsup's dts step injects `baseUrl` internally, which TypeScript 6
+        // hard-deprecates (TS5101). Silence until tsup stops doing that —
+        // nothing in THIS repo uses baseUrl.
+        "ignoreDeprecations": "6.0",
+        "target": "ES2022",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "skipLibCheck": true,
+        "isolatedModules": true,
+        "forceConsistentCasingInFileNames": true
+    }
+}

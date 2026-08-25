@@ -1,0 +1,59 @@
+---
+// Light/dark toggle for `mode: auto` sites. First click pins the opposite of
+// the effective theme; the choice persists in localStorage and the Base
+// layout's head script re-applies it before paint. Vanilla script — this is
+// far too small to be an island.
+---
+
+<button
+    id='theme-toggle'
+    type='button'
+    class='flex size-9 items-center justify-center rounded-card text-text-muted hover:bg-surface-alt hover:text-text'
+    aria-label='Toggle color theme'
+>
+    {/* Sun — shown while dark is effective (click → light). */}
+    <svg class='icon-sun size-5' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'>
+        <circle cx='12' cy='12' r='4'></circle>
+        <path
+            stroke-linecap='round'
+            d='M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4'></path>
+    </svg>
+    {/* Moon — shown while light is effective (click → dark). */}
+    <svg class='icon-moon size-5' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'>
+        <path stroke-linecap='round' stroke-linejoin='round' d='M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z'></path>
+    </svg>
+</button>
+
+<style is:global>
+    /* Effective-theme icon swap — mirrors themeCss()'s three-state logic:
+       explicit data-theme wins, otherwise prefers-color-scheme decides. */
+    #theme-toggle .icon-sun {
+        display: none;
+    }
+    [data-theme='dark'] #theme-toggle .icon-sun {
+        display: block;
+    }
+    [data-theme='dark'] #theme-toggle .icon-moon {
+        display: none;
+    }
+    @media (prefers-color-scheme: dark) {
+        :root:not([data-theme='light']) #theme-toggle .icon-sun {
+            display: block;
+        }
+        :root:not([data-theme='light']) #theme-toggle .icon-moon {
+            display: none;
+        }
+    }
+</style>
+
+<script is:inline>
+    document.getElementById('theme-toggle')?.addEventListener('click', () => {
+        const root = document.documentElement
+        const effective = root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        const next = effective === 'dark' ? 'light' : 'dark'
+        root.dataset.theme = next
+        try {
+            localStorage.setItem('theme', next)
+        } catch {}
+    })
+</script>

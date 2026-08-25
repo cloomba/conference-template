@@ -1,0 +1,52 @@
+---
+import CallBanner from '@/components/CallBanner.astro'
+import PageHeader from '@/components/PageHeader.astro'
+import Base from '@/layouts/Base.astro'
+import { config } from '@/lib/config'
+import { callsOpen, loadSpeakers } from '@/lib/data'
+import { speakerPath } from '@/lib/slugs'
+
+const speakers = await loadSpeakers()
+const cfpOpen = await callsOpen()
+---
+
+<Base title='Speakers' description={`Speakers at ${config.site.name}.`}>
+    <PageHeader title='Speakers' />
+    <div class='mx-auto max-w-5xl px-4 py-8'>
+        <ul class='grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4'>
+            {
+                speakers.map((speaker) => (
+                    <li>
+                        <a href={speakerPath(speaker)} class='group block'>
+                            {speaker.image_url ? (
+                                <img
+                                    draggable='false'
+                                    src={speaker.image_url}
+                                    alt={speaker.name ?? ''}
+                                    class='mb-3 aspect-square w-full rounded-card object-cover'
+                                    loading='lazy'
+                                />
+                            ) : (
+                                <div class='mb-3 flex aspect-square w-full items-center justify-center rounded-card bg-surface-alt font-display text-3xl text-text-muted'>
+                                    {(speaker.name ?? '?').slice(0, 1)}
+                                </div>
+                            )}
+                            <h2 class='font-medium group-hover:text-primary'>{speaker.name}</h2>
+                            {speaker.headline && <p class='mt-0.5 text-sm text-text-muted'>{speaker.headline}</p>}
+                        </a>
+                    </li>
+                ))
+            }
+        </ul>
+        {
+            cfpOpen && (
+                <CallBanner
+                    title='Your name belongs up here'
+                    body='The call for papers is open — every species, every experience level, mentors for first-timers.'
+                    href='/call-for-papers'
+                    label='Propose a talk'
+                />
+            )
+        }
+    </div>
+</Base>

@@ -1,0 +1,97 @@
+---
+import PageHeader from '@/components/PageHeader.astro'
+import Base from '@/layouts/Base.astro'
+
+// The template's own pitch page — linked from the promo band. Explains what
+// this site is and the ways an organizer can get one. Plain copy, no magic.
+---
+
+<Base
+    title='Conference website template — free and open source'
+    description='Build a conference website with agenda, speakers, sponsors, tickets, and registration — a free open-source template powered by Cloomba. Self-host it, or we host it for you.'
+>
+    <PageHeader
+        title='Run your conference on this'
+        subtitle='Everything you see here is an open-source template with Cloomba as the engine.'
+    />
+    <article class='mx-auto max-w-5xl px-4 py-8'>
+        <div class='prose-content max-w-3xl'>
+            <p>
+                This entire site — the agenda with its stage filter, the speaker pages, the ticket tiers, coupons, and
+                the registration flow — is a static website built from the open-source{' '}
+                <strong>Cloomba conference template</strong>. The content comes from a normal Cloomba event; the
+                template turns it into a fast site you can host anywhere, under your own domain and brand.
+            </p>
+            <p>
+                Registration, payments, and check-in run on <a href='https://cloomba.com' rel='noopener'>Cloomba</a>, an
+                EU-hosted event platform: attendees register in the embedded widget, get QR tickets and wallet passes,
+                and your team checks them in with the Cloomba app at the door. Your site never touches payments or
+                personal data.
+            </p>
+
+            <h2>Your options</h2>
+            <p><strong>1. Self-host this template — free.</strong></p>
+            <ul>
+                <li>
+                    Create your event on <a href='https://cloomba.com' rel='noopener'>cloomba.com</a> — agenda, speakers,
+                    sponsors, ticket tiers, coupons, registration questions.
+                </li>
+                <li>
+                    Get a free read-only API key under <a href='https://cloomba.com/me/developers' rel='noopener'
+                        >Developers</a
+                    >.
+                </li>
+                <li>
+                    Clone <a href='https://github.com/cloomba/conference-template' rel='noopener'>the template</a>, put
+                    your event's slug and your colors in <code>site.config.ts</code>, and deploy the static build to any
+                    host.
+                </li>
+            </ul>
+            <p>
+                Free events cost nothing at all; for paid tickets Cloomba keeps a small platform fee — the site itself
+                never adds a cent.
+            </p>
+
+            <p><strong>2. Just use your Cloomba event page.</strong></p>
+            <p>
+                Every Cloomba event already has a full public page with registration, agenda, and a photo wall — no
+                website project needed. The template is for when you want your own domain and a conference-shaped site
+                around it.
+            </p>
+
+            <p><strong>3. Cloomba Cloud.</strong></p>
+            <p>
+                The same site, hosted for you: set your colors, connect your domain — no repository, no build step.{' '}
+                <a href='https://cloomba.com/info/contact' rel='noopener'>Contact us</a> and we'll set you up.
+            </p>
+
+            <h2>Documentation</h2>
+            <ul>
+                <li>
+                    <a href='/cloomba-for-conferences/features'>Features</a> — everything this site demonstrates, itemized.
+                </li>
+                <li>
+                    <a href='/cloomba-for-conferences/configuration'>Configuration</a> — every option in <code
+                        >site.config.ts</code
+                    >, explained.
+                </li>
+                <li>
+                    <a href='/cloomba-for-conferences/customization'>Customization</a> — content files, colors, imagery, adding
+                    sections.
+                </li>
+                <li>
+                    <a href='/cloomba-for-conferences/deployment'>Deployment</a> — build and host anywhere; keeping the site
+                    fresh.
+                </li>
+            </ul>
+
+            <h2>Questions</h2>
+            <p>
+                Use the <a href='https://cloomba.com/info/contact' rel='noopener'>Cloomba contact form</a> — or open an issue
+                on{' '}
+                <a href='https://github.com/cloomba/conference-template' rel='noopener'>GitHub</a> if it's about the template
+                itself.
+            </p>
+        </div>
+    </article>
+</Base>

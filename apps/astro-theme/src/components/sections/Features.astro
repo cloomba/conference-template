@@ -1,0 +1,25 @@
+---
+import { getCollection, render } from 'astro:content'
+
+// Three-up feature cards from src/content/features/.
+const entries = (await getCollection('features')).sort((a, b) => a.data.order - b.data.order)
+const rendered = await Promise.all(entries.map(async (entry) => ({ entry, Content: (await render(entry)).Content })))
+---
+
+{
+    rendered.length > 0 && (
+        <section class='mx-auto max-w-5xl px-4 py-14'>
+            <ul class='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'>
+                {rendered.map(({ entry, Content }) => (
+                    <li class='rounded-card border border-text/10 p-6'>
+                        {entry.data.icon && <span class='text-3xl'>{entry.data.icon}</span>}
+                        <h3 class='mt-3 font-display text-lg font-semibold'>{entry.data.title}</h3>
+                        <div class='prose-content mt-2 text-sm text-text-muted'>
+                            <Content />
+                        </div>
+                    </li>
+                ))}
+            </ul>
+        </section>
+    )
+}

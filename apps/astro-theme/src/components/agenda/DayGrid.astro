@@ -1,0 +1,156 @@
+---
+import { formatTimeRange, groupByLocation, minutesOfDay, type AgendaSlot } from '@cloomba/core'
+
+import { sessionPath } from '@/lib/slugs'
+
+// One conference day as a time-proportional grid: rows are 15-minute slots,
+// columns are rooms, sessions span their real duration — so parallel talks
+// align vertically by actual time, and room-less items (breaks, lunch, the
+// social) render as full-width bands INSIDE every track's flow. On small
+// screens this collapses to a chronological list with room labels.
+
+type Slot = AgendaSlot & { speakers: { name: string | null }[] }
+
+interface Props {
+    slots: Slot[]
+    timezone: string
+    locale: string
+}
+
+const { slots, timezone, locale } = Astro.props
+
+const SLOT_MIN = 15
+
+const rooms = groupByLocation(slots.filter((s) => s.location !== null))
+const roomNames = rooms.map((room) => room.location as string)
+const columnOf = new Map(roomNames.map((name, index) => [name, index]))
+
+// Wall-clock minutes in the event timezone; a session ending at midnight
+// reads as 24:00, not 0:00.
+const startMin = (s: Slot) => minutesOfDay(s.starts_at, timezone)
+const endMin = (s: Slot) => {
+    const end = minutesOfDay(s.ends_at, timezone)
+    return end <= startMin(s) ? 24 * 60 : end
+}
+
+// Start the grid AT the first session (snapped to a slot) — snapping to the
+// whole hour left empty lead rows above the first card. Header row is row 1.
+const dayStart = Math.floor(Math.min(...slots.map(startMin)) / SLOT_MIN) * SLOT_MIN
+const dayEnd = Math.ceil(Math.max(...slots.map(endMin)) / SLOT_MIN) * SLOT_MIN
+const rowOf = (minutes: number) => 2 + Math.round((minutes - dayStart) / SLOT_MIN)
+
+const placed = slots.map((s) => ({
+    s,
+    column: s.location === null ? null : (columnOf.get(s.location) ?? null),
+    rowStart: rowOf(Math.floor(startMin(s) / SLOT_MIN) * SLOT_MIN),
+    rowEnd: Math.max(rowOf(Math.ceil(endMin(s) / SLOT_MIN) * SLOT_MIN), rowOf(startMin(s)) + 1),
+}))
+
+// A mark at the (possibly half-hour) day start, then every full hour.
+const hourMarks: number[] = [dayStart]
+for (let m = Math.floor(dayStart / 60) * 60 + 60; m < dayEnd; m += 60) {
+    if (m > dayStart) hourMarks.push(m)
+}
+const hourLabel = (minutes: number) =>
+    `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`
+
+const sorted = [...slots].sort((a, b) => startMin(a) - startMin(b) || a.position - b.position)
+
+// Two room columns fit from `md`; three or more need `lg`. (Both class pairs
+// stay as full literals below so Tailwind's scanner compiles them.)
+const twoRooms = roomNames.length <= 2
+const gridAt = twoRooms ? 'md:grid' : 'lg:grid'
+const listHideAt = twoRooms ? 'md:hidden' : 'lg:hidden'
+---
+
+{/* Desktop: the time grid. */}
+<div
+    class={`day-grid hidden gap-x-3 gap-y-1 ${gridAt}`}
+    style={`grid-template-columns: 3.25rem repeat(${roomNames.length}, minmax(0, 1fr)); grid-auto-rows: minmax(1.3rem, auto);`}
+>
+    {
+        roomNames.map((name, index) => (
+            <h3
+                class='pb-2 text-sm font-medium uppercase tracking-widest text-text-muted'
+                style={`grid-column: ${index + 2}; grid-row: 1;`}
+                data-room={name}
+            >
+                {name}
+            </h3>
+        ))
+    }
+    {
+        hourMarks.map((minutes) => (
+            <div
+                class='border-t border-text/10 pr-2 pt-0.5 text-right font-mono text-xs text-text-muted'
+                style={`grid-column: 1; grid-row: ${rowOf(minutes)};`}
+            >
+                {hourLabel(minutes)}
+            </div>
+        ))
+    }
+    {
+        placed.map(({ s, column, rowStart, rowEnd }) =>
+            column === null ? (
+                <div
+                    class='flex items-center justify-center gap-3 rounded-card bg-surface-alt px-3 text-sm text-text-muted'
+                    style={`grid-column: 2 / -1; grid-row: ${rowStart} / ${rowEnd};`}
+                >
+                    <span class='font-medium'>{s.title}</span>
+                    <span class='font-mono text-xs'>{formatTimeRange(s.starts_at, s.ends_at, timezone, locale)}</span>
+                </div>
+            ) : (
+                <a
+                    href={sessionPath(s)}
+                    class='flex flex-col overflow-hidden rounded-card border border-text/10 bg-surface p-2.5 transition-colors hover:border-primary/50'
+                    style={`grid-column: ${column + 2}; grid-row: ${rowStart} / ${rowEnd};`}
+                    data-room={s.location}
+                >
+                    <span class='font-mono text-xs text-text-muted'>
+                        {formatTimeRange(s.starts_at, s.ends_at, timezone, locale)}
+                    </span>
+                    <span class='mt-0.5 text-sm font-medium leading-snug'>{s.title}</span>
+                    {s.speakers.length > 0 && (
+                        <span class='mt-0.5 truncate text-xs text-text-muted'>
+                            {s.speakers
+                                .map((speaker) => speaker.name)
+                                .filter(Boolean)
+                                .join(', ')}
+                        </span>
+                    )}
+                </a>
+            )
+        )
+    }
+</div>
+
+{/* Mobile: chronological flow with room labels; bands stay inline. */}
+<ol class={`divide-y divide-text/10 overflow-hidden rounded-card border border-text/10 ${listHideAt}`}>
+    {
+        sorted.map((s) =>
+            s.location === null ? (
+                <li class='bg-surface-alt px-4 py-2.5 text-sm text-text-muted'>
+                    <span class='font-mono text-xs'>{formatTimeRange(s.starts_at, s.ends_at, timezone, locale)}</span>
+                    <span class='ml-3 font-medium'>{s.title}</span>
+                </li>
+            ) : (
+                <li data-room={s.location}>
+                    <a href={sessionPath(s)} class='block px-4 py-3 hover:bg-surface-alt'>
+                        <span class='font-mono text-xs text-text-muted'>
+                            {formatTimeRange(s.starts_at, s.ends_at, timezone, locale)} · {s.location}
+                        </span>
+                        <span class='mt-1 block font-medium'>{s.title}</span>
+                        {s.speakers.length > 0 && (
+                            <span class='mt-0.5 block text-sm text-text-muted'>
+                                {s.speakers
+                                    .map((speaker) => speaker.name)
+                                    .filter(Boolean)
+                                    .join(', ')}
+                            </span>
+                        )}
+                    </a>
+                </li>
+            )
+        )
+    }
+</ol>

@@ -1,0 +1,36 @@
+{
+    "name": "@cloomba/client",
+    "version": "0.1.0",
+    "description": "Typed client for the Cloomba public API (/public/v1)",
+    "license": "MIT",
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "publishConfig": {
+        "access": "public"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/cloomba/conference-template",
+        "directory": "packages/client"
+    },
+    "scripts": {
+        "generate": "openapi-typescript https://cloomba.com/openapi.yaml -o src/schema.d.ts",
+        "build": "tsup src/index.ts --format esm --dts --clean",
+        "typecheck": "tsc --noEmit"
+    },
+    "devDependencies": {
+        "openapi-typescript": "^7.13.0",
+        "tsup": "^8.5.1",
+        "typescript": "^6.0.3"
+    }
+}

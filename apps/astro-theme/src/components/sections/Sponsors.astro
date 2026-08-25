@@ -1,0 +1,58 @@
+---
+import { sortSponsors, SPONSOR_TIER_ORDER } from '@cloomba/core'
+
+import SectionHeading from '@/components/ui/SectionHeading.astro'
+import { loadSponsors } from '@/lib/data'
+
+interface Props {
+    // The home page renders this as an alt-surface band; the dedicated
+    // /sponsors page wants it plain (a full gray page reads broken).
+    plain?: boolean
+}
+const { plain = false } = Astro.props
+
+const sponsors = sortSponsors(await loadSponsors())
+const tiers = SPONSOR_TIER_ORDER.map((tier) => ({
+    tier,
+    entries: sponsors.filter((s) => s.tier === tier),
+})).filter((group) => group.entries.length > 0)
+---
+
+{
+    tiers.length > 0 && (
+        <section class={plain ? 'py-8' : 'bg-surface-alt py-14'}>
+            <div class='mx-auto max-w-5xl px-4'>
+                {/* On the dedicated page the PageHeader owns the title. */}
+                {!plain && <SectionHeading title='Sponsors' />}
+                {tiers.map(({ tier, entries }) => (
+                    <div class='mb-10 last:mb-0'>
+                        <h3 class='mb-4 text-sm font-medium uppercase tracking-widest text-text-muted'>{tier}</h3>
+                        <ul class='flex flex-wrap items-center gap-x-10 gap-y-6'>
+                            {entries.map((sponsor) => (
+                                <li>
+                                    <a
+                                        href={sponsor.link ?? undefined}
+                                        rel='noopener'
+                                        class='flex items-center gap-3 opacity-80 transition-opacity hover:opacity-100'
+                                    >
+                                        {sponsor.image_url ? (
+                                            <img
+                                                draggable='false'
+                                                src={sponsor.image_url}
+                                                alt={sponsor.name ?? ''}
+                                                class='max-h-12 w-auto max-w-40 object-contain'
+                                                loading='lazy'
+                                            />
+                                        ) : (
+                                            <span class='font-display text-lg font-semibold'>{sponsor.name}</span>
+                                        )}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                ))}
+            </div>
+        </section>
+    )
+}

@@ -1,0 +1,44 @@
+---
+import { formatDayHeading, formatTimeRange, groupByDay } from '@cloomba/core'
+
+import SectionHeading from '@/components/ui/SectionHeading.astro'
+import { config } from '@/lib/config'
+import { loadEvent, loadSessions } from '@/lib/data'
+import { sessionPath } from '@/lib/slugs'
+
+const [event, sessions] = await Promise.all([loadEvent(), loadSessions()])
+const days = groupByDay(sessions, event.timezone)
+const firstDay = days[0]
+const preview = firstDay?.slots.slice(0, 6) ?? []
+const locale = config.site.language
+---
+
+{
+    preview.length > 0 && (
+        <section class='mx-auto max-w-5xl px-4 py-14'>
+            <SectionHeading
+                title='Agenda'
+                href='/agenda'
+                linkLabel={days.length > 1 ? `All ${days.length} days` : 'Full agenda'}
+            />
+            <p class='mb-6 text-sm text-text-muted'>
+                {formatDayHeading(firstDay.slots[0].starts_at, event.timezone, locale)}
+            </p>
+            <ol class='divide-y divide-text/10 overflow-hidden rounded-card border border-text/10'>
+                {preview.map((session) => (
+                    <li>
+                        <a href={sessionPath(session)} class='flex items-baseline gap-4 px-4 py-3 hover:bg-surface-alt'>
+                            <span class='w-28 shrink-0 font-mono text-sm text-text-muted'>
+                                {formatTimeRange(session.starts_at, session.ends_at, event.timezone, locale)}
+                            </span>
+                            <span class='min-w-0 flex-1 truncate font-medium'>{session.title}</span>
+                            {session.location && (
+                                <span class='hidden shrink-0 text-sm text-text-muted sm:block'>{session.location}</span>
+                            )}
+                        </a>
+                    </li>
+                ))}
+            </ol>
+        </section>
+    )
+}

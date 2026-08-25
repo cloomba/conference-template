@@ -1,0 +1,144 @@
+---
+import { formatDayHeading, formatTimeRange, groupByDay, groupByLocation } from '@cloomba/core'
+
+import DayGrid from '@/components/agenda/DayGrid.astro'
+import NowNext from '@/components/islands/NowNext'
+import PageHeader from '@/components/PageHeader.astro'
+import Base from '@/layouts/Base.astro'
+import { config } from '@/lib/config'
+import { loadEvent, loadSessions } from '@/lib/data'
+import { browserBaseUrl } from '@/lib/env'
+import { sessionPath } from '@/lib/slugs'
+
+const [event, sessions] = await Promise.all([loadEvent(), loadSessions()])
+const days = groupByDay(sessions, event.timezone)
+const locale = config.site.language
+
+// Room filter — CSS-only. Rooms are known at build time, so we GENERATE the
+// exact per-room rules: picking a chip hides other rooms' cards/headers,
+// collapses the time grid to one column, and highlights the chip. No JS.
+const allRooms = groupByLocation(sessions.filter((s) => s.location !== null)).map((r) => r.location as string)
+
+// Sanctioned width-rule exception (AGENTS.md): the DAYS AREA widens for 4+
+// room events — a data grid needs the room; the PageHeader stays at 5xl so
+// the title never moves. Both classes are literals for Tailwind's scanner.
+const daysWidth = allRooms.length >= 4 ? 'max-w-7xl' : 'max-w-5xl'
+const roomId = (index: number) => `room-${index}`
+const filterCss =
+    allRooms.length > 1
+        ? allRooms
+              .map((name, index) => {
+                  const escaped = name.replace(/'/g, "\\'")
+                  const scope = `.agenda-root:has(#${roomId(index)}:checked)`
+                  return [
+                      `${scope} [data-room]:not([data-room='${escaped}']) { display: none; }`,
+                      `${scope} .day-grid { grid-template-columns: 3.25rem minmax(0, 1fr) !important; }`,
+                      `${scope} .day-grid [data-room='${escaped}'] { grid-column: 2 / -1 !important; }`,
+                      `${scope} label[for='${roomId(index)}'] { background: var(--t-primary); color: var(--t-primary-content); border-color: transparent; }`,
+                  ].join('\n')
+              })
+              .join('\n') +
+          `\n.agenda-root:has(#room-all:checked) label[for='room-all'] { background: var(--t-primary); color: var(--t-primary-content); border-color: transparent; }`
+        : ''
+---
+
+<Base title='Agenda' description={`The ${config.site.name} schedule.`}>
+    <div class='agenda-root'>
+        {filterCss && <style set:html={filterCss} />}
+        <PageHeader title='Agenda'>
+            <p class='mt-2 text-sm text-text-muted'>
+                All times are local to the venue.{' '}
+                <a href='/agenda.ics' class='text-primary hover:underline'>Add to your calendar (iCal)</a>
+            </p>
+
+            {
+                allRooms.length > 1 && (
+                    <fieldset class='mt-6 flex flex-wrap gap-2'>
+                        <legend class='sr-only'>Filter by stage</legend>
+                        <label
+                            for='room-all'
+                            class='cursor-pointer rounded-card border border-text/15 px-4 py-1.5 text-sm transition-colors hover:bg-surface-alt'
+                        >
+                            <input type='radio' name='room-filter' id='room-all' class='sr-only' checked />
+                            All stages
+                        </label>
+                        {allRooms.map((name, index) => (
+                            <label
+                                for={roomId(index)}
+                                class='cursor-pointer rounded-card border border-text/15 px-4 py-1.5 text-sm transition-colors hover:bg-surface-alt'
+                            >
+                                <input type='radio' name='room-filter' id={roomId(index)} class='sr-only' />
+                                {name}
+                            </label>
+                        ))}
+                    </fieldset>
+                )
+            }
+            {
+                days.length > 1 && (
+                    <nav class='mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm' aria-label='Jump to day'>
+                        {days.map((day) => (
+                            <a href={`#${day.day}`} class='text-primary hover:underline'>
+                                {formatDayHeading(day.slots[0].starts_at, event.timezone, locale)}
+                            </a>
+                        ))}
+                    </nav>
+                )
+            }
+        </PageHeader>
+
+        <div class={`mx-auto px-4 pb-16 ${daysWidth}`}>
+            <NowNext
+                client:load
+                browserBase={browserBaseUrl}
+                slug={config.event.slug}
+                timezone={event.timezone}
+                eventStartsAt={event.starts_at}
+                locale={locale}
+            />
+
+            {
+                days.map((day) => {
+                    const multiRoom = groupByLocation(day.slots.filter((s) => s.location !== null)).length > 1
+                    return (
+                        <section class='mt-12' id={day.day}>
+                            <h2 class='mb-6 font-display text-xl font-semibold'>
+                                {formatDayHeading(day.slots[0].starts_at, event.timezone, locale)}
+                            </h2>
+                            {multiRoom ? (
+                                <DayGrid slots={day.slots} timezone={event.timezone} locale={locale} />
+                            ) : (
+                                <ol class='divide-y divide-text/10 overflow-hidden rounded-card border border-text/10'>
+                                    {day.slots.map((session) => (
+                                        <li>
+                                            <a href={sessionPath(session)} class='block px-4 py-3 hover:bg-surface-alt'>
+                                                <span class='font-mono text-xs text-text-muted'>
+                                                    {formatTimeRange(
+                                                        session.starts_at,
+                                                        session.ends_at,
+                                                        event.timezone,
+                                                        locale
+                                                    )}
+                                                    {session.location && ` · ${session.location}`}
+                                                </span>
+                                                <span class='mt-1 block font-medium'>{session.title}</span>
+                                                {session.speakers.length > 0 && (
+                                                    <span class='mt-0.5 block text-sm text-text-muted'>
+                                                        {session.speakers
+                                                            .map((s) => s.name)
+                                                            .filter(Boolean)
+                                                            .join(', ')}
+                                                    </span>
+                                                )}
+                                            </a>
+                                        </li>
+                                    ))}
+                                </ol>
+                            )}
+                        </section>
+                    )
+                })
+            }
+        </div>
+    </div>
+</Base>

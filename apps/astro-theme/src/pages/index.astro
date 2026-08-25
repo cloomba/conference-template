@@ -1,0 +1,51 @@
+---
+import EventJsonLd from '@/components/EventJsonLd.astro'
+import About from '@/components/sections/About.astro'
+import AgendaPreview from '@/components/sections/AgendaPreview.astro'
+import Cta from '@/components/sections/Cta.astro'
+import Faq from '@/components/sections/Faq.astro'
+import Features from '@/components/sections/Features.astro'
+import Hero from '@/components/sections/Hero.astro'
+import Highlights from '@/components/sections/Highlights.astro'
+import News from '@/components/sections/News.astro'
+import Speakers from '@/components/sections/Speakers.astro'
+import Sponsors from '@/components/sections/Sponsors.astro'
+import Stats from '@/components/sections/Stats.astro'
+import Team from '@/components/sections/Team.astro'
+import Tickets from '@/components/sections/Tickets.astro'
+import Venue from '@/components/sections/Venue.astro'
+import Base from '@/layouts/Base.astro'
+import { config } from '@/lib/config'
+import { loadEvent } from '@/lib/data'
+
+// The whole "reorder sections" feature: config.sections is both presence and
+// order, this map is the only wiring.
+const SECTIONS = {
+    hero: Hero,
+    stats: Stats,
+    about: About,
+    features: Features,
+    agenda: AgendaPreview,
+    speakers: Speakers,
+    highlights: Highlights,
+    sponsors: Sponsors,
+    team: Team,
+    tickets: Tickets,
+    venue: Venue,
+    faq: Faq,
+    news: News,
+    cta: Cta,
+} as const
+
+const event = await loadEvent()
+---
+
+<Base ogImage={event.cover_url}>
+    <EventJsonLd />
+    {
+        config.sections.map((name) => {
+            const Section = SECTIONS[name]
+            return <Section />
+        })
+    }
+</Base>

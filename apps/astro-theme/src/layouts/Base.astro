@@ -1,0 +1,137 @@
+---
+import { themeCss } from '@cloomba/core'
+import frauncesLatinExtUrl from '@fontsource-variable/fraunces/files/fraunces-latin-ext-wght-normal.woff2?url'
+import frauncesLatinUrl from '@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2?url'
+
+import CloombaPromo from '@/components/CloombaPromo.astro'
+import DemoBanner from '@/components/DemoBanner.astro'
+import SiteFooter from '@/components/SiteFooter.astro'
+import SiteHeader from '@/components/SiteHeader.astro'
+import { config } from '@/lib/config'
+
+import '@/styles/global.css'
+
+// Self-hosted display font, inlined in <head> with a preload and
+// `font-display: optional`: the font is either ready AT first paint (always,
+// once cached) or the fallback holds for the whole page view — a mid-view
+// swap (the "titles jump on navigation" flash) is impossible by contract.
+// Ranges/sources mirror @fontsource-variable/fraunces.
+const fontCss = `
+@font-face {
+  font-family: 'Fraunces Variable';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: optional;
+  src: url(${frauncesLatinUrl}) format('woff2-variations');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+@font-face {
+  font-family: 'Fraunces Variable';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: optional;
+  src: url(${frauncesLatinExtUrl}) format('woff2-variations');
+  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+}`
+
+interface Props {
+    title?: string
+    description?: string
+    ogImage?: string | null
+}
+
+const { title, description = config.site.description, ogImage } = Astro.props
+
+const pageTitle = title ? `${title} — ${config.site.name}` : config.site.name
+const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString() : undefined
+
+// Social preview: the page's own image (event cover) wins, else the site
+// default. Crawlers require ABSOLUTE URLs — a relative path resolves against
+// the site URL, and without one we omit the tag rather than emit a broken one.
+const ogImageResolved = (() => {
+    const source = ogImage ?? config.site.og_image
+    if (!source) return undefined
+    try {
+        return new URL(source, Astro.site).toString()
+    } catch {
+        return source.startsWith('http') ? source : undefined
+    }
+})()
+
+// Google Fonts is the one third-party the template may load, and only when
+// the config asks for families.
+const fontsHref = config.theme.fonts.google.length
+    ? `https://fonts.googleapis.com/css2?${config.theme.fonts.google
+          .map((f: string) => `family=${encodeURIComponent(f)}:wght@400;600;700`)
+          .join('&')}&display=swap`
+    : null
+---
+
+<!doctype html>
+<html lang={config.site.language}>
+    <head>
+        <meta charset='utf-8' />
+        <meta name='viewport' content='width=device-width, initial-scale=1' />
+        <title>{pageTitle}</title>
+        {description && <meta name='description' content={description} />}
+        {config.site.noindex && <meta name='robots' content='noindex, nofollow' />}
+        {canonical && <link rel='canonical' href={canonical} />}
+        <meta property='og:title' content={pageTitle} />
+        {description && <meta property='og:description' content={description} />}
+        {canonical && <meta property='og:url' content={canonical} />}
+        {ogImageResolved && <meta property='og:image' content={ogImageResolved} />}
+        <meta property='og:type' content='website' />
+        <meta name='twitter:card' content={ogImageResolved ? 'summary_large_image' : 'summary'} />
+        <meta name='twitter:title' content={pageTitle} />
+        {description && <meta name='twitter:description' content={description} />}
+        {ogImageResolved && <meta name='twitter:image' content={ogImageResolved} />}
+        <link rel='icon' href='/favicon.svg' type='image/svg+xml' />
+
+        {/* Self-hosted display font: preload + inline faces (see fontCss). */}
+        <link rel='preload' as='font' type='font/woff2' href={frauncesLatinUrl} crossorigin />
+        <style set:html={fontCss}></style>
+
+        {fontsHref && <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin />}
+        {fontsHref && <link rel='stylesheet' href={fontsHref} />}
+
+        {/* The whole theme: runtime tokens from the validated config. */}
+        <style set:html={themeCss(config.theme)}></style>
+
+        {
+            /* Apply the visitor's stored theme choice before first paint (auto
+            mode only). RAW body in a top-level script — a script inside a JSX
+            expression container gets silently dropped by Astro. */
+        }
+        <script is:inline define:vars={{ themeMode: config.theme.mode }}>
+            if (themeMode === 'auto') {
+                try {
+                    var stored = localStorage.getItem('theme')
+                    if (stored === 'dark' || stored === 'light') document.documentElement.dataset.theme = stored
+                } catch (e) {}
+            }
+        </script>
+
+        {
+            config.analytics.umami && (
+                <script
+                    is:inline
+                    defer
+                    src={config.analytics.umami.src}
+                    data-website-id={config.analytics.umami.website_id}
+                />
+            )
+        }
+        {/* Arbitrary analytics snippets (GA, pixels, …) — verbatim. */}
+        {config.analytics.head_html && <Fragment set:html={config.analytics.head_html} />}
+    </head>
+    <body class='min-h-dvh bg-surface text-text font-body'>
+        <a href='#main' class='skip-link'>Skip to content</a>
+        {config.site.demo_banner && <DemoBanner text={config.site.demo_banner} />}
+        <SiteHeader />
+        <main id='main'>
+            <slot />
+        </main>
+        {config.cloomba_promo && <CloombaPromo />}
+        <SiteFooter />
+    </body>
+</html>
