@@ -6,6 +6,10 @@
         "packages/*",
         "apps/*"
     ],
+    "packageManager": "yarn@1.22.22",
+    "engines": {
+        "node": ">=22"
+    },
     "scripts": {
         "build": "yarn workspaces run build",
         "typecheck": "yarn workspaces run typecheck",
