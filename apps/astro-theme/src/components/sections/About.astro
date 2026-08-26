@@ -1,6 +1,7 @@
 ---
 import { loadEvent } from '@/lib/data'
 import { renderMarkdown } from '@/lib/markdown'
+import { t } from '@/lib/strings'
 
 // Home teaser: the description's FIRST paragraph as an [image][text] split,
 // linking to the full /about page.
@@ -20,15 +21,13 @@ const teaser = event.description?.split(/\n\s*\n/)[0] ?? null
                     loading='lazy'
                 />
                 <div>
-                    <h2 class='font-display text-2xl font-semibold tracking-tight sm:text-3xl'>
-                        One watering hole, every species
-                    </h2>
+                    <h2 class='font-display text-2xl font-semibold tracking-tight sm:text-3xl'>{t('about.heading')}</h2>
                     <div class='prose-content mt-3 text-text-muted' set:html={renderMarkdown(teaser)} />
                     <a
                         href='/about'
                         class='mt-4 inline-block rounded-card border border-text/15 px-5 py-2.5 font-medium transition-colors hover:bg-surface-alt'
                     >
-                        About the conference
+                        {t('about.cta')}
                     </a>
                 </div>
             </div>

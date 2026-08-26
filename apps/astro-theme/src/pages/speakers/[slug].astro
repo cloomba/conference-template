@@ -4,10 +4,10 @@ import { formatDayHeading, formatTimeRange } from '@cloomba/core'
 import PageHeader from '@/components/PageHeader.astro'
 import SocialLink from '@/components/ui/SocialLink.astro'
 import Base from '@/layouts/Base.astro'
-import { config } from '@/lib/config'
 import { loadEvent, loadSessions, loadSpeakers } from '@/lib/data'
 import { renderMarkdown } from '@/lib/markdown'
 import { detailSlug, sessionPath } from '@/lib/slugs'
+import { locale, t } from '@/lib/strings'
 
 export async function getStaticPaths() {
     const speakers = await loadSpeakers()
@@ -20,7 +20,6 @@ export async function getStaticPaths() {
 const { speaker } = Astro.props
 const [event, sessions] = await Promise.all([loadEvent(), loadSessions()])
 const own = sessions.filter((session) => session.speakers.some((s) => s.hash === speaker.hash))
-const locale = config.site.language
 
 // Person structured data for search.
 const jsonLd = {
@@ -34,12 +33,12 @@ const jsonLd = {
 }
 ---
 
-<Base title={speaker.name ?? 'Speaker'}>
+<Base title={speaker.name ?? t('speakers.unnamed')}>
     <script type='application/ld+json' set:html={JSON.stringify(jsonLd)} is:inline />
     <PageHeader
-        title={speaker.name ?? 'Speaker'}
+        title={speaker.name ?? t('speakers.unnamed')}
         subtitle={speaker.headline ?? undefined}
-        back={{ href: '/speakers', label: 'Speakers' }}
+        back={{ href: '/speakers', label: t('nav.speakers') }}
     >
         {
             speaker.link && (
@@ -73,7 +72,7 @@ const jsonLd = {
         {
             own.length > 0 && (
                 <section class='mt-10'>
-                    <h2 class='mb-4 font-display text-xl font-semibold'>Sessions</h2>
+                    <h2 class='mb-4 font-display text-xl font-semibold'>{t('speakers.sessions_heading')}</h2>
                     <ol class='max-w-3xl divide-y divide-text/10 overflow-hidden rounded-card border border-text/10'>
                         {own.map((session) => (
                             <li>

@@ -2,6 +2,7 @@
 import ThemeToggle from '@/components/ThemeToggle.astro'
 import { config } from '@/lib/config'
 import { headerLinks } from '@/lib/nav'
+import { t } from '@/lib/strings'
 
 const links = await headerLinks()
 ---
@@ -32,7 +33,7 @@ const links = await headerLinks()
                 type='button'
                 popovertarget='mobile-menu'
                 class='flex size-9 cursor-pointer items-center justify-center rounded-card hover:bg-surface-alt sm:hidden'
-                aria-label='Menu'
+                aria-label={t('a11y.menu')}
             >
                 <svg class='size-5' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'>
                     <path stroke-linecap='round' d='M4 7h16M4 12h16M4 17h16'></path>

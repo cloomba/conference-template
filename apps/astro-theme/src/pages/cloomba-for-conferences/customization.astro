@@ -42,6 +42,46 @@ import Base from '@/layouts/Base.astro'
                 restyles the whole site consistently — there is no per-component color to chase.
             </p>
 
+            <h2>Language — one file of labels</h2>
+            <p>
+                Your own writing (markdown pages, and everything from your Cloomba event) is already in whatever
+                language you wrote it. What's left is the template's own furniture — <em>Agenda</em>, <em>Register</em>,
+                <em>All stages</em>, <em>Sold out</em> — 81 short labels, all listed in one file:
+                <code>strings.en.json</code>.
+            </p>
+            <p>
+                You override them in <code>strings.ts</code>, which ships empty and is already wired into the config —
+                so translating never means editing <code>site.config.ts</code>. What you put there is merged over the
+                English, so you translate what matters and leave the rest:
+            </p>
+            <pre><code>{`// strings.ts
+export default {
+    'nav.sponsors': 'Sponzori',
+    'common.register': 'Registrovať sa',
+    'agenda.all_stages': 'Všetky pódiá',
+} satisfies StringOverrides`}</code></pre>
+            <p>
+                That <code>satisfies</code> is what makes your editor autocomplete all 81 keys and underline a misspelled
+                one before you ever run a build. A plain <code>.json</code> file works just as well if you're handing the
+                file to a translator — you lose only the editor checking.
+            </p>
+            <p>
+                Counted phrases like <em>2 days</em> are plural families. English needs only <code>.one</code> and
+                <code>.other</code>; Slovak and Czech add <code>.few</code>, Ukrainian adds <code>.many</code>, and the
+                right form is chosen for the number at hand. Anything you don't supply falls back to <code>.other</code
+                >.
+            </p>
+            <p>
+                A key you misspell, leave empty, or give a non-string value is ignored with a build warning and the
+                English word is used instead. Nothing about wording can stop your site from deploying — a mislabeled
+                page beats a failed deploy.
+            </p>
+            <p>
+                Set <code>language</code> too (<code>'sk'</code>, <code>'uk'</code>, …). That one doesn't change any
+                words — it drives <code>&lt;html lang&gt;</code> plus the dates, times, and prices, which are formatted by
+                the browser's own locale data and so already read correctly in every language.
+            </p>
+
             <h2>Images inside markdown pages</h2>
             <p>
                 Drop the image next to the markdown file and reference it relatively —

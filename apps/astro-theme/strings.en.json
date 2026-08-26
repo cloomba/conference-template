@@ -1,0 +1,102 @@
+{
+    "meta.page_title": "{title} — {site}",
+
+    "a11y.skip_to_content": "Skip to content",
+    "a11y.menu": "Menu",
+    "a11y.toggle_theme": "Toggle color theme",
+    "a11y.filter_by_stage": "Filter by stage",
+    "a11y.jump_to_day": "Jump to day",
+    "a11y.website": "Website",
+
+    "common.register": "Register",
+    "common.become_a_sponsor": "Become a sponsor",
+    "common.see_all": "See all",
+    "common.learn_more": "Learn more",
+
+    "nav.about": "About",
+    "nav.agenda": "Agenda",
+    "nav.speakers": "Speakers",
+    "nav.sponsors": "Sponsors",
+    "nav.tickets": "Tickets",
+    "nav.news": "News",
+    "nav.add_to_calendar": "Add to calendar (iCal)",
+    "nav.contact_us": "Contact us",
+    "nav.ios_app": "iOS application",
+    "nav.android_app": "Android application",
+    "nav.privacy": "Privacy policy",
+    "nav.terms": "Terms of service",
+    "nav.column_explore": "Explore",
+    "nav.column_attend": "Attend",
+    "nav.column_more": "More",
+
+    "footer.copyright": "© {year} {site}",
+    "footer.powered_by": "Powered by Cloomba",
+
+    "promo.title": "Organizing an event?",
+    "promo.body": "This whole site — agenda, speakers, tickets, registration — is an open-source template running on Cloomba.",
+    "promo.tagline": "Yours could look like this by the weekend.",
+    "promo.how_it_works": "How it works",
+    "promo.github": "GitHub",
+    "promo.cloomba": "cloomba.com",
+
+    "hero.view_agenda": "View agenda",
+
+    "stats.speakers": "Speakers",
+    "stats.sessions": "Sessions",
+    "stats.sponsors": "Sponsors",
+    "stats.days.one": "Day",
+    "stats.days.other": "Days",
+    "stats.registered": "Registered",
+
+    "about.heading": "One watering hole, every species",
+    "about.cta": "About the conference",
+    "about.page_title": "About {site}",
+
+    "agenda.meta_description": "The {site} schedule.",
+    "agenda.times_local": "All times are local to the venue.",
+    "agenda.add_to_calendar_inline": "Add to your calendar (iCal)",
+    "agenda.all_stages": "All stages",
+    "agenda.full_agenda": "Full agenda",
+    "agenda.all_days.one": "All {count} day",
+    "agenda.all_days.other": "All {count} days",
+
+    "speakers.meta_description": "Speakers at {site}.",
+    "speakers.all_count": "All {count}",
+    "speakers.unnamed": "Speaker",
+    "speakers.sessions_heading": "Sessions",
+    "speakers.cfp_title": "Your name belongs up here",
+    "speakers.cfp_body": "The call for papers is open — every species, every experience level, mentors for first-timers.",
+    "speakers.cfp_label": "Propose a talk",
+
+    "sponsors.meta_description": "Sponsors of {site}.",
+    "sponsors.cta_title": "Your logo belongs up there",
+    "sponsors.cta_body": "Sponsorship tiers for every size of den — and every tier helps keep the Community Pass free.",
+
+    "team.title": "The team",
+
+    "tickets.meta_description": "Register for {site}.",
+    "tickets.free": "Free",
+    "tickets.sold_out": "Sold out",
+    "tickets.spots_left.one": "Only {count} left",
+    "tickets.spots_left.other": "Only {count} left",
+    "tickets.register_heading": "Register",
+    "tickets.embed_title": "Register for {site}",
+
+    "venue.title": "Venue",
+    "venue.directions": "Get directions →",
+
+    "faq.title": "FAQ",
+
+    "news.all": "All news",
+
+    "cta.heading": "Be there when the whole kingdom gathers",
+
+    "nownext.now": "Now",
+    "nownext.until": "until {time}",
+    "nownext.next": "Next",
+    "nownext.at": "at {time}",
+
+    "error.not_found_title": "Page not found",
+    "error.not_found_body": "The page you're looking for doesn't exist or has moved.",
+    "error.not_found_cta": "Back to the home page"
+}

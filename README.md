@@ -55,6 +55,11 @@ apps/astro-theme  the site template: Astro (static) + React islands + Tailwind
 - **Content:** editorial pages, FAQ, and news are markdown files in
   `apps/astro-theme/src/content/`; everything event-shaped is edited on
   Cloomba and picked up on the next build.
+- **Language and wording:** every UI label the template renders lives in
+  `apps/astro-theme/strings.en.json` — 81 of them. Override the ones you want
+  in `apps/astro-theme/strings.ts` — it ships empty and is already wired in, so
+  translating never means touching `site.config.ts`. Your entries merge over
+  the English, and anything you skip stays English.
 
 ## License
 

@@ -2,24 +2,23 @@
 import { formatDayHeading, formatTimeRange, groupByDay } from '@cloomba/core'
 
 import SectionHeading from '@/components/ui/SectionHeading.astro'
-import { config } from '@/lib/config'
 import { loadEvent, loadSessions } from '@/lib/data'
 import { sessionPath } from '@/lib/slugs'
+import { locale, t, tn } from '@/lib/strings'
 
 const [event, sessions] = await Promise.all([loadEvent(), loadSessions()])
 const days = groupByDay(sessions, event.timezone)
 const firstDay = days[0]
 const preview = firstDay?.slots.slice(0, 6) ?? []
-const locale = config.site.language
 ---
 
 {
     preview.length > 0 && (
         <section class='mx-auto max-w-5xl px-4 py-14'>
             <SectionHeading
-                title='Agenda'
+                title={t('nav.agenda')}
                 href='/agenda'
-                linkLabel={days.length > 1 ? `All ${days.length} days` : 'Full agenda'}
+                linkLabel={days.length > 1 ? tn('agenda.all_days', days.length) : t('agenda.full_agenda')}
             />
             <p class='mb-6 text-sm text-text-muted'>
                 {formatDayHeading(firstDay.slots[0].starts_at, event.timezone, locale)}

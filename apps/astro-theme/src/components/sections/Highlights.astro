@@ -1,6 +1,8 @@
 ---
 import { getCollection, render } from 'astro:content'
 
+import { t } from '@/lib/strings'
+
 // Alternating [image][text] / [text][image] splits from
 // src/content/highlights/ — even entries put the image left, odd right.
 const entries = (await getCollection('highlights')).sort((a, b) => a.data.order - b.data.order)
@@ -29,7 +31,7 @@ const rendered = await Promise.all(entries.map(async (entry) => ({ entry, Conten
                                 href={entry.data.cta_href}
                                 class='mt-4 inline-block rounded-card border border-text/15 px-5 py-2.5 font-medium transition-colors hover:bg-surface-alt'
                             >
-                                {entry.data.cta_label ?? 'Learn more'}
+                                {entry.data.cta_label ?? t('common.learn_more')}
                             </a>
                         )}
                     </div>

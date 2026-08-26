@@ -8,6 +8,7 @@ import DemoBanner from '@/components/DemoBanner.astro'
 import SiteFooter from '@/components/SiteFooter.astro'
 import SiteHeader from '@/components/SiteHeader.astro'
 import { config } from '@/lib/config'
+import { t } from '@/lib/strings'
 
 import '@/styles/global.css'
 
@@ -42,7 +43,7 @@ interface Props {
 
 const { title, description = config.site.description, ogImage } = Astro.props
 
-const pageTitle = title ? `${title} — ${config.site.name}` : config.site.name
+const pageTitle = title ? t('meta.page_title', { title, site: config.site.name }) : config.site.name
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString() : undefined
 
 // Social preview: the page's own image (event cover) wins, else the site
@@ -125,7 +126,7 @@ const fontsHref = config.theme.fonts.google.length
         {config.analytics.head_html && <Fragment set:html={config.analytics.head_html} />}
     </head>
     <body class='min-h-dvh bg-surface text-text font-body'>
-        <a href='#main' class='skip-link'>Skip to content</a>
+        <a href='#main' class='skip-link'>{t('a11y.skip_to_content')}</a>
         {config.site.demo_banner && <DemoBanner text={config.site.demo_banner} />}
         <SiteHeader />
         <main id='main'>

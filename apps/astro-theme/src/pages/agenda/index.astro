@@ -9,10 +9,20 @@ import { config } from '@/lib/config'
 import { loadEvent, loadSessions } from '@/lib/data'
 import { browserBaseUrl } from '@/lib/env'
 import { sessionPath } from '@/lib/slugs'
+import { locale, strings, t } from '@/lib/strings'
 
 const [event, sessions] = await Promise.all([loadEvent(), loadSessions()])
 const days = groupByDay(sessions, event.timezone)
-const locale = config.site.language
+
+// The island can't call t() across the boundary, so it gets the four resolved
+// templates it needs as a prop — nothing else from the table ships to the
+// browser.
+const nowNextStrings = {
+    now: strings['nownext.now'],
+    until: strings['nownext.until'],
+    next: strings['nownext.next'],
+    at: strings['nownext.at'],
+}
 
 // Room filter — CSS-only. Rooms are known at build time, so we GENERATE the
 // exact per-room rules: picking a chip hides other rooms' cards/headers,
@@ -42,25 +52,26 @@ const filterCss =
         : ''
 ---
 
-<Base title='Agenda' description={`The ${config.site.name} schedule.`}>
+<Base title={t('nav.agenda')} description={t('agenda.meta_description', { site: config.site.name })}>
     <div class='agenda-root'>
         {filterCss && <style set:html={filterCss} />}
-        <PageHeader title='Agenda'>
+        <PageHeader title={t('nav.agenda')}>
             <p class='mt-2 text-sm text-text-muted'>
-                All times are local to the venue.{' '}
-                <a href='/agenda.ics' class='text-primary hover:underline'>Add to your calendar (iCal)</a>
+                {/* Explicit {' '} — a bare newline before an element collapses. */}
+                {t('agenda.times_local')}{' '}
+                <a href='/agenda.ics' class='text-primary hover:underline'>{t('agenda.add_to_calendar_inline')}</a>
             </p>
 
             {
                 allRooms.length > 1 && (
                     <fieldset class='mt-6 flex flex-wrap gap-2'>
-                        <legend class='sr-only'>Filter by stage</legend>
+                        <legend class='sr-only'>{t('a11y.filter_by_stage')}</legend>
                         <label
                             for='room-all'
                             class='cursor-pointer rounded-card border border-text/15 px-4 py-1.5 text-sm transition-colors hover:bg-surface-alt'
                         >
                             <input type='radio' name='room-filter' id='room-all' class='sr-only' checked />
-                            All stages
+                            {t('agenda.all_stages')}
                         </label>
                         {allRooms.map((name, index) => (
                             <label
@@ -76,7 +87,7 @@ const filterCss =
             }
             {
                 days.length > 1 && (
-                    <nav class='mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm' aria-label='Jump to day'>
+                    <nav class='mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm' aria-label={t('a11y.jump_to_day')}>
                         {days.map((day) => (
                             <a href={`#${day.day}`} class='text-primary hover:underline'>
                                 {formatDayHeading(day.slots[0].starts_at, event.timezone, locale)}
@@ -95,6 +106,7 @@ const filterCss =
                 timezone={event.timezone}
                 eventStartsAt={event.starts_at}
                 locale={locale}
+                strings={nowNextStrings}
             />
 
             {

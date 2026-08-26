@@ -1,5 +1,5 @@
 ---
-import { formatTimeRange, groupByLocation, minutesOfDay, type AgendaSlot } from '@cloomba/core'
+import { formatMinutesOfDay, formatTimeRange, groupByLocation, minutesOfDay, type AgendaSlot } from '@cloomba/core'
 
 import { sessionPath } from '@/lib/slugs'
 
@@ -51,8 +51,9 @@ const hourMarks: number[] = [dayStart]
 for (let m = Math.floor(dayStart / 60) * 60 + 60; m < dayEnd; m += 60) {
     if (m > dayStart) hourMarks.push(m)
 }
-const hourLabel = (minutes: number) =>
-    `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`
+// Through Intl, not a hand-rolled HH:MM — the gutter has to agree with the
+// session cards beside it, and locales disagree on the separator (fi: 09.30).
+const hourLabel = (minutes: number) => formatMinutesOfDay(minutes, locale)
 
 const sorted = [...slots].sort((a, b) => startMin(a) - startMin(b) || a.position - b.position)
 

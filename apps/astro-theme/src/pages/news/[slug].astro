@@ -3,7 +3,7 @@ import { getCollection, render } from 'astro:content'
 
 import PageHeader from '@/components/PageHeader.astro'
 import Base from '@/layouts/Base.astro'
-import { config } from '@/lib/config'
+import { locale, t } from '@/lib/strings'
 
 export async function getStaticPaths() {
     const posts = await getCollection('news')
@@ -12,14 +12,14 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props
 const { Content } = await render(post)
-const dateFormat = new Intl.DateTimeFormat(config.site.language, { dateStyle: 'long' })
+const dateFormat = new Intl.DateTimeFormat(locale, { dateStyle: 'long' })
 ---
 
 <Base title={post.data.title} description={post.data.description}>
     <PageHeader
         title={post.data.title}
         subtitle={dateFormat.format(post.data.date)}
-        back={{ href: '/news', label: 'News' }}
+        back={{ href: '/news', label: t('nav.news') }}
     />
     <article class='mx-auto max-w-5xl px-4 py-8'>
         <div class='prose-content max-w-3xl'>

@@ -1,4 +1,6 @@
 ---
+import { t } from '@/lib/strings'
+
 interface Props {
     title: string
     href?: string
@@ -12,7 +14,7 @@ const { title, href, linkLabel } = Astro.props
     {
         href && (
             <a href={href} class='text-sm text-primary hover:underline'>
-                {linkLabel ?? 'See all'} →
+                {linkLabel ?? t('common.see_all')} →
             </a>
         )
     }

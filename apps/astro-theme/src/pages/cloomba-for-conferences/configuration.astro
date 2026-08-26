@@ -17,12 +17,21 @@ import Base from '@/layouts/Base.astro'
                 is mostly uncommenting. A typo or wrong value fails the build with a readable message before anything
                 deploys.
             </p>
+            <p>
+                With one deliberate exception: <strong>wording never fails the build</strong>. A bad entry in <code
+                    >strings.ts</code
+                > is skipped with a warning and the English is used instead, because a mislabeled page is better than a site
+                that won't deploy. Everything else — a missing event slug, a malformed theme — still stops the build, since
+                those give you a broken site rather than a wrong word.
+            </p>
 
             <h2>The blocks</h2>
             <ul>
                 <li>
-                    <strong>site</strong> — name, logo, absolute URL (canonical tags + sitemap), description, language, and
-                    <code>noindex</code> for staging deploys.
+                    <strong>site</strong> — name, logo, absolute URL (canonical tags + sitemap), description,
+                    <code>language</code>, and <code>noindex</code> for staging deploys. Note that <code>language</code> sets
+                    <code>&lt;html lang&gt;</code> and formats dates, times and prices — it does not translate any words;
+                    that's <code>strings</code> below.
                 </li>
                 <li>
                     <strong>event</strong> — the Cloomba event slug this site renders. One event per site; a satellite event
@@ -44,6 +53,11 @@ import Base from '@/layouts/Base.astro'
                     <strong>header / footer</strong> — omit them and navigation derives itself from the enabled sections and
                     your custom pages; set them to take full control. The footer also carries app links and privacy/terms
                     URLs.
+                </li>
+                <li>
+                    <strong>strings</strong> — every UI label the template renders, so you can translate the site or just
+                    reword it. Already wired to <code>strings.ts</code>, which ships empty — you edit that file, never
+                    this line. See <a href='/cloomba-for-conferences/customization'>customization</a>.
                 </li>
                 <li><strong>socials</strong> — profile URLs; icons are detected from the domain automatically.</li>
                 <li>

@@ -13,7 +13,17 @@ export {
     type SponsorTierName,
     type WireSession,
 } from './agenda'
-export { formatDateSpan, formatDayHeading, formatMoney, formatTime, formatTimeRange, minutesOfDay } from './format'
+export {
+    formatDateSpan,
+    formatDayHeading,
+    formatMinutesOfDay,
+    formatMoney,
+    formatTime,
+    formatTimeRange,
+    minutesOfDay,
+    normalizeLocale,
+} from './format'
+export { resolveStrings, translate, translatePlural, CLDR_FORMS, type CldrForm, type StringTable } from './strings'
 export { buildAgendaIcs, type AgendaIcsOptions } from './ical'
 export {
     defineConfig,

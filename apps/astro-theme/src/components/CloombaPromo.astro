@@ -1,6 +1,8 @@
 ---
 import { siGithub } from 'simple-icons'
 
+import { t } from '@/lib/strings'
+
 // The band above the footer: this site is itself the pitch. Organizers who
 // like what they see get the three doors — how it works, the code, the
 // platform. Config-gated (`cloomba_promo: false` hides it — nothing to
@@ -10,17 +12,16 @@ import { siGithub } from 'simple-icons'
 <aside class='px-4'>
     <div class='mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-4 py-6 bg-primary/10 rounded-xl'>
         <p class='text-sm text-text-muted'>
-            <span class='font-medium text-text'>Organizing an event?</span><br/>
-            This whole site — agenda, speakers, tickets, registration — is an open-source template running on
-            Cloomba.<br/>
-            Yours could look like this by the weekend.
+            <span class='font-medium text-text'>{t('promo.title')}</span><br />
+            {t('promo.body')}<br />
+            {t('promo.tagline')}
         </p>
         <div class='flex flex-wrap gap-2'>
             <a
                 href='/cloomba-for-conferences'
                 class='rounded-card bg-primary px-4 py-2 text-sm font-medium text-primary-content transition-opacity hover:opacity-90'
             >
-                How it works
+                {t('promo.how_it_works')}
             </a>
             <a
                 href='https://github.com/cloomba/conference-template'
@@ -28,7 +29,7 @@ import { siGithub } from 'simple-icons'
                 class='inline-flex items-center gap-2 rounded-card border border-text/15 px-4 py-2 text-sm font-medium transition-colors hover:bg-surface-alt'
             >
                 <svg class='size-4' viewBox='0 0 24 24' fill='currentColor'><path d={siGithub.path}></path></svg>
-                GitHub
+                {t('promo.github')}
             </a>
             <a
                 href='https://cloomba.com'
@@ -36,7 +37,7 @@ import { siGithub } from 'simple-icons'
                 class='inline-flex items-center gap-2 rounded-card border border-text/15 px-4 py-2 text-sm font-medium transition-colors hover:bg-surface-alt'
             >
                 <img draggable='false' src='/cloomba-mark.svg' alt='' class='size-4' />
-                cloomba.com
+                {t('promo.cloomba')}
             </a>
         </div>
     </div>

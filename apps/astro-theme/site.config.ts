@@ -6,6 +6,10 @@
 
 import { defineConfig } from '@cloomba/core'
 
+// Your wording, in its own file — see strings.ts. Ships empty ({}), so the
+// template renders its English until you put something there.
+import strings from './strings'
+
 export default defineConfig({
     site: {
         // Conference name — site title, header brand, © line.
@@ -115,6 +119,10 @@ export default defineConfig({
         // Extra line under the © notice:
         text: 'Fauna Forum is a fictional conference — the live demo of the Cloomba conference template.',
     },
+    // Wording and translation — edit strings.ts, not this line. It ships
+    // empty, so out of the box every label is the shipped English.
+    strings,
+
     // Shown in the footer and used for mailto CTAs.
     contact_email: 'team@fauna-forum.example',
     // Social profile URLs — icons auto-detected from the domain, rendered in

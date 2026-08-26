@@ -16,6 +16,9 @@ interface Props {
     timezone: string
     eventStartsAt: string
     locale: string
+    // Resolved templates, not keys: t() lives on the server side of the island
+    // boundary. `until` and `at` carry a {time} placeholder.
+    strings: { now: string; until: string; next: string; at: string }
 }
 
 const timeOf = (date: Date, timezone: string, locale: string) =>
@@ -23,7 +26,9 @@ const timeOf = (date: Date, timezone: string, locale: string) =>
         date
     )
 
-export default function NowNext({ browserBase, slug, timezone, eventStartsAt, locale }: Props) {
+const fill = (template: string, time: string) => template.replace('{time}', time)
+
+export default function NowNext({ browserBase, slug, timezone, eventStartsAt, locale, strings }: Props) {
     const [slots, setSlots] = useState<AgendaSlot[]>([])
 
     useEffect(() => {
@@ -56,16 +61,20 @@ export default function NowNext({ browserBase, slug, timezone, eventStartsAt, lo
         <div className='mt-6 rounded-card border border-primary/30 bg-surface-alt p-4'>
             {current.map((session) => (
                 <p key={session.hash} className='text-sm'>
-                    <span className='font-semibold text-primary'>Now</span>{' '}
+                    <span className='font-semibold text-primary'>{strings.now}</span>{' '}
                     {session.location && <span className='text-text-muted'>{session.location}: </span>}
                     <span className='font-medium'>{session.title}</span>{' '}
-                    <span className='text-text-muted'>until {timeOf(session.ends_at, timezone, locale)}</span>
+                    <span className='text-text-muted'>
+                        {fill(strings.until, timeOf(session.ends_at, timezone, locale))}
+                    </span>
                 </p>
             ))}
             {next && (
                 <p className='mt-1 text-sm'>
-                    <span className='font-semibold text-text-muted'>Next</span> <span>{next.title}</span>{' '}
-                    <span className='text-text-muted'>at {timeOf(next.starts_at, timezone, locale)}</span>
+                    <span className='font-semibold text-text-muted'>{strings.next}</span> <span>{next.title}</span>{' '}
+                    <span className='text-text-muted'>
+                        {fill(strings.at, timeOf(next.starts_at, timezone, locale))}
+                    </span>
                 </p>
             )}
         </div>

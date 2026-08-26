@@ -4,6 +4,8 @@
 
 import { siBluesky, siFacebook, siGithub, siInstagram, siMastodon, siTelegram, siX, siYoutube } from 'simple-icons'
 
+import { t } from './strings'
+
 export interface SocialIconDef {
     title: string
     // SVG path in a 0 0 24 24 viewBox.
@@ -29,9 +31,10 @@ const BRANDS: [RegExp, { title: string; path: string }][] = [
 ]
 
 // Globe outline for plain websites (drawn for a 24px box, stroke-style path
-// converted to fill-rule-friendly strokes via the component).
+// converted to fill-rule-friendly strokes via the component). The brand titles
+// above stay as they are — those are proper nouns, not UI copy.
 export const GLOBE: SocialIconDef = {
-    title: 'Website',
+    title: t('a11y.website'),
     path: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm7.93 9h-3.47a15.6 15.6 0 0 0-1.21-5.5A8.02 8.02 0 0 1 19.93 11ZM12 4.06c.87 1.03 1.94 3.03 2.3 6.94H9.7c.36-3.91 1.43-5.91 2.3-6.94ZM8.75 5.5A15.6 15.6 0 0 0 7.54 11H4.07a8.02 8.02 0 0 1 4.68-5.5ZM4.07 13h3.47c.14 2.11.56 3.99 1.21 5.5A8.02 8.02 0 0 1 4.07 13ZM12 19.94c-.87-1.03-1.94-3.03-2.3-6.94h4.6c-.36 3.91-1.43 5.91-2.3 6.94Zm3.25-1.44c.65-1.51 1.07-3.39 1.21-5.5h3.47a8.02 8.02 0 0 1-4.68 5.5Z',
 }
 

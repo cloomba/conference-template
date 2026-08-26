@@ -4,6 +4,7 @@ import Tickets from '@/components/sections/Tickets.astro'
 import Base from '@/layouts/Base.astro'
 import { config } from '@/lib/config'
 import { embedOrigin } from '@/lib/env'
+import { t } from '@/lib/strings'
 
 // Registration runs INSIDE the Cloomba embed — the attendee signs in and pays
 // on Cloomba; this site never touches auth, payments, or personal data. The
@@ -14,18 +15,18 @@ import { embedOrigin } from '@/lib/env'
 const embedSrc = `${embedOrigin}/embed/e/${encodeURIComponent(config.event.slug)}`
 ---
 
-<Base title='Tickets' description={`Register for ${config.site.name}.`}>
-    <PageHeader title='Tickets' />
+<Base title={t('nav.tickets')} description={t('tickets.meta_description', { site: config.site.name })}>
+    <PageHeader title={t('nav.tickets')} />
     <Tickets plain />
     <section class='mx-auto max-w-5xl px-4 pb-16' id='register'>
-        <h2 class='mb-6 font-display text-2xl font-semibold tracking-tight'>Register</h2>
+        <h2 class='mb-6 font-display text-2xl font-semibold tracking-tight'>{t('tickets.register_heading')}</h2>
         <div class='max-w-3xl overflow-hidden rounded-card border border-text/10'>
             <iframe
                 class='cloomba-embed'
                 src={embedSrc}
                 style='width: 100%; height: 800px; border: none'
                 loading='lazy'
-                title={`Register for ${config.site.name}`}></iframe>
+                title={t('tickets.embed_title', { site: config.site.name })}></iframe>
         </div>
         <script src={`${embedOrigin}/embed/embed.js`} is:inline async></script>
     </section>

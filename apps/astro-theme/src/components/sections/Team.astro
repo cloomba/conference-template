@@ -2,6 +2,7 @@
 import SectionHeading from '@/components/ui/SectionHeading.astro'
 import SocialLink from '@/components/ui/SocialLink.astro'
 import { loadFeatured } from '@/lib/data'
+import { t } from '@/lib/strings'
 
 // The organizing team — featured entries with kind 'host'.
 const hosts = (await loadFeatured()).items.filter((f) => f.kind === 'host')
@@ -10,7 +11,7 @@ const hosts = (await loadFeatured()).items.filter((f) => f.kind === 'host')
 {
     hosts.length > 0 && (
         <section class='mx-auto max-w-5xl px-4 py-14'>
-            <SectionHeading title='The team' />
+            <SectionHeading title={t('team.title')} />
             <ul class='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'>
                 {hosts.map((host) => (
                     <li class='rounded-card border border-text/10 p-6'>

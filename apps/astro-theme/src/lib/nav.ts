@@ -5,6 +5,7 @@
 import { getCollection } from 'astro:content'
 
 import { config } from './config'
+import { t } from './strings'
 
 export interface NavLink {
     label: string
@@ -13,12 +14,12 @@ export interface NavLink {
 
 // Sections that have a page of their own worth linking from the nav.
 export const SECTION_LINKS: Partial<Record<(typeof config.sections)[number], NavLink>> = {
-    about: { label: 'About', href: '/about' },
-    agenda: { label: 'Agenda', href: '/agenda' },
-    speakers: { label: 'Speakers', href: '/speakers' },
-    sponsors: { label: 'Sponsors', href: '/sponsors' },
-    tickets: { label: 'Tickets', href: '/tickets' },
-    news: { label: 'News', href: '/news' },
+    about: { label: t('nav.about'), href: '/about' },
+    agenda: { label: t('nav.agenda'), href: '/agenda' },
+    speakers: { label: t('nav.speakers'), href: '/speakers' },
+    sponsors: { label: t('nav.sponsors'), href: '/sponsors' },
+    tickets: { label: t('nav.tickets'), href: '/tickets' },
+    news: { label: t('nav.news'), href: '/news' },
 }
 
 export const navPages = async (slot: 'header' | 'footer'): Promise<NavLink[]> => {
@@ -47,28 +48,28 @@ export const footerColumns = async (): Promise<FooterColumn[]> => {
 
     const explore = config.sections.flatMap((section) => (section === 'tickets' ? [] : (SECTION_LINKS[section] ?? [])))
     const attend: NavLink[] = [
-        ...(config.sections.includes('tickets') ? [{ label: 'Tickets', href: '/tickets' }] : []),
-        ...(config.sections.includes('agenda') ? [{ label: 'Add to calendar (iCal)', href: '/agenda.ics' }] : []),
+        ...(config.sections.includes('tickets') ? [{ label: t('nav.tickets'), href: '/tickets' }] : []),
+        ...(config.sections.includes('agenda') ? [{ label: t('nav.add_to_calendar'), href: '/agenda.ics' }] : []),
         ...(await navPages('footer')),
-        ...(config.contact_email ? [{ label: 'Contact us', href: `mailto:${config.contact_email}` }] : []),
+        ...(config.contact_email ? [{ label: t('nav.contact_us'), href: `mailto:${config.contact_email}` }] : []),
     ]
     const more: NavLink[] = [
         ...(config.footer.show_app_links
             ? [
-                  { label: 'iOS application', href: 'https://apps.apple.com/app/cloomba' },
+                  { label: t('nav.ios_app'), href: 'https://apps.apple.com/app/cloomba' },
                   {
-                      label: 'Android application',
+                      label: t('nav.android_app'),
                       href: 'https://play.google.com/store/apps/details?id=com.allwhitetown.cloomba',
                   },
               ]
             : []),
-        { label: 'Privacy policy', href: config.footer.privacy_href },
-        { label: 'Terms of service', href: config.footer.terms_href },
+        { label: t('nav.privacy'), href: config.footer.privacy_href },
+        { label: t('nav.terms'), href: config.footer.terms_href },
     ]
 
     return [
-        { title: 'Explore', links: explore },
-        { title: 'Attend', links: attend },
-        { title: 'More', links: more },
+        { title: t('nav.column_explore'), links: explore },
+        { title: t('nav.column_attend'), links: attend },
+        { title: t('nav.column_more'), links: more },
     ].filter((column) => column.links.length > 0)
 }

@@ -2,16 +2,16 @@
 import { getCollection } from 'astro:content'
 
 import SectionHeading from '@/components/ui/SectionHeading.astro'
-import { config } from '@/lib/config'
+import { locale, t } from '@/lib/strings'
 
 const posts = (await getCollection('news')).sort((a, b) => b.data.date.getTime() - a.data.date.getTime()).slice(0, 3)
-const dateFormat = new Intl.DateTimeFormat(config.site.language, { dateStyle: 'long' })
+const dateFormat = new Intl.DateTimeFormat(locale, { dateStyle: 'long' })
 ---
 
 {
     posts.length > 0 && (
         <section class='mx-auto max-w-5xl px-4 py-14'>
-            <SectionHeading title='News' href='/news' linkLabel='All news' />
+            <SectionHeading title={t('nav.news')} href='/news' linkLabel={t('news.all')} />
             <ul class='grid gap-6 sm:grid-cols-3'>
                 {posts.map((post) => (
                     <li>

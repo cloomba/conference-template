@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content'
 
 import SectionHeading from '@/components/ui/SectionHeading.astro'
+import { t } from '@/lib/strings'
 
 const entries = (await getCollection('faq')).sort((a, b) => a.data.order - b.data.order)
 const rendered = await Promise.all(entries.map(async (entry) => ({ entry, Content: (await render(entry)).Content })))
@@ -10,7 +11,7 @@ const rendered = await Promise.all(entries.map(async (entry) => ({ entry, Conten
 {
     rendered.length > 0 && (
         <section class='mx-auto max-w-5xl px-4 py-14'>
-            <SectionHeading title='FAQ' />
+            <SectionHeading title={t('faq.title')} />
             <div class='max-w-3xl divide-y divide-text/10 overflow-hidden rounded-card border border-text/10'>
                 {rendered.map(({ entry, Content }) => (
                     <details class='group'>

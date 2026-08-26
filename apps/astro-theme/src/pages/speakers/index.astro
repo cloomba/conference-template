@@ -5,13 +5,14 @@ import Base from '@/layouts/Base.astro'
 import { config } from '@/lib/config'
 import { callsOpen, loadSpeakers } from '@/lib/data'
 import { speakerPath } from '@/lib/slugs'
+import { t } from '@/lib/strings'
 
 const speakers = await loadSpeakers()
 const cfpOpen = await callsOpen()
 ---
 
-<Base title='Speakers' description={`Speakers at ${config.site.name}.`}>
-    <PageHeader title='Speakers' />
+<Base title={t('nav.speakers')} description={t('speakers.meta_description', { site: config.site.name })}>
+    <PageHeader title={t('nav.speakers')} />
     <div class='mx-auto max-w-5xl px-4 py-8'>
         <ul class='grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4'>
             {
@@ -41,10 +42,10 @@ const cfpOpen = await callsOpen()
         {
             cfpOpen && (
                 <CallBanner
-                    title='Your name belongs up here'
-                    body='The call for papers is open — every species, every experience level, mentors for first-timers.'
+                    title={t('speakers.cfp_title')}
+                    body={t('speakers.cfp_body')}
                     href='/call-for-papers'
-                    label='Propose a talk'
+                    label={t('speakers.cfp_label')}
                 />
             )
         }

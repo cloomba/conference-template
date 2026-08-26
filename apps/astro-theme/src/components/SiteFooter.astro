@@ -2,6 +2,7 @@
 import SocialLink from '@/components/ui/SocialLink.astro'
 import { config } from '@/lib/config'
 import { footerColumns } from '@/lib/nav'
+import { t } from '@/lib/strings'
 
 const columns = await footerColumns()
 const year = new Date().getFullYear()
@@ -47,11 +48,11 @@ const year = new Date().getFullYear()
             class='mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-text/10 pt-6 text-sm text-text-muted'
         >
             <p>
-                {/* Explicit {' '} — a bare newline between expressions collapses to nothing. */}
-                © {year}{' '}{config.site.name}
+                {/* One expression, so no bare newline can collapse the spacing. */}
+                {t('footer.copyright', { year, site: config.site.name })}
                 {config.footer.text && <span> · {config.footer.text}</span>}
             </p>
-            <a href='https://cloomba.com' class='hover:text-text' rel='noopener'>Powered by Cloomba</a>
+            <a href='https://cloomba.com' class='hover:text-text' rel='noopener'>{t('footer.powered_by')}</a>
         </div>
     </div>
 </footer>

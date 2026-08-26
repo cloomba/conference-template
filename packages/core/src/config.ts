@@ -144,9 +144,7 @@ export const siteConfigSchema = z.object({
     // them (Explore / Attend / More); setting it replaces them wholesale.
     footer: z
         .object({
-            columns: z
-                .array(z.object({ title: z.string().min(1), links: z.array(linkSchema) }))
-                .optional(),
+            columns: z.array(z.object({ title: z.string().min(1), links: z.array(linkSchema) })).optional(),
             // Cloomba app links (attendees carry their tickets there).
             show_app_links: z.boolean().default(true),
             privacy_href: z.string().min(1).default('https://cloomba.com/legal/privacy'),
@@ -154,6 +152,16 @@ export const siteConfigSchema = z.object({
             text: z.string().optional(),
         })
         .prefault({}),
+    // UI label overrides, merged over the theme's own English table:
+    // `{ ...en, ...strings }` — how a site gets translated. The theme owns the
+    // key list (apps/astro-theme/strings.en.json) and gives authors
+    // autocomplete over it; the schema only has to accept the shape.
+    //
+    // Deliberately permissive: z.record(…, z.string()) would make one numeric
+    // value in a hand-written JSON file throw out of parseSiteConfig and kill
+    // the build. resolveStrings drops bad entries with a warning instead,
+    // because a mislabeled site beats a dead one.
+    strings: z.record(z.string(), z.unknown()).prefault({}),
     contact_email: z.string().optional(),
     // Call-for-papers / call-for-sponsors banners (speakers + sponsors pages)
     // stop rendering this many days before the event starts — a CFP the week
@@ -179,6 +187,9 @@ export const siteConfigSchema = z.object({
 
 export type SiteConfig = z.infer<typeof siteConfigSchema>
 // The authoring shape — defaults still optional. What site.config.ts exports.
+// `strings` stays loose here because the KEYS belong to the theme, not to
+// core: the theme's strings.ts pins them with `satisfies StringOverrides`,
+// which is where the autocomplete and the typo errors actually happen.
 export type SiteConfigInput = z.input<typeof siteConfigSchema>
 
 // Identity helper for site.config.ts — exists purely so forkers get editor

@@ -7,6 +7,6 @@
             "@/*": ["./src/*"]
         }
     },
-    "include": [".astro/types.d.ts", "src", "site.config.ts", "astro.config.ts"],
+    "include": [".astro/types.d.ts", "src", "site.config.ts", "strings.ts", "astro.config.ts"],
     "exclude": ["dist"]
 }

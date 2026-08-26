@@ -3,13 +3,14 @@
 // the effective theme; the choice persists in localStorage and the Base
 // layout's head script re-applies it before paint. Vanilla script — this is
 // far too small to be an island.
+import { t } from '@/lib/strings'
 ---
 
 <button
     id='theme-toggle'
     type='button'
     class='flex size-9 items-center justify-center rounded-card text-text-muted hover:bg-surface-alt hover:text-text'
-    aria-label='Toggle color theme'
+    aria-label={t('a11y.toggle_theme')}
 >
     {/* Sun — shown while dark is effective (click → light). */}
     <svg class='icon-sun size-5' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'>
