@@ -145,10 +145,15 @@ export const siteConfigSchema = z.object({
     footer: z
         .object({
             columns: z.array(z.object({ title: z.string().min(1), links: z.array(linkSchema) })).optional(),
-            // Cloomba app links (attendees carry their tickets there).
-            show_app_links: z.boolean().default(true),
-            privacy_href: z.string().min(1).default('https://cloomba.com/legal/privacy'),
-            terms_href: z.string().min(1).default('https://cloomba.com/legal/terms'),
+            // Cloomba app links (attendees carry their tickets there). OFF by
+            // default: a fork is someone else's conference, and their footer
+            // shouldn't advertise our apps unless they ask for it.
+            show_app_links: z.boolean().default(false),
+            // YOUR policies. Undefined = the links don't render. There is
+            // deliberately no default: pointing a conference's footer at
+            // Cloomba's privacy policy would misstate who controls the site.
+            privacy_href: z.string().min(1).optional(),
+            terms_href: z.string().min(1).optional(),
             text: z.string().optional(),
         })
         .prefault({}),
@@ -171,8 +176,13 @@ export const siteConfigSchema = z.object({
     // auto-detected from the domain; rendered as an icon row in the footer.
     socials: z.array(z.string().min(1)).default([]),
     // The "built with the Cloomba conference template" band above the footer.
-    // Flip to false to hide it — nothing to delete.
-    cloomba_promo: z.boolean().default(true),
+    // OFF by default — a fork is a real conference's website, not an ad for the
+    // thing it was built with. Flip to true to show it; the demo does.
+    cloomba_promo: z.boolean().default(false),
+    // The `/cloomba-for-conferences/*` documentation pages. OFF by default —
+    // they document the TEMPLATE, so they belong on the demo, not inside
+    // somebody's conference site. See src/pages/cloomba-for-conferences/.
+    cloomba_docs: z.boolean().default(false),
     analytics: z
         .object({
             umami: z.object({ src: z.string().min(1), website_id: z.string().min(1) }).optional(),

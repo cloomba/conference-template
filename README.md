@@ -11,23 +11,43 @@ animal conference exercising every feature: paid and hidden ticket tiers,
 coupons, a multi-stage agenda with a CSS-only filter, light/dark theming, and
 Event structured data.
 
+| Light                                                                | Dark                                                    |
+| -------------------------------------------------------------------- | ------------------------------------------------------- |
+| ![The demo conference site in light mode](docs/screenshot-light.jpg) | ![The same page in dark mode](docs/screenshot-dark.jpg) |
+
 ## Quick start
 
+No account and no API key needed to try it — a fresh clone renders the demo
+conference straight away:
+
 ```bash
-yarn install
-cp apps/astro-theme/.env.example apps/astro-theme/.env
-# put your free read-only API key (cloomba.com/me/developers) in .env
+yarn install      # run this at the REPOSITORY ROOT (yarn workspaces)
+yarn dev          # → localhost:4321
 yarn build        # → apps/astro-theme/dist — deploy anywhere static
 ```
 
-Point the template at your own event by editing
-`apps/astro-theme/site.config.ts` — one typed, fully annotated file: event
-slug, colors, fonts, section order, navigation. Validation runs at build; a
-bad value fails with a readable message.
+With no key configured the build uses a shared, read-only key against the demo
+event. That key's permissions cover public event content only — it cannot read
+an attendee list — which is why it can sit in a public repository at all.
+
+## Your own conference
+
+1. Create a free key at [cloomba.com/me/developers](https://cloomba.com/me/developers)
+   and choose the **Read Public** permission. Put it in
+   `apps/astro-theme/.env` as `CLOOMBA_API_KEY`.
+2. Point `apps/astro-theme/site.config.ts` at your event — one typed, fully
+   annotated file: event slug, colors, fonts, section order, navigation.
+   Validation runs at build, so a bad value fails with a readable message.
+
+Everything event-shaped (agenda, speakers, sponsors, ticket tiers, venue) is
+edited on Cloomba and picked up on the next build. Editorial content — custom
+pages, FAQ, news — is markdown in `apps/astro-theme/src/content/`.
 
 ## Documentation
 
-The demo hosts the full documentation, generated from this repository:
+The demo hosts the full documentation. These pages live in this repository but
+are off by default (`cloomba_docs`), so your own build doesn't publish
+documentation about the template:
 
 - [Features](https://demo.cloomba.com/cloomba-for-conferences/features)
 - [Configuration](https://demo.cloomba.com/cloomba-for-conferences/configuration)
@@ -48,7 +68,8 @@ apps/astro-theme  the site template: Astro (static) + React islands + Tailwind
 ## How it fits together
 
 - **Build time:** the template pulls your event from `api.cloomba.com/public/v1`
-  with a read-only key and renders static pages.
+  with a read-only key and renders static pages. The key is never shipped to the
+  browser, and the one it uses by default reaches public event content only.
 - **Runtime:** two small live elements (agenda now/next, ticket availability)
   poll anonymous endpoints; registration runs inside Cloomba's embedded
   widget under the attendee's own account.

@@ -1,12 +1,15 @@
 ---
 import { siGithub } from 'simple-icons'
 
+import { config } from '@/lib/config'
 import { t } from '@/lib/strings'
 
 // The band above the footer: this site is itself the pitch. Organizers who
 // like what they see get the three doors — how it works, the code, the
-// platform. Config-gated (`cloomba_promo: false` hides it — nothing to
-// delete).
+// platform. Config-gated (`cloomba_promo` ships false — the demo opts in).
+//
+// The first door only exists when the docs pages are built (`cloomba_docs`);
+// with promo on and docs off it would 404, so it drops out instead.
 ---
 
 <aside class='px-4'>
@@ -17,12 +20,16 @@ import { t } from '@/lib/strings'
             {t('promo.tagline')}
         </p>
         <div class='flex flex-wrap gap-2'>
-            <a
-                href='/cloomba-for-conferences'
-                class='rounded-card bg-primary px-4 py-2 text-sm font-medium text-primary-content transition-opacity hover:opacity-90'
-            >
-                {t('promo.how_it_works')}
-            </a>
+            {
+                config.cloomba_docs && (
+                    <a
+                        href='/cloomba-for-conferences'
+                        class='rounded-card bg-primary px-4 py-2 text-sm font-medium text-primary-content transition-opacity hover:opacity-90'
+                    >
+                        {t('promo.how_it_works')}
+                    </a>
+                )
+            }
             <a
                 href='https://github.com/cloomba/conference-template'
                 rel='noopener'

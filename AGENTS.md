@@ -42,6 +42,17 @@ yarn lint           # eslint over packages/
   embedded Cloomba widget under the attendee's own auth. The API key used at
   build time is read-only; it lives in `.env` (gitignored) and must never be
   referenced from island/client-side code.
+- **`DEMO_API_KEY` in `src/lib/env.ts` is committed on purpose** — it is what
+  makes a fresh clone run with no setup. It is publishable only because its
+  scope (`read_public`) cannot reach the attendee endpoints. Never widen it, and
+  never commit any other key.
+- **Cloomba's own surfaces are opt-in.** `cloomba_promo`, `cloomba_docs` and
+  `footer.show_app_links` all default to FALSE, and the legal hrefs have no
+  default at all; `apps/astro-theme/site.config.ts` turns them on because that
+  file configures the demo. A fork is somebody's real conference — anything that
+  advertises Cloomba, or points at Cloomba's policies, must be a choice they
+  made. No analytics id is ever committed (the demo reads `UMAMI_WEBSITE_ID`
+  from its build environment).
 - **Semantic tokens only in components** — `bg-surface`, `text-text`,
   `text-primary`, never raw colors and never `dark:` variants; light/dark is
   handled entirely by token values.

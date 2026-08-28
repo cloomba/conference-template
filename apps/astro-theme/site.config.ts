@@ -10,6 +10,11 @@ import { defineConfig } from '@cloomba/core'
 // template renders its English until you put something there.
 import strings from './strings'
 
+// This file is loaded by astro.config.ts, which runs in Node — so `process.env`
+// is the right accessor here, not `import.meta.env` (that one is populated for
+// the app's own modules, not for the config graph).
+const umamiWebsiteId = process.env.UMAMI_WEBSITE_ID
+
 export default defineConfig({
     site: {
         // Conference name — site title, header brand, © line.
@@ -111,11 +116,12 @@ export default defineConfig({
         // automatically (sections + custom pages + apps + legal):
         // columns: [{ title: 'Explore', links: [{ label: 'Agenda', href: '/agenda' }] }],
         // Cloomba iOS/Android links in the More column (attendee tickets live
-        // in the apps):
-        // show_app_links: true,
-        // Legal links — default to Cloomba's own:
-        // privacy_href: 'https://cloomba.com/legal/privacy',
-        // terms_href: 'https://cloomba.com/legal/terms',
+        // in the apps). Off by default; this demo opts in.
+        show_app_links: true,
+        // YOUR privacy policy and terms. No default — omit them and the links
+        // don't render. This demo points at Cloomba's because Cloomba runs it.
+        privacy_href: 'https://cloomba.com/legal/privacy',
+        terms_href: 'https://cloomba.com/legal/terms',
         // Extra line under the © notice:
         text: 'Fauna Forum is a fictional conference — the live demo of the Cloomba conference template.',
     },
@@ -131,11 +137,19 @@ export default defineConfig({
     // Analytics — self-hosted Umami; omit for none. `head_html` injects any
     // other tracker verbatim (GA, Meta pixel, …) — cookie-based trackers make
     // you responsible for a consent banner; the template ships none.
-    analytics: {
-        umami: { src: 'https://umami.cloomba.com/script.js', website_id: 'e302d401-376c-492d-bd50-96263c67c9a5' },
-        // head_html: `<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXX"></script>`,
-    },
-    // The "built with Cloomba" band above the footer. Set false to hide —
-    // nothing to delete.
+    //
+    // Your own id goes here directly:
+    //   umami: { src: 'https://umami.example.com/script.js', website_id: 'your-id' },
+    // This demo reads its id from the environment INSTEAD of committing it. A
+    // committed id is the one setting a forker reliably forgets to change —
+    // and forgetting it silently ships their visitors' traffic to our account.
+    analytics: umamiWebsiteId
+        ? { umami: { src: 'https://umami.cloomba.com/script.js', website_id: umamiWebsiteId } }
+        : {},
+    // The "built with Cloomba" band above the footer. Off by default; this demo
+    // opts in. Set false to hide — nothing to delete.
     cloomba_promo: true,
+    // The /cloomba-for-conferences/* documentation pages. Off by default — they
+    // document the template, so only the demo publishes them.
+    cloomba_docs: true,
 })

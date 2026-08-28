@@ -1,0 +1,41 @@
+---
+import Configuration from '@/components/docs/Configuration.astro'
+import Customization from '@/components/docs/Customization.astro'
+import Deployment from '@/components/docs/Deployment.astro'
+import Features from '@/components/docs/Features.astro'
+import Overview from '@/components/docs/Overview.astro'
+import { config } from '@/lib/config'
+
+// The template's own documentation. These pages describe the TEMPLATE, not any
+// conference, so they ship OFF (`cloomba_docs`) and only the demo publishes
+// them — a fork's build emits no route here at all, rather than five pages the
+// forker has to find and delete.
+//
+// One rest route rather than five page files because Astro emits every file
+// under src/pages/ unconditionally; returning an empty getStaticPaths is the
+// only way a static build can decide not to have a page. The page bodies moved
+// to src/components/docs/ verbatim — each still carries its own <Base>.
+const PAGES = {
+    undefined: Overview,
+    features: Features,
+    configuration: Configuration,
+    customization: Customization,
+    deployment: Deployment,
+} as const
+
+export const getStaticPaths = () =>
+    config.cloomba_docs
+        ? [
+              { params: { slug: undefined } },
+              { params: { slug: 'features' } },
+              { params: { slug: 'configuration' } },
+              { params: { slug: 'customization' } },
+              { params: { slug: 'deployment' } },
+          ]
+        : []
+
+const { slug } = Astro.params
+const Doc = PAGES[(slug ?? 'undefined') as keyof typeof PAGES]
+---
+
+<Doc />

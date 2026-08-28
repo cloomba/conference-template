@@ -43,6 +43,8 @@ export interface FooterColumn {
 // Derived footer columns (config.footer.columns replaces them wholesale):
 //   Explore — content sections;  Attend — practical links + custom footer
 //   pages;  More — the Cloomba apps (tickets live there) + legal.
+// Everything in More is opt-in, so a site that configures neither ends up with
+// two columns rather than a column of links to someone else's site.
 export const footerColumns = async (): Promise<FooterColumn[]> => {
     if (config.footer.columns) return config.footer.columns
 
@@ -63,8 +65,10 @@ export const footerColumns = async (): Promise<FooterColumn[]> => {
                   },
               ]
             : []),
-        { label: t('nav.privacy'), href: config.footer.privacy_href },
-        { label: t('nav.terms'), href: config.footer.terms_href },
+        // Only when the site has its own — a conference's footer must not link
+        // someone else's privacy policy, so there is no default to fall back to.
+        ...(config.footer.privacy_href ? [{ label: t('nav.privacy'), href: config.footer.privacy_href }] : []),
+        ...(config.footer.terms_href ? [{ label: t('nav.terms'), href: config.footer.terms_href }] : []),
     ]
 
     return [

@@ -2,17 +2,28 @@
 // each endpoint is fetched exactly once per build no matter how many pages
 // render it. BUILD-TIME ONLY — this module reads the secret key from env and
 // must never be imported from an island (see AGENTS.md).
+//
+// With no key configured the build falls back to the shared demo key (env.ts),
+// so a fresh clone renders without any setup at all.
 
 import { createClient } from '@cloomba/client'
 import { toAgendaSlots } from '@cloomba/core'
 
 import { config } from './config'
-import { apiBaseUrl } from './env'
+import { apiBaseUrl, apiKey, usingDemoKey } from './env'
 
-const apiKey = import.meta.env.CLOOMBA_API_KEY as string | undefined
 if (!apiKey) {
     throw new Error(
         'CLOOMBA_API_KEY is not set. Copy .env.example to .env and add a read-only key from https://cloomba.com/me/developers.'
+    )
+}
+
+// Not an error — this is the intended first-run path. It says so once so that
+// nobody ships a real conference on the shared key by accident.
+if (usingDemoKey) {
+    console.warn(
+        '[cloomba] Building with the shared demo key against the demo event. ' +
+            'Set CLOOMBA_API_KEY in .env (free, at https://cloomba.com/me/developers) and point `event.slug` at your own event.'
     )
 }
 
