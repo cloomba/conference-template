@@ -20,9 +20,15 @@ const cover = event.cover_url ?? '/placeholders/hero.svg'
 
 <section class='relative overflow-hidden'>
     <img draggable='false' src={cover} alt='' class='absolute inset-0 size-full object-cover' loading='eager' />
-    <div class='absolute inset-0 bg-linear-to-t from-surface via-surface/70 to-surface/30'></div>
+    <!-- The scrim is thinnest at the TOP, which is where the hero text starts —
+         keep it opaque enough that the title and dates stay legible over a dark
+         cover, without flattening the artwork. -->
+    <div class='absolute inset-0 bg-linear-to-t from-surface via-surface/70 to-surface/50'></div>
     <div class='relative mx-auto max-w-5xl px-4 pb-20 pt-24 sm:pb-28 sm:pt-32'>
-        <p class='mb-3 text-sm font-semibold uppercase tracking-widest text-primary'>
+        <!-- text-text, not text-primary: this line sits over the cover, so its
+             contrast depends on an image the template does not control. Primary
+             is reserved for the button below, where it earns the attention. -->
+        <p class='mb-3 text-sm font-semibold uppercase tracking-widest text-text'>
             {dates}{place && ` · ${place}`}
         </p>
         <h1 class='max-w-3xl font-display text-4xl font-bold tracking-tight sm:text-6xl'>{event.title}</h1>
