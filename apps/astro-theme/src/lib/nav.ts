@@ -58,7 +58,7 @@ export const footerColumns = async (): Promise<FooterColumn[]> => {
     const more: NavLink[] = [
         ...(config.footer.show_app_links
             ? [
-                  { label: t('nav.ios_app'), href: 'https://apps.apple.com/app/cloomba' },
+                  { label: t('nav.ios_app'), href: 'https://apps.apple.com/app/id6670720223' },
                   {
                       label: t('nav.android_app'),
                       href: 'https://play.google.com/store/apps/details?id=com.allwhitetown.cloomba',
