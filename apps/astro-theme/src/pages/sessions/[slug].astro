@@ -3,8 +3,9 @@ import { formatDayHeading, formatTimeRange } from '@cloomba/core'
 
 import PageHeader from '@/components/PageHeader.astro'
 import Base from '@/layouts/Base.astro'
-import { loadEvent, loadSessions } from '@/lib/data'
-import { renderMarkdown } from '@/lib/markdown'
+import { loadEvent, loadSessions, loadSpeakers, loadTicketTypes } from '@/lib/data'
+import { sessionEventNode } from '@/lib/jsonld'
+import { plainText, renderMarkdown } from '@/lib/markdown'
 import { detailSlug, speakerPath } from '@/lib/slugs'
 import { locale, t } from '@/lib/strings'
 
@@ -17,18 +18,23 @@ export async function getStaticPaths() {
 }
 
 const { session } = Astro.props
-const event = await loadEvent()
+const [event, speakers, ticketTypes] = await Promise.all([loadEvent(), loadSpeakers(), loadTicketTypes()])
 
-// Sub-Event structured data: the talk, nested under the conference.
+// Sub-Event structured data: the talk, nested under the conference. A session
+// has no venue of its own — `session.location` is a room, so the node takes
+// the event's address (see lib/jsonld.ts).
 const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Event',
-    name: session.title,
-    startDate: session.starts_at.toISOString(),
-    endDate: session.ends_at.toISOString(),
-    ...(session.location ? { location: { '@type': 'Place', name: session.location } } : {}),
-    performer: session.speakers.filter((s) => s.name).map((s) => ({ '@type': 'Person', name: s.name })),
-    superEvent: { '@type': 'Event', name: event.title, startDate: event.starts_at },
+    ...sessionEventNode({
+        event,
+        session,
+        // The canonical path, trailing slash and all — same value Base.astro
+        // puts in <link rel='canonical'>.
+        path: Astro.url.pathname,
+        speakers,
+        ticketTypes: ticketTypes.items,
+        description: plainText(session.description),
+    }),
 }
 ---
 

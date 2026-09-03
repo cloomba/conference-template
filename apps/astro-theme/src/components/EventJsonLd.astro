@@ -1,68 +1,22 @@
 ---
-import { config } from '@/lib/config'
 import { loadEvent, loadSpeakers, loadTicketTypes } from '@/lib/data'
+import { conferenceEventNode } from '@/lib/jsonld'
+import { plainText } from '@/lib/markdown'
 
 // schema.org Event structured data — what Google builds event rich results
 // from (name, dates, venue, ticket offers, speakers). Rendered on the home
-// page.
+// page. The node itself is built in lib/jsonld.ts, so the session pages nest
+// exactly this shape as their `superEvent`.
 const [event, speakers, ticketTypes] = await Promise.all([loadEvent(), loadSpeakers(), loadTicketTypes()])
-
-const offers = ticketTypes.items
-    .filter((tier) => tier.visibility === 'public')
-    .map((tier) => ({
-        '@type': 'Offer',
-        name: tier.name,
-        price: (tier.price_cents / 100).toFixed(2),
-        priceCurrency: tier.currency,
-        availability: tier.sold_out ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
-        url: config.site.url ? new URL('/tickets', config.site.url).toString() : '/tickets',
-    }))
 
 const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Event',
-    name: event.title,
-    description: config.site.description ?? undefined,
-    startDate: event.starts_at,
-    endDate: event.ends_at ?? undefined,
-    eventAttendanceMode:
-        event.format === 'online'
-            ? 'https://schema.org/OnlineEventAttendanceMode'
-            : event.format === 'hybrid'
-              ? 'https://schema.org/MixedEventAttendanceMode'
-              : 'https://schema.org/OfflineEventAttendanceMode',
-    eventStatus:
-        event.status === 'cancelled' ? 'https://schema.org/EventCancelled' : 'https://schema.org/EventScheduled',
-    image: event.cover_url ?? undefined,
-    location:
-        event.location.name || event.location.city
-            ? {
-                  '@type': 'Place',
-                  name: event.location.name ?? undefined,
-                  address: {
-                      '@type': 'PostalAddress',
-                      streetAddress: event.location.address ?? undefined,
-                      addressLocality: event.location.city ?? undefined,
-                      addressCountry: event.location.country ?? undefined,
-                  },
-                  ...(event.location.lat != null && event.location.lng != null
-                      ? {
-                            geo: {
-                                '@type': 'GeoCoordinates',
-                                latitude: event.location.lat,
-                                longitude: event.location.lng,
-                            },
-                        }
-                      : {}),
-              }
-            : undefined,
-    performer: speakers.filter((speaker) => speaker.name).map((speaker) => ({ '@type': 'Person', name: speaker.name })),
-    organizer: {
-        '@type': 'Organization',
-        name: config.site.name,
-        url: config.site.url ?? 'https://cloomba.com',
-    },
-    offers: offers.length > 0 ? offers : undefined,
+    ...conferenceEventNode({
+        event,
+        speakers,
+        ticketTypes: ticketTypes.items,
+        description: plainText(event.description),
+    }),
 }
 ---
 
