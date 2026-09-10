@@ -3,6 +3,11 @@
 Instructions for AI coding agents (and a fine orientation for humans) working in
 this repository.
 
+_Verified against the code 2026-09-10 (specs/126). Counts below are scale, not
+inventory — a wrong one means this file has aged, so re-check rather than reason
+from it._ (`CLAUDE.md` in this directory is a one-line `@AGENTS.md` import — this
+file is the real one; edit here.)
+
 ## What this is
 
 An open-source conference website template on top of the Cloomba public API.
@@ -30,6 +35,8 @@ yarn build          # builds every workspace (tsup for packages, astro for the a
 yarn typecheck      # tsc --noEmit in every workspace
 yarn lint           # eslint over packages/
 ```
+
+`engines.node` is `>=22`; `packageManager` pins yarn 1.22.22.
 
 ## Hard rules
 
