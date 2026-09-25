@@ -121,7 +121,10 @@ export const createClient = (options: CloombaClientOptions) => {
         listMedia: (slug: string, query?: Query<'listMedia'>) => request<MediaList>(slugPath(slug, '/media'), query),
         /** Ticket tiers with prices and seats left. */
         listTicketTypes: (slug: string) => request<TicketTypeList>(slugPath(slug, '/ticket-types')),
-        /** Check a guest in (requires Pro + a read_write key). */
+        /**
+         * Check a guest in (requires a read_write key on an account with write access — `api_pro_required`
+         * otherwise). Accepts a registration token, a ticket token, or a ticket's share URL.
+         */
         checkIn: (slug: string, qrToken: string) =>
             request<CheckInResult>(slugPath(slug, '/check-in'), undefined, {
                 method: 'POST',

@@ -76,6 +76,8 @@
 
     "tickets.meta_description": "Register for {site}.",
     "tickets.free": "Free",
+    "tickets.price_from": "from {price}",
+    "tickets.price_on_request": "Price on request",
     "tickets.sold_out": "Sold out",
     "tickets.spots_left.one": "Only {count} left",
     "tickets.spots_left.other": "Only {count} left",

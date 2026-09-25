@@ -19,7 +19,22 @@ export interface paths {
          */
         get: operations['listEvents']
         put?: never
-        post?: never
+        /**
+         * Create an event
+         * @description Creates an event you organize. **Requires a key with the `read_write`
+         *     scope**, and the key must be account-wide — a key restricted to specific
+         *     events cannot create new ones (`api_scope_forbidden`).
+         *
+         *     Send `external_id` and this becomes an **upsert**: if one of your events
+         *     already carries that id, it is updated instead and the response is `200`
+         *     rather than `201`. That makes a retry or a repeated sync safe, and means
+         *     you never have to store or guess our `slug`. Without `external_id`, every
+         *     call creates a new event.
+         *
+         *     The event is created with a single free "Standard" ticket tier. Set
+         *     `status` to `published` to make it live immediately.
+         */
+        post: operations['createEvent']
         delete?: never
         options?: never
         head?: never
@@ -46,7 +61,19 @@ export interface paths {
         delete?: never
         options?: never
         head?: never
-        patch?: never
+        /**
+         * Update an event
+         * @description Partial update — only the fields you send are changed. **Requires the Pro
+         *     plan and a key with the `read_write` scope.**
+         *
+         *     Changing `starts_at` / `ends_at` reschedules attendee reminders and
+         *     refreshes issued wallet passes; changing `capacity` reconciles the
+         *     waitlist. Attendees are not emailed — announce changes with an event
+         *     update in the app.
+         *
+         *     Cancelling an event is not part of this endpoint.
+         */
+        patch: operations['updateEvent']
         trace?: never
     }
     '/events/{slug}/attendees': {
@@ -197,6 +224,68 @@ export interface paths {
         patch?: never
         trace?: never
     }
+    '/events/{slug}/cover': {
+        parameters: {
+            query?: never
+            header?: never
+            path?: never
+            cookie?: never
+        }
+        get?: never
+        /**
+         * Set or replace the event cover
+         * @description Sets the event's cover image. **Requires a key with the `read_write`
+         *     scope.** Send exactly one of `cover_url` or `preset_key`.
+         *
+         *     `cover_url` is **mirrored** into our storage, never hot-linked — we fetch it
+         *     once and serve our own copy, so your link rotting doesn't break the event
+         *     page. The image is **letterboxed to a square, never cropped**: we can't know
+         *     which part of a wide image matters, so nothing is cut off.
+         *
+         *     Idempotent. Re-sending this event's current `cover_url` — the value you get back
+         *     when you read it — is a no-op, so read-modify-write is safe. Any *other* image
+         *     already hosted by us is rejected with `400 validation_failed`: `cover_url` is for
+         *     images you host, and silently ignoring it would leave you thinking the cover
+         *     changed when it hadn't.
+         *
+         *     Replacing a cover that was set through this endpoint discards the old image.
+         *     A cover the organizer uploaded in the app is only detached, never deleted.
+         */
+        put: operations['setEventCover']
+        post?: never
+        /**
+         * Remove the event cover
+         * @description Clears the cover. **Requires a key with the `read_write` scope.** An image
+         *     set through this endpoint is discarded; one the organizer uploaded in the
+         *     app is only detached from the event, never deleted.
+         */
+        delete: operations['clearEventCover']
+        options?: never
+        head?: never
+        patch?: never
+        trace?: never
+    }
+    '/cover-presets': {
+        parameters: {
+            query?: never
+            header?: never
+            path?: never
+            cookie?: never
+        }
+        /**
+         * List the bundled cover images
+         * @description The stock cover library. Use a `key` from this list as `preset_key` when
+         *     setting a cover, for an event with no artwork of its own.
+         */
+        get: operations['listCoverPresets']
+        put?: never
+        post?: never
+        delete?: never
+        options?: never
+        head?: never
+        patch?: never
+        trace?: never
+    }
     '/events/{slug}/check-in': {
         parameters: {
             query?: never
@@ -209,10 +298,12 @@ export interface paths {
         /**
          * Check a guest in
          * @description Marks a registration (and its admission) as checked in. **Requires
-         *     the Pro plan and a key with the `read_write` scope** — a non-Pro
-         *     account returns `403 api_pro_required`, a `read` key
-         *     `403 api_scope_forbidden`. Accepts the registration token or a
-         *     per-admission ticket token, same as the lookup endpoint.
+         *     a key with the `read_write` scope** — a `read` key returns
+         *     `403 api_scope_forbidden`. Send the scanned string as-is: a
+         *     registration token, a per-admission ticket token, or the
+         *     `https://cloomba.com/t/<key>` URL a ticket QR may carry — the
+         *     server reads the key out of any of them. A string that is none
+         *     of these answers `400 validation_failed`.
          */
         post: operations['checkIn']
         delete?: never
@@ -273,11 +364,23 @@ export interface components {
          * @enum {string}
          */
         TicketTypeVisibility: 'public' | 'hidden'
+        /**
+         * @description How a tier is priced. `fixed` — `price_cents` is the price. `variable` —
+         *     pay what you want: `price_cents` is the minimum and the buyer picks the
+         *     amount at checkout (a `0` minimum is free with optional support).
+         *     `request` — the organizer does not publish the price: the event page
+         *     shows "Price on request", and so should anything you build from this.
+         *     `price_cents` is still what gets charged, or `0` when no price is set yet.
+         * @enum {string}
+         */
+        TicketPriceKind: 'fixed' | 'request' | 'variable'
         /** @description Physical location. All fields are null for a purely online event. */
         Location: {
             name: string | null
             address: string | null
             city: string | null
+            /** @description Sub-city district, when one is known. `city` keeps meaning the plain settlement — join the two yourself for Google-style precision. */
+            district: string | null
             /**
              * @description ISO 3166-1 alpha-2 country code.
              * @example SK
@@ -315,6 +418,11 @@ export interface components {
             capacity: number | null
             /** @description Whether free registrations need organizer approval. */
             require_approval: boolean
+            /**
+             * @description Your own id for this event, if you supplied one when writing it. `null` for events created in the Cloomba app. Lets you correlate a listing back to your records without storing our `slug`.
+             * @example yolk-1042
+             */
+            external_id: string | null
             /** Format: uri */
             cover_url: string | null
             /**
@@ -322,10 +430,29 @@ export interface components {
              * @description The event's public page.
              */
             url: string
+            /** @description Set when the event is a listing that links out to another site — it has no registration, tickets, chat or media on Cloomba. `null` for every other event. */
+            external: components['schemas']['ExternalListing'] | null
             /** Format: date-time */
             created_at: string
             /** Format: date-time */
             updated_at: string
+        }
+        /** @description Where a listing-only event lives. */
+        ExternalListing: {
+            /**
+             * Format: uri
+             * @description The event's page on the other site.
+             */
+            url: string
+            /**
+             * @description The host of `url`, lower-cased and without `www.`.
+             * @example example.org
+             */
+            host_name: string
+            /** @description Who runs the event */
+            organizer_name: string | null
+            /** @description The event has no meaningful start time — show the date only. */
+            all_day: boolean
         }
         /** @description The base event shape plus detail-only enrichments. */
         EventDetail: components['schemas']['Event'] & {
@@ -333,6 +460,97 @@ export interface components {
             /** @description Capacity minus confirmed admissions; `null` when uncapped. */
             spots_remaining: number | null
             registration_questions: components['schemas']['RegistrationQuestion'][]
+        }
+        /** @description Venue fields to write. Every key is optional and only the ones you send are changed; send `"location": null` to clear the venue entirely. Mirrors the `Location` read shape, so you can read an event, edit a field and write it straight back. */
+        LocationWrite: {
+            name?: string | null
+            address?: string | null
+            city?: string | null
+            district?: string | null
+            /** @description ISO 3166-1 alpha-2. Overridden by the country of the city derived from `lat`/`lng` when those are supplied. */
+            country?: string | null
+            /** Format: double */
+            lat?: number | null
+            /** Format: double */
+            lng?: number | null
+        }
+        /**
+         * @description The writable fields of an event. **Unknown keys are rejected** with `400 validation_failed` rather than ignored, so a typo fails loudly instead of silently dropping data.
+         *
+         *     Not writable in v1: ticket tiers, registration questions, categories, calendars, recurrence, payment settings, and cover images. Create the event here, then finish it in the app.
+         */
+        EventWrite: {
+            title?: string
+            /** @description Markdown, the same encoding the app renders. */
+            description?: string | null
+            /** Format: date-time */
+            starts_at?: string
+            /**
+             * Format: date-time
+             * @description Must be after `starts_at`.
+             */
+            ends_at?: string
+            /**
+             * @description IANA timezone. Validated — an unknown zone is rejected. Attendees see wall-clock time in this zone.
+             * @example Europe/Warsaw
+             */
+            timezone?: string
+            location?: components['schemas']['LocationWrite']
+            /** Format: uri */
+            online_url?: string | null
+            format?: components['schemas']['EventFormat']
+            visibility?: components['schemas']['EventVisibility']
+            /** @description Positive integer, or `null` for uncapped. */
+            capacity?: number | null
+            /** @description `draft` or `published` only. **Defaults to `draft`** — omit it and the event is created but not publicly visible. Send `published` to make it live immediately. Cancelling is not part of this endpoint. */
+            status?: components['schemas']['EventStatus']
+            /**
+             * @description Your own id for this event — whatever your system calls it. Optional,
+             *     at most 200 characters, and unique among your own events (two
+             *     different organizers may both use `42`).
+             *
+             *     On `POST` it makes the call repeatable: if one of your events already
+             *     carries this id, that event is updated and you get `200` instead of a
+             *     second event and `201`.
+             *
+             *     On `PATCH` it just sets the id. If a **different** one of your events
+             *     already holds it, the request fails with `409 external_id_taken`.
+             *
+             *     Send `null` to detach the id from an event.
+             * @example yolk-1042
+             */
+            external_id?: string | null
+        }
+        /** @description `EventWrite` with the four fields every event needs. `slug` is not accepted here — the URL is derived from the title; rename it afterwards with `PATCH`. */
+        EventCreate: WithRequired<components['schemas']['EventWrite'], 'title' | 'starts_at' | 'ends_at' | 'timezone'>
+        /** @description `EventWrite` plus the event URL. Every field is optional. */
+        EventUpdate: components['schemas']['EventWrite'] & {
+            /** @description A new URL for the event. Slugified on write; a value already in use returns `409 slug_taken`. Old links stop working. */
+            slug?: string
+        }
+        /** @description Exactly one of `cover_url` or `preset_key`. */
+        CoverWrite: {
+            /**
+             * Format: uri
+             * @description A publicly reachable image URL that you host. Fetched once and mirrored into our storage; letterboxed to a square. Max 15 MB. Passing this event's current `cover_url` back is a no-op; passing any other cloomba-hosted URL is rejected.
+             */
+            cover_url?: string
+            /** @description A `key` from `GET /cover-presets`. */
+            preset_key?: string
+        }
+        CoverPreset: {
+            key: string
+            /** Format: uri */
+            url: string
+            alt: string | null
+            width: number
+            height: number
+            palette: {
+                [key: string]: unknown
+            } | null
+        }
+        CoverPresetList: {
+            items: components['schemas']['CoverPreset'][]
         }
         /**
          * @description Registration tallies by status. `guests` counts registrations;
@@ -541,8 +759,9 @@ export interface components {
             /** @description Not unique within an event — join on `hash`. */
             name: string
             description: string | null
-            /** @description Integer minor units (cents). */
+            /** @description Integer minor units (cents). What it means depends on `price_kind`. */
             price_cents: number
+            price_kind: components['schemas']['TicketPriceKind']
             /** @description ISO 4217 currency code. */
             currency: string
             /** @description Seats allocated to this tier; `null` when uncapped. */
@@ -586,6 +805,11 @@ export interface components {
             total: number
             limit: number
             offset: number
+            /**
+             * Format: date-time
+             * @description Server time for this query. Store it and pass it back as `since` on your next call to fetch only what changed — this keeps your own clock out of the contract.
+             */
+            timestamp: string
         }
         AttendeeList: {
             items: components['schemas']['Attendee'][]
@@ -594,6 +818,11 @@ export interface components {
             checked_in_count: number
             limit: number
             offset: number
+            /**
+             * Format: date-time
+             * @description Server time for this query. Store it and pass it back as `since` on your next call to fetch only what changed — this keeps your own clock out of the contract.
+             */
+            timestamp: string
         }
         /** @description Error body. Branch on `code`, never on `message`. */
         Error: {
@@ -631,8 +860,11 @@ export interface components {
         }
         /**
          * @description The key can't reach this resource — an event outside the key's
-         *     scope, a write with a `read`-only key (`api_scope_forbidden`), or
-         *     a write from a non-Pro account (`api_pro_required`).
+         *     scope, an attendee endpoint with a `read_public` key, or a write
+         *     with a `read`-only key (all `api_scope_forbidden`).
+         *
+         *     `api_pro_required` means the account is not currently eligible to
+         *     write; see Developers in your account.
          */
         Forbidden: {
             headers: {
@@ -717,6 +949,8 @@ export interface components {
     parameters: {
         /** @description The event's URL slug. */
         Slug: string
+        /** @description Return only rows changed after this time (compared against the row's `updated_at`, so check-ins and approvals are included). Pass back the `timestamp` value from your previous response. Deletions are not conveyed — a consumer needing exact deletion semantics wants webhooks. */
+        Since: string
         /** @description Page size (default 50, max 100). */
         Limit50: number
         /** @description Page size (default 100, max 500). */
@@ -737,6 +971,15 @@ export interface operations {
                 limit?: components['parameters']['Limit50']
                 /** @description Number of items to skip. */
                 offset?: components['parameters']['Offset']
+                /** @description Return only rows changed after this time (compared against the row's `updated_at`, so check-ins and approvals are included). Pass back the `timestamp` value from your previous response. Deletions are not conveyed — a consumer needing exact deletion semantics wants webhooks. */
+                since?: components['parameters']['Since']
+                /**
+                 * @description Listing-only events that link out to another site (see `external` on
+                 *     the event) are left out unless you ask for them: `include` returns
+                 *     them alongside your other events, `only` returns them alone. Any
+                 *     other value reads as absent.
+                 */
+                external?: 'include' | 'only'
             }
             header?: never
             path?: never
@@ -754,6 +997,59 @@ export interface operations {
                 }
             }
             401: components['responses']['Unauthorized']
+            429: components['responses']['RateLimited']
+        }
+    }
+    createEvent: {
+        parameters: {
+            query?: never
+            header?: never
+            path?: never
+            cookie?: never
+        }
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "title": "Open Coffee Kraków",
+                 *       "starts_at": "2026-10-01T08:00:00Z",
+                 *       "ends_at": "2026-10-01T10:00:00Z",
+                 *       "timezone": "Europe/Warsaw",
+                 *       "status": "published",
+                 *       "external_id": "yolk-1042",
+                 *       "location": {
+                 *         "name": "Yolk",
+                 *         "address": "Lubicz 17",
+                 *         "city": "Kraków",
+                 *         "country": "PL"
+                 *       }
+                 *     }
+                 */
+                'application/json': components['schemas']['EventCreate']
+            }
+        }
+        responses: {
+            /** @description An event with this `external_id` already existed and was updated. */
+            200: {
+                headers: {
+                    [name: string]: unknown
+                }
+                content: {
+                    'application/json': components['schemas']['Event']
+                }
+            }
+            /** @description The event was created. */
+            201: {
+                headers: {
+                    [name: string]: unknown
+                }
+                content: {
+                    'application/json': components['schemas']['Event']
+                }
+            }
+            400: components['responses']['ValidationFailed']
+            401: components['responses']['Unauthorized']
+            403: components['responses']['Forbidden']
             429: components['responses']['RateLimited']
         }
     }
@@ -784,6 +1080,59 @@ export interface operations {
             429: components['responses']['RateLimited']
         }
     }
+    updateEvent: {
+        parameters: {
+            query?: never
+            header?: never
+            path: {
+                /** @description The event's URL slug. */
+                slug: components['parameters']['Slug']
+            }
+            cookie?: never
+        }
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "capacity": 40,
+                 *       "description": "Doors at 8:00. Coffee is on us."
+                 *     }
+                 */
+                'application/json': components['schemas']['EventUpdate']
+            }
+        }
+        responses: {
+            /** @description The updated event. */
+            200: {
+                headers: {
+                    [name: string]: unknown
+                }
+                content: {
+                    'application/json': components['schemas']['Event']
+                }
+            }
+            400: components['responses']['ValidationFailed']
+            401: components['responses']['Unauthorized']
+            403: components['responses']['Forbidden']
+            404: components['responses']['EventNotFound']
+            /** @description The requested `slug` is already in use (`slug_taken`), or another of your events already carries the requested `external_id` (`external_id_taken`). */
+            409: {
+                headers: {
+                    [name: string]: unknown
+                }
+                content: {
+                    /**
+                     * @example {
+                     *       "code": "slug_taken",
+                     *       "message": "That event URL is already taken."
+                     *     }
+                     */
+                    'application/json': components['schemas']['Error']
+                }
+            }
+            429: components['responses']['RateLimited']
+        }
+    }
     listAttendees: {
         parameters: {
             query?: {
@@ -791,6 +1140,8 @@ export interface operations {
                 limit?: components['parameters']['Limit100']
                 /** @description Number of items to skip. */
                 offset?: components['parameters']['Offset']
+                /** @description Return only rows changed after this time (compared against the row's `updated_at`, so check-ins and approvals are included). Pass back the `timestamp` value from your previous response. Deletions are not conveyed — a consumer needing exact deletion semantics wants webhooks. */
+                since?: components['parameters']['Since']
                 /**
                  * @description Optional filter by registration status. An unknown value returns
                  *     `400 validation_failed` rather than an empty list.
@@ -977,6 +1328,107 @@ export interface operations {
             429: components['responses']['RateLimited']
         }
     }
+    setEventCover: {
+        parameters: {
+            query?: never
+            header?: never
+            path: {
+                /** @description The event's URL slug. */
+                slug: components['parameters']['Slug']
+            }
+            cookie?: never
+        }
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "cover_url": "https://yolkfolk.pl/img/open-coffee.jpg"
+                 *     }
+                 */
+                'application/json': components['schemas']['CoverWrite']
+            }
+        }
+        responses: {
+            /** @description The event, with its new `cover_url`. */
+            200: {
+                headers: {
+                    [name: string]: unknown
+                }
+                content: {
+                    'application/json': components['schemas']['Event']
+                }
+            }
+            400: components['responses']['ValidationFailed']
+            401: components['responses']['Unauthorized']
+            403: components['responses']['Forbidden']
+            404: components['responses']['EventNotFound']
+            /** @description The image could not be fetched from that URL — unreachable, not an image, too large (15 MB max), or a blocked address (`cover_fetch_failed`). */
+            422: {
+                headers: {
+                    [name: string]: unknown
+                }
+                content: {
+                    /**
+                     * @example {
+                     *       "code": "cover_fetch_failed",
+                     *       "message": "The cover image could not be fetched from that URL."
+                     *     }
+                     */
+                    'application/json': components['schemas']['Error']
+                }
+            }
+            429: components['responses']['RateLimited']
+        }
+    }
+    clearEventCover: {
+        parameters: {
+            query?: never
+            header?: never
+            path: {
+                /** @description The event's URL slug. */
+                slug: components['parameters']['Slug']
+            }
+            cookie?: never
+        }
+        requestBody?: never
+        responses: {
+            /** @description The event, with `cover_url` now null. */
+            200: {
+                headers: {
+                    [name: string]: unknown
+                }
+                content: {
+                    'application/json': components['schemas']['Event']
+                }
+            }
+            401: components['responses']['Unauthorized']
+            403: components['responses']['Forbidden']
+            404: components['responses']['EventNotFound']
+            429: components['responses']['RateLimited']
+        }
+    }
+    listCoverPresets: {
+        parameters: {
+            query?: never
+            header?: never
+            path?: never
+            cookie?: never
+        }
+        requestBody?: never
+        responses: {
+            /** @description The cover library. */
+            200: {
+                headers: {
+                    [name: string]: unknown
+                }
+                content: {
+                    'application/json': components['schemas']['CoverPresetList']
+                }
+            }
+            401: components['responses']['Unauthorized']
+            429: components['responses']['RateLimited']
+        }
+    }
     checkIn: {
         parameters: {
             query?: never
@@ -990,7 +1442,7 @@ export interface operations {
         requestBody: {
             content: {
                 'application/json': {
-                    /** @description The registration token or a per-admission ticket token. */
+                    /** @description The scanned string — a registration token, a per-admission ticket token, or a ticket's share URL. */
                     qr_token: string
                 }
             }
@@ -1012,4 +1464,7 @@ export interface operations {
             429: components['responses']['RateLimited']
         }
     }
+}
+type WithRequired<T, K extends keyof T> = T & {
+    [P in K]-?: T[P]
 }

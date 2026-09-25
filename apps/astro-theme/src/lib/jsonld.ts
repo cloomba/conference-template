@@ -20,12 +20,12 @@ import { config } from './config'
 export const absoluteUrl = (path: string): string =>
     config.site.url ? new URL(path, config.site.url).toString() : path
 
+// Online or in person. `hybrid` is being retired from the API and reads as in
+// person here, so this keeps compiling once the value is gone.
 const attendanceMode = (format: EventDetail['format']): string =>
     format === 'online'
         ? 'https://schema.org/OnlineEventAttendanceMode'
-        : format === 'hybrid'
-          ? 'https://schema.org/MixedEventAttendanceMode'
-          : 'https://schema.org/OfflineEventAttendanceMode'
+        : 'https://schema.org/OfflineEventAttendanceMode'
 
 const eventStatus = (status: EventDetail['status']): string =>
     status === 'cancelled' ? 'https://schema.org/EventCancelled' : 'https://schema.org/EventScheduled'
@@ -55,16 +55,10 @@ const placeNode = (venue: Location, room?: string | null) => {
     }
 }
 
-// Place, VirtualLocation, or both (hybrid) — the shape Google documents.
+// A Place, or a VirtualLocation for an online event — the shape Google documents.
 export const locationNode = (event: EventDetail, room?: string | null) => {
-    const place = event.format === 'online' ? undefined : placeNode(event.location, room)
-    const virtual =
-        event.format !== 'in_person' && event.online_url
-            ? { '@type': 'VirtualLocation', url: event.online_url }
-            : undefined
-    const nodes = [place, virtual].filter(Boolean)
-    if (nodes.length === 0) return undefined
-    return nodes.length === 1 ? nodes[0] : nodes
+    if (event.format !== 'online') return placeNode(event.location, room)
+    return event.online_url ? { '@type': 'VirtualLocation', url: event.online_url } : undefined
 }
 
 const performerNodes = (speakers: Pick<Featured, 'name'>[]) => {
@@ -92,7 +86,10 @@ export const offerNodes = (ticketTypes: TicketType[]) =>
         .map((tier) => ({
             '@type': 'Offer',
             name: tier.name,
-            price: (tier.price_cents / 100).toFixed(2),
+            // An on-request tier's price is not published, so its Offer carries the
+            // currency alone — never a number the page doesn't show. A
+            // pay-what-you-want tier quotes its minimum.
+            ...(tier.price_kind === 'request' ? {} : { price: (tier.price_cents / 100).toFixed(2) }),
             priceCurrency: tier.currency,
             availability: tier.sold_out ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
             url: absoluteUrl('/tickets'),

@@ -5,7 +5,7 @@
 //
 //     final = { ...en, ...these }
 //
-// The complete key list is strings.en.json, right next to this file — 81 keys,
+// The complete key list is strings.en.json, right next to this file — 83 keys,
 // the whole vocabulary of the template. Your editor autocompletes every one of
 // them and underlines a typo, thanks to the `satisfies` at the bottom.
 //

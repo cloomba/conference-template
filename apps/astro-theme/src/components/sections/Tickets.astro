@@ -16,6 +16,16 @@ const { plain = false } = Astro.props
 const { items } = await loadTicketTypes()
 const tiers = items.filter((tier) => tier.visibility === 'public')
 
+// The big price line. An on-request tier's price is not published — the API
+// still hands it to the organizer's key, so it must never reach the page. A
+// pay-what-you-want tier's price is its minimum; at 0 it's simply free.
+const priceLabel = (tier: (typeof tiers)[number]): string => {
+    if (tier.price_kind === 'request') return t('tickets.price_on_request')
+    if (tier.price_cents === 0) return t('tickets.free')
+    const amount = formatMoney(tier.price_cents, tier.currency, locale)
+    return tier.price_kind === 'variable' ? t('tickets.price_from', { price: amount }) : amount
+}
+
 // "Only N left" once a capped tier runs low.
 const FEW_LEFT = 10
 
@@ -43,11 +53,7 @@ const gridCols = tiers.length === 4 ? 'sm:grid-cols-2' : 'sm:grid-cols-2 lg:grid
                 {tiers.map((tier) => (
                     <li class='flex flex-col rounded-card border border-text/10 p-6' data-tier={tier.hash}>
                         <h3 class='font-medium'>{tier.name}</h3>
-                        <p class='mt-2 font-display text-3xl font-semibold'>
-                            {tier.price_cents === 0
-                                ? t('tickets.free')
-                                : formatMoney(tier.price_cents, tier.currency, locale)}
-                        </p>
+                        <p class='mt-2 font-display text-3xl font-semibold'>{priceLabel(tier)}</p>
                         {tier.description && <p class='mt-3 text-sm text-text-muted'>{tier.description}</p>}
                         <div class='mt-auto pt-6'>
                             <span
