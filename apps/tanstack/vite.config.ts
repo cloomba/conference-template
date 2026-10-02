@@ -59,7 +59,12 @@ export default defineConfig(async ({ mode }) => {
             alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
         },
         plugins: [
-            nitro(),
+            // A static build deploys only the prerendered files, so its own
+            // server — the one the prerender renders through — is always a
+            // plain Node server. Left to auto-detect, Nitro switches to the
+            // host's preset (cloudflare-pages on Cloudflare's builder), whose
+            // preview server can't start there. Server builds keep detection.
+            nitro(isStatic ? { preset: 'node-server' } : undefined),
             tailwindcss(),
             tanstackStart({
                 // Links found on the listed pages are followed too. Besides the
