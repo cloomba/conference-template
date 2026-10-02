@@ -12,6 +12,13 @@
     },
     "scripts": {
         "build": "yarn workspaces run build",
+        "build:packages": "yarn workspace @cloomba/client build && yarn workspace @cloomba/core build && yarn workspace @cloomba/react build",
+        "dev:astro": "yarn build:packages && yarn workspace astro-theme dev",
+        "build:astro": "yarn build:packages && yarn workspace astro-theme build",
+        "dev:tanstack": "yarn build:packages && yarn workspace tanstack dev",
+        "build:tanstack": "yarn build:packages && yarn workspace tanstack build",
+        "build:tanstack:static": "yarn build:packages && yarn workspace tanstack build:static",
+        "start:tanstack": "yarn workspace tanstack start",
         "typecheck": "yarn workspaces run typecheck",
         "lint": "eslint packages",
         "format": "prettier --write \"packages/*/src/**/*.ts\" \"apps/*/src/**/*.{ts,tsx,astro}\""

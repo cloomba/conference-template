@@ -3,10 +3,13 @@ import PageHeader from '@/components/PageHeader.astro'
 import Base from '@/layouts/Base.astro'
 ---
 
-<Base title='Deployment' description='Build the site and put it on any static host.'>
+<Base
+    title='Deployment'
+    description='Build the site and put it on any static host — or run the TanStack Start app on a Node server.'
+>
     <PageHeader
         title='Deploying your site'
-        subtitle='The build is plain static files — any host that serves HTML works.'
+        subtitle='The Astro build is plain static files; the TanStack Start app runs as static files or on a Node server.'
         back={{ href: '/cloomba-for-conferences', label: 'Cloomba for conferences' }}
     />
     <article class='mx-auto max-w-5xl px-4 py-8'>
@@ -14,7 +17,7 @@ import Base from '@/layouts/Base.astro'
             <h2>Build</h2>
             <pre><code>yarn install
 cp .env.example .env   # add your CLOOMBA_API_KEY
-yarn build             # → apps/astro-theme/dist/</code></pre>
+yarn build:astro       # → apps/astro-theme/dist/</code></pre>
             <p>
                 The build pulls your event's agenda, speakers, sponsors, and tickets from the Cloomba API and bakes them
                 into static pages. <code>dist/</code> is the whole site.
@@ -23,14 +26,42 @@ yarn build             # → apps/astro-theme/dist/</code></pre>
             <h2>Hosting</h2>
             <p>
                 <strong>Cloudflare Pages</strong> (what the demo runs on): connect the repository, set the build command to
-                <code>yarn build</code>, the output directory to <code>apps/astro-theme/dist</code>, and add <code
+                <code>yarn build:astro</code>, the output directory to <code>apps/astro-theme/dist</code>, and add <code
                     >CLOOMBA_API_KEY</code
                 > as a build environment variable. Attach your custom domain in the Pages settings.
             </p>
             <p>
-                <a href='https://railway.com'>Railway</a> or Netlify work identically (same command, same output path, same env var). GitHub Pages works
-                with any static-deploy action. Or run <code>yarn build</code> locally and upload
+                <a href='https://railway.com'>Railway</a> or Netlify work identically (same command, same output path, same
+                env var). GitHub Pages works with any static-deploy action. Or run <code>yarn build:astro</code> locally and
+                upload
                 <code>dist/</code> to any web server — nothing about the site needs a runtime.
+            </p>
+
+            <h2>The TanStack Start app</h2>
+            <p>
+                <code>apps/tanstack</code> is the same site as a React app. It is served one of two ways:
+            </p>
+            <ul>
+                <li>
+                    <strong>On a Node server</strong> — <code>yarn build:tanstack</code>, then{' '}
+                    <code>yarn start:tanstack</code> (it listens on <code>PORT</code>). Pages render on each request
+                    from event data the server keeps for a minute, so edits on Cloomba show up within a minute, with no
+                    rebuild. Any host that runs Node works.
+                </li>
+                <li>
+                    <strong>As static files</strong> — <code>yarn build:tanstack:static</code> writes every page to{' '}
+                    <code>apps/tanstack/.output/public</code>; host that folder exactly like the Astro build. Serve it
+                    from the root of a domain or subdomain (<code>tanstack.example.com</code> rather than{' '}
+                    <code>example.com/conference/</code>) — pages load their data from absolute paths.{' '}
+                    <a href='https://tanstack.cloomba.com' rel='noopener'>tanstack.cloomba.com</a> runs this way on Cloudflare
+                    Pages.
+                </li>
+            </ul>
+            <p>
+                Either way, <code>CLOOMBA_API_KEY</code> goes in the host's environment (or <code
+                    >apps/tanstack/.env</code
+                >{' '}
+                locally). It is read on the server or at build time and never reaches the browser.
             </p>
 
             <h2>Keeping it fresh</h2>
@@ -42,6 +73,7 @@ yarn build             # → apps/astro-theme/dist/</code></pre>
                 <li>
                     <strong>Everything else</strong> (a new speaker, a session moved, edited copy) appears on the next build.
                     Every host above has a deploy-hook URL — trigger it after editing your event, or put it on a schedule.
+                    The TanStack app on a Node server picks these up by itself within a minute.
                 </li>
             </ul>
 
@@ -51,7 +83,10 @@ yarn build             # → apps/astro-theme/dist/</code></pre>
                     Set <code>site.url</code> in the config to your real domain — it drives canonical tags, the sitemap, and
                     the iCal link.
                 </li>
-                <li>Submit <code>/sitemap-index.xml</code> in Google Search Console once.</li>
+                <li>
+                    Submit the sitemap in Google Search Console once: <code>/sitemap-index.xml</code> for the Astro build,
+                    <code>/sitemap.xml</code> for the TanStack app.
+                </li>
             </ul>
 
             <p>

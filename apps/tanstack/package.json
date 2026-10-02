@@ -1,0 +1,38 @@
+{
+    "name": "tanstack",
+    "private": true,
+    "version": "0.1.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite dev --port 4322",
+        "build": "vite build",
+        "build:static": "vite build --mode static",
+        "start": "node .output/server/index.mjs",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@cloomba/client": "*",
+        "@cloomba/core": "*",
+        "@cloomba/react": "*",
+        "@fontsource-variable/fraunces": "^5.3.0",
+        "@tanstack/react-router": "1.170.41",
+        "@tanstack/react-start": "1.168.60",
+        "@tanstack/start-static-server-functions": "1.167.39",
+        "marked": "^18.0.11",
+        "marked-smartypants": "^1.1.12",
+        "react": "^19.2.8",
+        "react-dom": "^19.2.8",
+        "simple-icons": "^16.28.0",
+        "yaml": "^2.9.0"
+    },
+    "devDependencies": {
+        "@tailwindcss/vite": "^4.3.3",
+        "@types/react": "^19.2.18",
+        "@types/react-dom": "^19.2.5",
+        "@vitejs/plugin-react": "6.1.1",
+        "nitro": "3.0.260903-beta",
+        "tailwindcss": "^4.3.3",
+        "typescript": "^6.0.3",
+        "vite": "8.2.2"
+    }
+}

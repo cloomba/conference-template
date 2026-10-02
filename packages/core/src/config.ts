@@ -187,7 +187,8 @@ export const siteConfigSchema = z.object({
         .object({
             umami: z.object({ src: z.string().min(1), website_id: z.string().min(1) }).optional(),
             // Escape hatch for any other analytics (GA, Meta pixel, …): raw
-            // HTML injected verbatim into <head>. It's your site — but note
+            // HTML injected verbatim — into <head> in astro-theme, at the start
+            // of <body> in tanstack (React owns <head>). It's your site — but note
             // that cookie-based trackers make YOU responsible for a consent
             // banner; the template ships none (umami needs none).
             head_html: z.string().optional(),

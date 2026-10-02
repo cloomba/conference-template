@@ -11,6 +11,11 @@ import Base from '@/layouts/Base.astro'
     />
     <article class='mx-auto max-w-5xl px-4 py-8'>
         <div class='prose-content max-w-3xl'>
+            <p>
+                Paths on this page are inside the app you build — <code>apps/astro-theme</code> or{' '}
+                <code>apps/tanstack</code>. Both apps read the same files in the same shape.
+            </p>
+
             <h2>Content — markdown files, no code</h2>
             <p>Everything editorial lives in <code>src/content/</code>:</p>
             <ul>
@@ -90,6 +95,11 @@ export default {
                 Images from <code>public/</code> (<code>![Map](/images/map.png)</code>) and remote URLs also work,
                 served exactly as-is — use the relative form when you can.
             </p>
+            <p>
+                In the TanStack Start app, put images under <code>public/</code> and reference them from the root (<code
+                    >![The venue](/images/venue.jpg)</code
+                >), or use a remote URL.
+            </p>
 
             <h2>Images shipped with the site</h2>
             <ul>
@@ -104,9 +114,10 @@ export default {
 
             <h2>Going further</h2>
             <p>
-                It's your repository — every section is a small component under
-                <code>src/components/sections/</code>, and the home page is a list mapping config names to them. Add a
-                section type by writing a component and one map entry. The repo's <code>AGENTS.md</code>
+                It's your repository — every section is a small component under{' '}
+                <code>src/components/sections/</code> (<code>.astro</code> files in the Astro app, <code>.tsx</code> in the
+                TanStack one), and the home page is a list mapping config names to them. Add a section type by writing a component
+                and one map entry. The repo's <code>AGENTS.md</code>
                 carries the few layout rules that keep everything aligned (one page width, semantic tokens only) — they apply
                 to humans and AI assistants alike.
             </p>

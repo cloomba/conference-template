@@ -25,6 +25,7 @@ export {
 } from './format'
 export { resolveStrings, translate, translatePlural, CLDR_FORMS, type CldrForm, type StringTable } from './strings'
 export { buildAgendaIcs, type AgendaIcsOptions } from './ical'
+export { contentSchemas, type ContentCollection } from './content'
 export {
     defineConfig,
     parseSiteConfig,

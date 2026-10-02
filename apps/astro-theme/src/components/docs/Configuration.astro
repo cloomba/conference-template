@@ -61,10 +61,14 @@ import Base from '@/layouts/Base.astro'
                 </li>
                 <li><strong>socials</strong> — profile URLs; icons are detected from the domain automatically.</li>
                 <li>
-                    <strong>analytics</strong> — a self-hosted Umami script (cookieless — no consent banner needed), plus
+                    <strong>analytics</strong> — a self-hosted Umami script (cookieless — no consent banner needed), plus{
+                        ' '
+                    }
                     <code>head_html</code> for anything else: Google Analytics, a Meta pixel, any snippet, injected verbatim
-                    into <code>&lt;head&gt;</code>. Cookie-based trackers make you responsible for a consent banner —
-                    the template ships none.
+                    into <code>&lt;head&gt;</code> (in the TanStack app, at the start of <code>&lt;body&gt;</code>).{
+                        ' '
+                    }
+                    Cookie-based trackers make you responsible for a consent banner — the template ships none.
                 </li>
                 <li>
                     <strong>cloomba_promo</strong> — the "built with Cloomba" band above the footer. Set <code
