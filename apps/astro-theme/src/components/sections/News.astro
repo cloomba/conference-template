@@ -15,7 +15,10 @@ const dateFormat = new Intl.DateTimeFormat(locale, { dateStyle: 'long' })
             <ul class='grid gap-6 sm:grid-cols-3'>
                 {posts.map((post) => (
                     <li>
-                        <a href={`/news/${post.id}`} class='group block rounded-card border border-text/10 p-5'>
+                        <a
+                            href={`/news/${post.id}`}
+                            class='group block rounded-card border border-text/10 p-5 transition duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/10 motion-safe:hover:-translate-y-1'
+                        >
                             <time class='text-sm text-text-muted'>{dateFormat.format(post.data.date)}</time>
                             <h3 class='mt-2 font-medium group-hover:text-primary'>{post.data.title}</h3>
                             {post.data.description && (

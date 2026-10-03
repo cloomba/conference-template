@@ -10,7 +10,7 @@ export function NotFound() {
             <p className='mt-4 text-text-muted'>{t('error.not_found_body')}</p>
             <Link
                 to='/'
-                className='mt-8 inline-block rounded-card bg-primary px-6 py-3 font-medium text-primary-content transition-opacity hover:opacity-90'
+                className='mt-8 inline-block rounded-card bg-primary px-6 py-3 font-medium text-primary-content transition hover:opacity-90 hover:shadow-md hover:shadow-primary/25 motion-safe:hover:-translate-y-0.5'
             >
                 {t('error.not_found_cta')}
             </Link>

@@ -33,6 +33,10 @@ export default defineConfig({
         // event cover wins on the home page. Raster only (no SVG); ships as a
         // rasterized hero scene:
         // og_image: '/og-default.jpg',
+        // Wide hero image (16:9) at full width under the title — a path under
+        // public/ or an absolute URL. Without one, the hero shows the event's
+        // cover from Cloomba as a square beside the title.
+        hero_image: '/hero.jpg',
         // Keep the site out of search indexes (staging/preview deploys only).
         // noindex: true,
         // When set, a banner with this text renders on every page.
@@ -66,26 +70,29 @@ export default defineConfig({
         },
         // Corner radius for cards, buttons, images.
         // radius: '0.75rem',
-        // Color tokens per mode — set any subset, the rest keep defaults.
+        // Color tokens per mode — set any subset. The rest derive from that
+        // mode's primary: the grays take its hue, text on primary buttons is
+        // white or a dark tint (whichever reads better), accent follows it.
+        // (A primary that isn't #rgb / #rrggbb leaves the shipped defaults.)
         // Full set: primary, primary_content, accent, surface, surface_alt,
-        // text, text_muted.
+        // text, text_muted. The commented values are what this demo derives.
         light: {
             primary: '#1f7a4d',
             // primary_content: '#ffffff',
             // accent: '#1f7a4d',
             // surface: '#ffffff',
-            // surface_alt: '#f5f6f8',
-            // text: '#17191c',
-            // text_muted: '#5b626b',
+            // surface_alt: '#f0f9f3',
+            // text: '#131b16',
+            // text_muted: '#58655d',
         },
         dark: {
             primary: '#5fd39a',
-            // primary_content: '#0c1526',
+            // primary_content: '#002112',
             // accent: '#5fd39a',
-            // surface: '#101215',
-            // surface_alt: '#1a1d21',
-            // text: '#e8eaed',
-            // text_muted: '#9aa2ac',
+            // surface: '#0e1310',
+            // surface_alt: '#181f1b',
+            // text: '#e2ede6',
+            // text_muted: '#97a59d',
         },
     },
     // Home-page sections: order here = order on the page; remove a line to

@@ -23,13 +23,13 @@ const place = [event.location.city, event.location.country].filter(Boolean).join
         <div class='mt-8 flex flex-wrap justify-center gap-3'>
             <a
                 href='/tickets'
-                class='rounded-card bg-surface px-6 py-3 font-medium text-text transition-opacity hover:opacity-90'
+                class='rounded-card bg-surface px-6 py-3 font-medium text-text transition hover:opacity-90 hover:shadow-md motion-safe:hover:-translate-y-0.5'
             >
                 {t('common.register')}
             </a>
             <a
                 href='/become-a-sponsor'
-                class='rounded-card border border-primary-content/40 px-6 py-3 font-medium transition-colors hover:bg-primary-content/10'
+                class='rounded-card border border-primary-content/40 px-6 py-3 font-medium transition hover:bg-primary-content/10 motion-safe:hover:-translate-y-0.5'
             >
                 {t('common.become_a_sponsor')}
             </a>

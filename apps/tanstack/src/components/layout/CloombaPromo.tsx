@@ -26,7 +26,7 @@ export function CloombaPromo() {
                     {config.cloomba_docs && (
                         <a
                             href={DOCS_URL}
-                            className='rounded-card bg-primary px-4 py-2 text-sm font-medium text-primary-content transition-opacity hover:opacity-90'
+                            className='rounded-card bg-primary px-4 py-2 text-sm font-medium text-primary-content transition hover:opacity-90 hover:shadow-md hover:shadow-primary/25 motion-safe:hover:-translate-y-0.5'
                         >
                             {t('promo.how_it_works')}
                         </a>

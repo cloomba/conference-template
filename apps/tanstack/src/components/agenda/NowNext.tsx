@@ -65,6 +65,10 @@ export function NowNext({ browserBase, slug, timezone, eventStartsAt, locale, st
         <div className='mt-6 rounded-card border border-primary/30 bg-surface-alt p-4'>
             {current.map((session) => (
                 <p key={session.hash} className='text-sm'>
+                    <span className='relative mr-1.5 inline-flex size-2 align-middle'>
+                        <span className='absolute inline-flex size-full rounded-full bg-primary opacity-75 motion-safe:animate-live'></span>
+                        <span className='relative inline-flex size-2 rounded-full bg-primary'></span>
+                    </span>
                     <span className='font-semibold text-primary'>{strings.now}</span>{' '}
                     {session.location && <span className='text-text-muted'>{session.location}: </span>}
                     <span className='font-medium'>{session.title}</span>{' '}

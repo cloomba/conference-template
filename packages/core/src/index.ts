@@ -29,6 +29,7 @@ export { contentSchemas, type ContentCollection } from './content'
 export {
     defineConfig,
     parseSiteConfig,
+    registrationEmbedUrl,
     resolveTokens,
     siteConfigSchema,
     themeCss,

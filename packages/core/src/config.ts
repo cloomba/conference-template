@@ -6,10 +6,14 @@
 
 import { z } from 'zod'
 
+import { contrastRatio, hexToOklch, normalizeHex, oklchToHex } from './color'
+
 // --- Theme tokens -----------------------------------------------------------
 
 // The full token set. Values are CSS color strings (hex, oklch, …) — the
-// template never restricts the color space.
+// template never restricts the color space. Unset tokens derive from a hex
+// primary (see resolveTokens); the defaults below are the fallback and the
+// lightness each neutral keeps.
 const tokenNames = ['primary', 'primary_content', 'accent', 'surface', 'surface_alt', 'text', 'text_muted'] as const
 export type TokenName = (typeof tokenNames)[number]
 export type TokenSet = Record<TokenName, string>
@@ -94,6 +98,10 @@ export const siteConfigSchema = z.object({
         // without one of their own. Raster only (crawlers reject SVG); made
         // absolute against `url` at build. Ships as a rasterized hero scene.
         og_image: z.string().min(1).default('/og-default.jpg'),
+        // Wide hero image (16:9) shown at full width under the title — a path
+        // under public/ or an absolute URL. Without one the hero shows the
+        // event's cover from Cloomba as a square beside the title.
+        hero_image: z.string().min(1).optional(),
         // Keep the whole site out of search indexes (demo deploys).
         noindex: z.boolean().default(false),
         // When set, a banner with this text renders on every page (demo sites).
@@ -223,9 +231,49 @@ export const parseSiteConfig = (raw: unknown): SiteConfig => {
 
 // --- Theme CSS --------------------------------------------------------------
 
+type Mode = 'light' | 'dark'
+type NeutralRole = 'surface' | 'surface_alt' | 'text' | 'text_muted'
+
+// How much of the primary's hue each neutral carries (OKLCH chroma). Capped at
+// a fifth of the primary's own chroma, so a near-gray brand gets near-gray
+// neutrals. Lightness comes from the shipped defaults above, so contrast stays
+// where those put it.
+const NEUTRAL_CHROMA: Record<Mode, Record<NeutralRole, number>> = {
+    light: { surface: 0, surface_alt: 0.012, text: 0.015, text_muted: 0.02 },
+    dark: { surface: 0.01, surface_alt: 0.012, text: 0.015, text_muted: 0.02 },
+}
+const NEUTRAL_ROLES = Object.keys(NEUTRAL_CHROMA.light) as NeutralRole[]
+
+// The tokens an organizer didn't set, derived from the primary they did: the
+// neutrals take its hue (green brand → green-gray, not the defaults' blue-gray),
+// text on a primary button is white or a dark tint of that hue — whichever
+// reads better — and accent follows primary. A primary that isn't hex derives
+// nothing; the shipped defaults apply.
+const deriveFromPrimary = (primary: string, mode: Mode): Partial<TokenSet> => {
+    const hex = normalizeHex(primary)
+    if (!hex) return {}
+    const brand = hexToOklch(hex)
+    const defaults = mode === 'light' ? LIGHT_DEFAULTS : DARK_DEFAULTS
+    const derived: Partial<TokenSet> = { accent: primary }
+    for (const role of NEUTRAL_ROLES) {
+        const chroma = Math.min(NEUTRAL_CHROMA[mode][role], brand.c * 0.2)
+        derived[role] = oklchToHex({ l: hexToOklch(defaults[role]).l, c: chroma, h: brand.h })
+    }
+    const darkTint = oklchToHex({ l: 0.22, c: Math.min(0.05, brand.c), h: brand.h })
+    derived.primary_content = contrastRatio('#ffffff', hex) >= contrastRatio(darkTint, hex) ? '#ffffff' : darkTint
+    return derived
+}
+
+const resolveMode = (set: Partial<TokenSet>, mode: Mode): TokenSet => {
+    const own = stripUndefined(set)
+    const defaults = mode === 'light' ? LIGHT_DEFAULTS : DARK_DEFAULTS
+    return { ...defaults, ...deriveFromPrimary(own.primary ?? defaults.primary, mode), ...own }
+}
+
+// Tokens the organizer set always win; the rest derive from the primary.
 export const resolveTokens = (theme: SiteConfig['theme']): { light: TokenSet; dark: TokenSet } => ({
-    light: { ...LIGHT_DEFAULTS, ...stripUndefined(theme.light) },
-    dark: { ...DARK_DEFAULTS, ...stripUndefined(theme.dark) },
+    light: resolveMode(theme.light, 'light'),
+    dark: resolveMode(theme.dark, 'dark'),
 })
 
 const stripUndefined = (set: Partial<TokenSet>): Partial<TokenSet> =>
@@ -235,8 +283,13 @@ const stripUndefined = (set: Partial<TokenSet>): Partial<TokenSet> =>
 // is Tailwind v4's @theme namespace. The app's global.css maps them:
 //   @theme inline { --color-primary: var(--t-primary); … }
 // so utilities read the runtime var and mode switching swaps only values.
-const tokenBlock = (tokens: TokenSet): string =>
-    tokenNames.map((name) => `--t-${name.replace(/_/g, '-')}: ${tokens[name]};`).join(' ')
+// Each palette also declares its `color-scheme`: native scrollbars and controls
+// follow it, and an embedded iframe (the registration widget) reads it as its
+// own prefers-color-scheme — so the visitor's toggle reaches inside the frame.
+const tokenBlock = (tokens: TokenSet, mode: Mode): string =>
+    [...tokenNames.map((name) => `--t-${name.replace(/_/g, '-')}: ${tokens[name]};`), `color-scheme: ${mode};`].join(
+        ' '
+    )
 
 // The stylesheet that carries the whole theme. Components use only the
 // custom properties (via Tailwind @theme), so mode switching is purely a
@@ -248,11 +301,30 @@ export const themeCss = (theme: SiteConfig['theme']): string => {
     const { light, dark } = resolveTokens(theme)
     const base = `--t-font-display: ${theme.fonts.display}; --t-font-body: ${theme.fonts.body}; --t-radius: ${theme.radius};`
 
-    if (theme.mode === 'light') return `:root { ${base} ${tokenBlock(light)} }`
-    if (theme.mode === 'dark') return `:root { ${base} ${tokenBlock(dark)} }`
+    if (theme.mode === 'light') return `:root { ${base} ${tokenBlock(light, 'light')} }`
+    if (theme.mode === 'dark') return `:root { ${base} ${tokenBlock(dark, 'dark')} }`
     return [
-        `:root { ${base} ${tokenBlock(light)} }`,
-        `@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { ${tokenBlock(dark)} } }`,
-        `:root[data-theme="dark"] { ${tokenBlock(dark)} }`,
+        `:root { ${base} ${tokenBlock(light, 'light')} }`,
+        `@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { ${tokenBlock(dark, 'dark')} } }`,
+        `:root[data-theme="dark"] { ${tokenBlock(dark, 'dark')} }`,
     ].join('\n')
+}
+
+// --- Registration embed -----------------------------------------------------
+
+// The registration iframe's URL, carrying the site's look so the widget matches
+// it: each mode's resolved primary as `accent` / `accent_dark`, and `theme`
+// when the site pins a mode. Auto mode sends no `theme` — the widget follows
+// the page's `color-scheme` (themeCss), the visitor's toggle included. The
+// embed accepts 6-digit hex only, so a primary in any other notation isn't sent.
+export const registrationEmbedUrl = (config: SiteConfig, origin: string): string => {
+    const { light, dark } = resolveTokens(config.theme)
+    const params = new URLSearchParams()
+    const accent = normalizeHex(light.primary)
+    const accentDark = normalizeHex(dark.primary)
+    if (accent) params.set('accent', accent)
+    if (accentDark) params.set('accent_dark', accentDark)
+    if (config.theme.mode !== 'auto') params.set('theme', config.theme.mode)
+    const query = params.toString()
+    return `${origin}/embed/e/${encodeURIComponent(config.event.slug)}${query ? `?${query}` : ''}`
 }

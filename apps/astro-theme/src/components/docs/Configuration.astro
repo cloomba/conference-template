@@ -28,7 +28,8 @@ import Base from '@/layouts/Base.astro'
             <h2>The blocks</h2>
             <ul>
                 <li>
-                    <strong>site</strong> — name, logo, absolute URL (canonical tags + sitemap), description,
+                    <strong>site</strong> — name, logo, a wide <code>hero_image</code> (without one the hero shows the event's
+                    cover as a square), absolute URL (canonical tags + sitemap), description,
                     <code>language</code>, and <code>noindex</code> for staging deploys. Note that <code>language</code> sets
                     <code>&lt;html lang&gt;</code> and formats dates, times and prices — it does not translate any words;
                     that's <code>strings</code> below.
@@ -42,7 +43,8 @@ import Base from '@/layouts/Base.astro'
                     <code>light</code>/<code>dark</code> pin one), font stacks, corner radius, and the color tokens per mode:
                     <code>primary</code>, <code>primary_content</code>, <code>accent</code>, <code>surface</code>, <code
                         >surface_alt</code
-                    >, <code>text</code>, <code>text_muted</code>. Set any subset — the rest keep sensible defaults.
+                    >, <code>text</code>, <code>text_muted</code>. Set any subset — the rest derive from the mode's{' '}
+                    <code>primary</code>: the grays take its hue, so one brand color gives a matching palette.
                 </li>
                 <li>
                     <strong>sections</strong> — the home page as a list: order is display order, removing a line removes the

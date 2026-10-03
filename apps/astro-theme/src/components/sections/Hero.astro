@@ -1,6 +1,7 @@
 ---
 import { formatDateSpan } from '@cloomba/core'
 
+import { config } from '@/lib/config'
 import { loadEvent } from '@/lib/data'
 import { locale, t } from '@/lib/strings'
 
@@ -13,38 +14,77 @@ const dates = formatDateSpan(
 )
 const place = [event.location.city, event.location.country].filter(Boolean).join(', ')
 
-// The event's cover from Cloomba wins; without one, the bundled scene keeps
-// the hero from being a wall of blank surface.
-const cover = event.cover_url ?? '/placeholders/hero.svg'
+// The hero image always shows at full opacity, so the text never sits on it —
+// its contrast would depend on an image the template does not control.
+//   wide   — the site's own `hero_image`: title first, the image below it at
+//            full width (16:9). With no hero image and no cover, the bundled
+//            scene takes its place.
+//   square — no `hero_image`: the event's cover from Cloomba beside the title
+//            (above it on phones). Square is Cloomba's cover shape.
+// Both frames have a fixed aspect: the API sends no image dimensions, and a
+// fixed frame is what keeps the page from shifting as the image loads.
+const square = config.site.hero_image ? null : event.cover_url
+const wide = config.site.hero_image ?? '/placeholders/hero.svg'
 ---
 
 <section class='relative overflow-hidden'>
-    <img draggable='false' src={cover} alt='' class='absolute inset-0 size-full object-cover' loading='eager' />
-    <!-- The scrim is thinnest at the TOP, which is where the hero text starts —
-         keep it opaque enough that the title and dates stay legible over a dark
-         cover, without flattening the artwork. -->
-    <div class='absolute inset-0 bg-linear-to-t from-surface via-surface/70 to-surface/50'></div>
-    <div class='relative mx-auto max-w-5xl px-4 pb-20 pt-24 sm:pb-28 sm:pt-32'>
-        <!-- text-text, not text-primary: this line sits over the cover, so its
-             contrast depends on an image the template does not control. Primary
-             is reserved for the button below, where it earns the attention. -->
-        <p class='mb-3 text-sm font-semibold uppercase tracking-widest text-text'>
-            {dates}{place && ` · ${place}`}
-        </p>
-        <h1 class='max-w-3xl font-display text-4xl font-bold tracking-tight sm:text-6xl'>{event.title}</h1>
-        <div class='mt-8 flex flex-wrap gap-3'>
-            <a
-                href='/tickets'
-                class='rounded-card bg-primary px-6 py-3 font-medium text-primary-content transition-opacity hover:opacity-90'
-            >
-                {t('common.register')}
-            </a>
-            <a
-                href='/agenda'
-                class='rounded-card border border-text/15 px-6 py-3 font-medium transition-colors bg-surface hover:bg-surface-alt'
-            >
-                {t('hero.view_agenda')}
-            </a>
+    <div
+        aria-hidden='true'
+        class='pointer-events-none absolute inset-0 bg-[radial-gradient(var(--color-text)_1px,transparent_1.5px)] opacity-15 [background-size:22px_22px] [mask-image:radial-gradient(ellipse_80%_70%_at_0%_0%,black,transparent)]'
+    >
+    </div>
+    <div class='relative mx-auto max-w-5xl px-4 pb-16 pt-12 sm:pb-20 sm:pt-16'>
+        <div class:list={['grid gap-10', square && 'items-center md:grid-cols-2']}>
+            {
+                square && (
+                    <div class='overflow-hidden rounded-card md:order-last'>
+                        <img
+                            draggable='false'
+                            src={square}
+                            alt=''
+                            class='motion-safe:animate-settle aspect-square w-full object-cover'
+                            loading='eager'
+                        />
+                    </div>
+                )
+            }
+            <div>
+                <p class='motion-safe:animate-rise mb-3 text-sm font-semibold uppercase tracking-widest text-text'>
+                    {dates}{place && ` · ${place}`}
+                </p>
+                <h1
+                    class='motion-safe:animate-rise max-w-3xl font-display text-4xl font-bold tracking-tight [--rise-delay:80ms] sm:text-5xl lg:text-6xl'
+                >
+                    {event.title}
+                </h1>
+                <div class='motion-safe:animate-rise mt-8 flex flex-wrap gap-3 [--rise-delay:160ms]'>
+                    <a
+                        href='/tickets'
+                        class='rounded-card bg-primary px-6 py-3 font-medium text-primary-content transition hover:opacity-90 hover:shadow-md hover:shadow-primary/25 motion-safe:hover:-translate-y-0.5'
+                    >
+                        {t('common.register')}
+                    </a>
+                    <a
+                        href='/agenda'
+                        class='rounded-card border border-text/15 px-6 py-3 font-medium transition bg-surface hover:bg-surface-alt motion-safe:hover:-translate-y-0.5'
+                    >
+                        {t('hero.view_agenda')}
+                    </a>
+                </div>
+            </div>
+            {
+                !square && (
+                    <div class='overflow-hidden rounded-card'>
+                        <img
+                            draggable='false'
+                            src={wide}
+                            alt=''
+                            class='motion-safe:animate-settle aspect-video w-full object-cover'
+                            loading='eager'
+                        />
+                    </div>
+                )
+            }
         </div>
     </div>
 </section>

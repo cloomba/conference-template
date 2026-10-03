@@ -78,6 +78,15 @@ yarn lint                   # eslint over packages/
 - **Semantic tokens only in components** — `bg-surface`, `text-text`,
   `text-primary`, never raw colors and never `dark:` variants; light/dark is
   handled entirely by token values.
+- **Motion is CSS only.** Keyframes live in each app's `global.css` (`@theme
+  inline`); components apply them with Tailwind utilities, identical in both
+  apps — no animation library, no script. Every transform and animation sits
+  behind `motion-safe:` (with a `motion-reduce:` fallback where layout depends
+  on it), and nothing starts hidden where an animation doesn't run. Lift and
+  shadow only on links — a card that lifts reads as clickable; shadows are
+  token-tinted (`shadow-primary/…`). Anything that moves on its own for more
+  than five seconds needs a pause control (WCAG 2.2.2) — see the sponsors
+  marquee.
 - **One page width.** Every page container is `mx-auto max-w-5xl px-4` (the
   nav bar's width — left edges always align). Long-form TEXT may be capped at
   `max-w-3xl` for reading measure, but always left-aligned INSIDE the one

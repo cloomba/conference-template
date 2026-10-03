@@ -4,7 +4,7 @@
 // wrote for it ('static' mode). Handler bodies never reach the browser bundle,
 // and neither does anything only they import (the key, the site config).
 
-import { themeCss } from '@cloomba/core'
+import { registrationEmbedUrl, themeCss } from '@cloomba/core'
 import { createServerFn } from '@tanstack/react-start'
 import { staticFunctionMiddleware } from '@tanstack/start-static-server-functions'
 
@@ -219,7 +219,7 @@ export const getTickets = createServerFn({ method: 'GET' })
     .middleware(middleware)
     .handler(async () => ({
         tiers: toPublicTiers((await loadTicketTypes()).items),
-        embedSrc: `${embedOrigin}/embed/e/${encodeURIComponent(config.event.slug)}`,
+        embedSrc: registrationEmbedUrl(config, embedOrigin),
         embedScript: `${embedOrigin}/embed/embed.js`,
     }))
 

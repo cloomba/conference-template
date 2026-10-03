@@ -1,6 +1,6 @@
 import type { SectionName } from '@cloomba/core'
 import { createFileRoute } from '@tanstack/react-router'
-import { Fragment, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 import { About } from '@/components/sections/About'
 import { AgendaPreview } from '@/components/sections/AgendaPreview'
@@ -48,6 +48,12 @@ export const Route = createFileRoute('/')({
     component: Home,
 })
 
+// Every section after the hero fades up as it scrolls into view — a scroll-driven
+// CSS animation, so only where the browser supports `animation-timeline` and
+// the visitor allows motion. Everywhere else the sections simply show.
+const REVEAL =
+    'motion-safe:supports-[animation-timeline:view()]:animate-reveal motion-safe:supports-[animation-timeline:view()]:[animation-timeline:view()] motion-safe:supports-[animation-timeline:view()]:[animation-range:entry_0%_entry_35%]'
+
 function Home() {
     const home = Route.useLoaderData()
     const { config } = useSite()
@@ -55,7 +61,9 @@ function Home() {
         <>
             <JsonLd text={home.jsonLd} />
             {config.sections.map((name) => (
-                <Fragment key={name}>{SECTIONS[name](home)}</Fragment>
+                <div key={name} className={name === 'hero' ? undefined : REVEAL}>
+                    {SECTIONS[name](home)}
+                </div>
             ))}
         </>
     )

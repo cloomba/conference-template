@@ -38,7 +38,7 @@ function TicketsPage() {
                 <h2 className='mb-6 font-display text-2xl font-semibold tracking-tight'>
                     {t('tickets.register_heading')}
                 </h2>
-                <div className='max-w-3xl overflow-hidden rounded-card border border-text/10'>
+                <div className='w-full overflow-hidden rounded-card border border-text/10'>
                     <iframe
                         className='cloomba-embed'
                         src={embedSrc}

@@ -15,13 +15,13 @@ export function Cta({ event }: { event: EventSummary }) {
                 <div className='mt-8 flex flex-wrap justify-center gap-3'>
                     <SiteLink
                         href='/tickets'
-                        className='rounded-card bg-surface px-6 py-3 font-medium text-text transition-opacity hover:opacity-90'
+                        className='rounded-card bg-surface px-6 py-3 font-medium text-text transition hover:opacity-90 hover:shadow-md motion-safe:hover:-translate-y-0.5'
                     >
                         {t('common.register')}
                     </SiteLink>
                     <SiteLink
                         href='/become-a-sponsor'
-                        className='rounded-card border border-primary-content/40 px-6 py-3 font-medium transition-colors hover:bg-primary-content/10'
+                        className='rounded-card border border-primary-content/40 px-6 py-3 font-medium transition hover:bg-primary-content/10 motion-safe:hover:-translate-y-0.5'
                     >
                         {t('common.become_a_sponsor')}
                     </SiteLink>

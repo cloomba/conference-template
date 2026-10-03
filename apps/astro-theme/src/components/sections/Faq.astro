@@ -14,7 +14,7 @@ const rendered = await Promise.all(entries.map(async (entry) => ({ entry, Conten
             <SectionHeading title={t('faq.title')} />
             <div class='max-w-3xl divide-y divide-text/10 overflow-hidden rounded-card border border-text/10'>
                 {rendered.map(({ entry, Content }) => (
-                    <details class='group'>
+                    <details class='group [interpolate-size:allow-keywords] [&::details-content]:h-0 [&::details-content]:overflow-clip [&::details-content]:[transition:height_300ms_ease,content-visibility_300ms_allow-discrete] open:[&::details-content]:h-auto'>
                         {/* Padding lives ON the summary so the whole row —
                             edges included — is the click target. */}
                         <summary class='flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 font-medium transition-colors hover:bg-surface-alt'>

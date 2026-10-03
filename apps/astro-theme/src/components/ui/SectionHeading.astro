@@ -13,8 +13,9 @@ const { title, href, linkLabel } = Astro.props
     <h2 class='font-display text-2xl font-semibold tracking-tight sm:text-3xl'>{title}</h2>
     {
         href && (
-            <a href={href} class='text-sm text-primary hover:underline'>
-                {linkLabel ?? t('common.see_all')} →
+            <a href={href} class='group text-sm text-primary hover:underline'>
+                {linkLabel ?? t('common.see_all')}{' '}
+                <span class='inline-block transition-transform motion-safe:group-hover:translate-x-0.5'>→</span>
             </a>
         )
     }

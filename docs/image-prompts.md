@@ -41,16 +41,25 @@ format. One per sponsor: Golden Bone Capital (bone + coin), Whisker & Co.
 nest), Bamboo Cloud (bamboo + cloud), Burrow & Sons (burrow arch), Steady
 Stride Consulting (horseshoe), The Shelter Alliance (roof + paw).
 
-## Event cover (cloomba event admin → cover)
+## Hero image (the template's `public/hero.jpg`, set as `site.hero_image`)
 
 > a wide painterly illustration of many different animals gathered around a
 > forest watering hole at golden hour, conference lanyards, warm greens and
 > amber, no text, 16:9
+
+Export at least 1920×1080; it renders at full width in a 16:9 frame, so a
+different ratio is cropped from the center.
+
+## Event cover (cloomba event admin → cover)
+
+The same scene, composed for a square: Cloomba shows covers square, and the
+hero falls back to it (beside the title) when the site sets no `hero_image`.
 
 ## Where images land
 
 Speaker/host portraits and sponsor logos are uploaded in the Cloomba event
 admin (Featured entries) — the API serves them and the template picks them up
 on the next build, replacing the initial-letter fallbacks automatically. The
-cover feeds the hero background. The `public/placeholders/*.svg` splits can
+hero shows `site.hero_image` when set, the event cover otherwise. The
+`public/placeholders/*.svg` splits can
 be replaced with generated scene illustrations in the same palette whenever.

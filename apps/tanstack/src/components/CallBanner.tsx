@@ -20,7 +20,7 @@ export function CallBanner({ title, body, href, label }: Props) {
             </div>
             <SiteLink
                 href={href}
-                className='rounded-card bg-primary px-5 py-2.5 font-medium text-primary-content transition-opacity hover:opacity-90'
+                className='rounded-card bg-primary px-5 py-2.5 font-medium text-primary-content transition hover:opacity-90 hover:shadow-md hover:shadow-primary/25 motion-safe:hover:-translate-y-0.5'
             >
                 {label}
             </SiteLink>

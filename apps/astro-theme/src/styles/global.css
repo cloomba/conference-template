@@ -66,6 +66,60 @@ body {
     top: 1rem;
 }
 
+/* --- Motion ----------------------------------------------------------------
+   Keyframes only — components apply them with Tailwind utilities, always
+   behind `motion-safe:`, so where an animation doesn't run the page simply
+   shows. `inline` keeps var(--rise-delay) unresolved until it reaches the
+   element, so each element sets its own delay ([--rise-delay:80ms]). */
+@theme inline {
+    /* Hero entrance: dates, title, buttons rise in turn. */
+    --animate-rise: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) var(--rise-delay, 0ms) both;
+    /* The hero image eases out of a slight zoom once, then holds still. */
+    --animate-settle: settle 2.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+
+    @keyframes rise {
+        from {
+            opacity: 0;
+            transform: translateY(0.75rem);
+        }
+    }
+    @keyframes settle {
+        from {
+            transform: scale(1.08);
+        }
+    }
+
+    /* The "Now" dot in the live agenda: four pulses (under five seconds, so
+       it needs no pause control), then it rests. */
+    --animate-live: live 1.2s cubic-bezier(0, 0, 0.2, 1) 4;
+
+    /* Sponsor logos, one row scrolling left; each copy of the row moves by its
+       own width plus the gap, so the copies hand over seamlessly. */
+    --animate-marquee: marquee var(--duration, 40s) linear infinite;
+    @keyframes marquee {
+        to {
+            transform: translateX(calc(-100% - var(--gap)));
+        }
+    }
+
+    /* Home sections fading up as they scroll in (scroll-driven: the duration
+       is the scroll range, set where it's applied). */
+    --animate-reveal: reveal linear both;
+    @keyframes reveal {
+        from {
+            opacity: 0;
+            transform: translateY(2rem);
+        }
+    }
+    @keyframes live {
+        75%,
+        100% {
+            transform: scale(2.2);
+            opacity: 0;
+        }
+    }
+}
+
 /* Markdown-rendered content (event description, custom pages, FAQ answers). */
 .prose-content {
     line-height: 1.7;

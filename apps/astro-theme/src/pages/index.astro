@@ -38,6 +38,12 @@ const SECTIONS = {
 } as const
 
 const event = await loadEvent()
+
+// Every section after the hero fades up as it scrolls into view — a scroll-driven
+// CSS animation, so only where the browser supports `animation-timeline` and
+// the visitor allows motion. Everywhere else the sections simply show.
+const REVEAL =
+    'motion-safe:supports-[animation-timeline:view()]:animate-reveal motion-safe:supports-[animation-timeline:view()]:[animation-timeline:view()] motion-safe:supports-[animation-timeline:view()]:[animation-range:entry_0%_entry_35%]'
 ---
 
 <Base ogImage={event.cover_url}>
@@ -45,7 +51,11 @@ const event = await loadEvent()
     {
         config.sections.map((name) => {
             const Section = SECTIONS[name]
-            return <Section />
+            return (
+                <div class={name === 'hero' ? undefined : REVEAL}>
+                    <Section />
+                </div>
+            )
         })
     }
 </Base>

@@ -32,19 +32,21 @@ function SpeakerList() {
                     {speakers.map((speaker) => (
                         <li key={speaker.hash}>
                             <SiteLink href={speaker.path} className='group block'>
-                                {speaker.image_url ? (
-                                    <img
-                                        draggable={false}
-                                        src={speaker.image_url}
-                                        alt={speaker.name ?? ''}
-                                        className='mb-3 aspect-square w-full rounded-card object-cover'
-                                        loading='lazy'
-                                    />
-                                ) : (
-                                    <div className='mb-3 flex aspect-square w-full items-center justify-center rounded-card bg-surface-alt font-display text-3xl text-text-muted'>
-                                        {(speaker.name ?? '?').slice(0, 1)}
-                                    </div>
-                                )}
+                                <div className='mb-3 overflow-hidden rounded-card transition duration-300 group-hover:shadow-lg group-hover:shadow-primary/15 motion-safe:group-hover:-translate-y-1'>
+                                    {speaker.image_url ? (
+                                        <img
+                                            draggable={false}
+                                            src={speaker.image_url}
+                                            alt={speaker.name ?? ''}
+                                            className='aspect-square w-full object-cover transition-transform duration-500 motion-safe:group-hover:scale-105'
+                                            loading='lazy'
+                                        />
+                                    ) : (
+                                        <div className='flex aspect-square w-full items-center justify-center bg-surface-alt font-display text-3xl text-text-muted'>
+                                            {(speaker.name ?? '?').slice(0, 1)}
+                                        </div>
+                                    )}
+                                </div>
                                 <h2 className='font-medium group-hover:text-primary'>{speaker.name}</h2>
                                 {speaker.headline && (
                                     <p className='mt-0.5 text-sm text-text-muted'>{speaker.headline}</p>

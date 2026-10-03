@@ -66,7 +66,10 @@ export function Tickets({ tiers, plain = false }: Props) {
                     const { sold_out, spots_left } = live.get(tier.hash) ?? tier
                     const fewLeft = !sold_out && spots_left !== null && spots_left <= FEW_LEFT
                     return (
-                        <li key={tier.hash} className='flex flex-col rounded-card border border-text/10 p-6'>
+                        <li
+                            key={tier.hash}
+                            className='flex flex-col rounded-card border border-text/10 p-6 transition-colors duration-300 hover:border-primary/30'
+                        >
                             <h3 className='font-medium'>{tier.name}</h3>
                             <p className='mt-2 font-display text-3xl font-semibold'>{tier.priceLabel}</p>
                             {tier.description && <p className='mt-3 text-sm text-text-muted'>{tier.description}</p>}
@@ -78,7 +81,7 @@ export function Tickets({ tiers, plain = false }: Props) {
                                 ) : (
                                     <SiteLink
                                         href='/tickets#register'
-                                        className='inline-block rounded-card bg-primary px-5 py-2.5 font-medium text-primary-content transition-opacity hover:opacity-90'
+                                        className='inline-block rounded-card bg-primary px-5 py-2.5 font-medium text-primary-content transition hover:opacity-90 hover:shadow-md hover:shadow-primary/25 motion-safe:hover:-translate-y-0.5'
                                     >
                                         {t('common.register')}
                                     </SiteLink>

@@ -99,7 +99,7 @@ apps/tanstack     the template in React on TanStack Start (SSR or static) + Tail
 - **Content:** editorial pages, FAQ, and news are markdown files in the app's
   `src/content/`; everything event-shaped is edited on Cloomba.
 - **Language and wording:** every UI label the template renders lives in the
-  app's `strings.en.json` — 83 of them. Override the ones you want in the app's
+  app's `strings.en.json` — 84 of them. Override the ones you want in the app's
   `strings.ts` — it ships empty and is already wired in, so translating never
   means touching `site.config.ts`. Your entries merge over the English, and
   anything you skip stays English.

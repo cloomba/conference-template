@@ -9,7 +9,10 @@ export function Features({ features }: { features: ContentBlock<ContentData<'fea
         <section className='mx-auto max-w-5xl px-4 py-14'>
             <ul className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'>
                 {features.map((entry) => (
-                    <li key={entry.id} className='rounded-card border border-text/10 p-6'>
+                    <li
+                        key={entry.id}
+                        className='rounded-card border border-text/10 p-6 transition-colors duration-300 hover:border-primary/30'
+                    >
                         {entry.data.icon && <span className='text-3xl'>{entry.data.icon}</span>}
                         <h3 className='mt-3 font-display text-lg font-semibold'>{entry.data.title}</h3>
                         <Html html={entry.html} className='prose-content mt-2 text-sm text-text-muted' />

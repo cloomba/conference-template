@@ -17,10 +17,96 @@ const tiers = SPONSOR_TIER_ORDER.map((tier) => ({
     tier,
     entries: sponsors.filter((s) => s.tier === tier),
 })).filter((group) => group.entries.length > 0)
+
+// The home band scrolls the logos in one row once there are enough to fill
+// it. /sponsors always keeps the tiers: top tiers pay to be seen, and a moving
+// logo is harder to see and to click.
+const MARQUEE_MIN = 6
+// Copies of the row in the track — enough to cover a wide screen while the
+// first copy scrolls out.
+const MARQUEE_COPIES = 4
+const all = tiers.flatMap((group) => group.entries)
+const marquee = !plain && all.length >= MARQUEE_MIN
+const copies = Array.from({ length: MARQUEE_COPIES }, (_, index) => index)
 ---
 
 {
-    tiers.length > 0 && (
+    marquee && (
+        <section class='bg-surface-alt py-14'>
+            <div class='mx-auto max-w-5xl px-4'>
+                <SectionHeading title={t('nav.sponsors')} href='/sponsors' />
+                {/* Moving content that runs longer than five seconds needs a way to stop it
+                    (WCAG 2.2.2) — hover pauses it, and so does the pause control, which is a
+                    checkbox so it works without JavaScript. Only the first copy is in the
+                    accessibility tree and the tab order, so each sponsor is met once. With
+                    reduced motion there is no scrolling: the first copy wraps, the rest hide. */}
+                <div class='group'>
+                    <div class='flex gap-(--gap) overflow-hidden [--gap:3rem] [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)] motion-reduce:[mask-image:none]'>
+                        {copies.map((index) => (
+                            <ul
+                                aria-hidden={index > 0 ? 'true' : undefined}
+                                class:list={[
+                                    'flex shrink-0 items-center justify-around gap-(--gap) motion-safe:animate-marquee group-hover:[animation-play-state:paused] group-has-[:checked]:[animation-play-state:paused]',
+                                    index > 0
+                                        ? 'motion-reduce:hidden'
+                                        : 'motion-reduce:shrink motion-reduce:flex-wrap motion-reduce:justify-start motion-reduce:gap-y-6',
+                                ]}
+                            >
+                                {all.map((sponsor) => (
+                                    <li>
+                                        <a
+                                            href={sponsor.link ?? undefined}
+                                            rel='noopener'
+                                            tabindex={index > 0 ? -1 : undefined}
+                                            class='flex items-center gap-3 opacity-80 transition-opacity hover:opacity-100'
+                                        >
+                                            {sponsor.image_url ? (
+                                                <img
+                                                    draggable='false'
+                                                    src={sponsor.image_url}
+                                                    alt={sponsor.name ?? ''}
+                                                    class='max-h-12 w-auto max-w-40 object-contain'
+                                                    loading='lazy'
+                                                />
+                                            ) : (
+                                                <span class='font-display text-lg font-semibold'>{sponsor.name}</span>
+                                            )}
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
+                        ))}
+                    </div>
+                    <div class='mt-6 flex justify-end motion-reduce:hidden'>
+                        <label class='flex size-9 cursor-pointer items-center justify-center rounded-full border border-text/15 text-text-muted transition-colors hover:bg-surface hover:text-text has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary'>
+                            <input type='checkbox' class='peer sr-only' />
+                            <span class='sr-only'>{t('sponsors.pause')}</span>
+                            <svg
+                                viewBox='0 0 16 16'
+                                fill='currentColor'
+                                aria-hidden='true'
+                                class='size-3.5 peer-checked:hidden'
+                            >
+                                <rect x='3' y='2' width='3.5' height='12' rx='1' />
+                                <rect x='9.5' y='2' width='3.5' height='12' rx='1' />
+                            </svg>
+                            <svg
+                                viewBox='0 0 16 16'
+                                fill='currentColor'
+                                aria-hidden='true'
+                                class='hidden size-3.5 peer-checked:block'
+                            >
+                                <path d='M4 2.5v11a1 1 0 0 0 1.5.86l9-5.5a1 1 0 0 0 0-1.72l-9-5.5A1 1 0 0 0 4 2.5Z' />
+                            </svg>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </section>
+    )
+}
+{
+    !marquee && tiers.length > 0 && (
         <section class={plain ? 'py-8' : 'bg-surface-alt py-14'}>
             <div class='mx-auto max-w-5xl px-4'>
                 {/* On the dedicated page the PageHeader owns the title. */}

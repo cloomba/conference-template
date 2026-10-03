@@ -15,7 +15,7 @@ export function News({ news }: { news: NewsTeaser[] }) {
                     <li key={post.id}>
                         <SiteLink
                             href={`/news/${post.id}`}
-                            className='group block rounded-card border border-text/10 p-5'
+                            className='group block rounded-card border border-text/10 p-5 transition duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/10 motion-safe:hover:-translate-y-1'
                         >
                             <time className='text-sm text-text-muted'>{post.dateLabel}</time>
                             <h3 className='mt-2 font-medium group-hover:text-primary'>{post.title}</h3>
