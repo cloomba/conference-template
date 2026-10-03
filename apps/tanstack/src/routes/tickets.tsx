@@ -44,6 +44,7 @@ function TicketsPage() {
                         src={embedSrc}
                         style={{ width: '100%', height: '800px', border: 'none' }}
                         loading='lazy'
+                        allow='payment'
                         title={t('tickets.embed_title', { site: config.site.name })}
                     ></iframe>
                 </div>
