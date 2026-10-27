@@ -2,7 +2,18 @@
 // (simple-icons paths, inlined at build time — nothing ships to the client
 // but the <path>). Unknown domains fall back to a globe outline.
 
-import { siBluesky, siFacebook, siGithub, siInstagram, siMastodon, siTelegram, siX, siYoutube } from 'simple-icons'
+import {
+    siBluesky,
+    siFacebook,
+    siGithub,
+    siInstagram,
+    siMastodon,
+    siTelegram,
+    siThreads,
+    siWhatsapp,
+    siX,
+    siYoutube,
+} from 'simple-icons'
 
 import { t } from './strings'
 
@@ -28,6 +39,8 @@ const BRANDS: [RegExp, { title: string; path: string }][] = [
     [/(^|\.)(mastodon\.[a-z]+|fosstodon\.org|hachyderm\.io|mstdn\.[a-z]+)$/, siMastodon],
     [/(^|\.)(bsky\.app|bsky\.social)$/, siBluesky],
     [/(^|\.)(t\.me|telegram\.org)$/, siTelegram],
+    [/(^|\.)threads\.(com|net)$/, siThreads],
+    [/(^|\.)(whatsapp\.com|wa\.me)$/, siWhatsapp],
 ]
 
 // Globe outline for plain websites (drawn for a 24px box, stroke-style path
@@ -38,7 +51,23 @@ export const GLOBE: SocialIconDef = {
     path: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm7.93 9h-3.47a15.6 15.6 0 0 0-1.21-5.5A8.02 8.02 0 0 1 19.93 11ZM12 4.06c.87 1.03 1.94 3.03 2.3 6.94H9.7c.36-3.91 1.43-5.91 2.3-6.94ZM8.75 5.5A15.6 15.6 0 0 0 7.54 11H4.07a8.02 8.02 0 0 1 4.68-5.5ZM4.07 13h3.47c.14 2.11.56 3.99 1.21 5.5A8.02 8.02 0 0 1 4.07 13ZM12 19.94c-.87-1.03-1.94-3.03-2.3-6.94h4.6c-.36 3.91-1.43 5.91-2.3 6.94Zm3.25-1.44c.65-1.51 1.07-3.39 1.21-5.5h3.47a8.02 8.02 0 0 1-4.68 5.5Z',
 }
 
+// A mailto: or tel: href has no hostname to match, so contact lines
+// (footer.contacts) get their own glyphs — straight-edged filled paths
+// whose holes rely on the default nonzero fill rule.
+export const MAIL: SocialIconDef = {
+    title: t('a11y.email'),
+    path: 'M2 5H22V19H2ZM3.5 6.5V17.5H20.5V6.5ZM3.5 6.5L12 12.4L20.5 6.5V8.3L12 14.2L3.5 8.3Z',
+}
+
+export const PHONE: SocialIconDef = {
+    title: t('a11y.phone'),
+    path: 'M7 2H17V22H7ZM8.5 4V18H15.5V4ZM11 19.25V20.75H13V19.25Z',
+}
+
 export const socialIconFor = (href: string): SocialIconDef => {
+    const scheme = href.trim().toLowerCase()
+    if (scheme.startsWith('mailto:')) return MAIL
+    if (scheme.startsWith('tel:')) return PHONE
     try {
         const hostname = new URL(href).hostname.toLowerCase()
         const match = BRANDS.find(([pattern]) => pattern.test(hostname))

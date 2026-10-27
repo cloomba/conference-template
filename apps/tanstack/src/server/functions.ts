@@ -21,7 +21,7 @@ import { browserBaseUrl, embedOrigin } from './env'
 import { conferenceEventNode, jsonLdText, sessionEventNode } from './jsonld'
 import { plainText, renderMarkdown } from './markdown'
 import { footerColumns, headerLinks } from './nav'
-import { GITHUB_ICON_PATH, socialLink } from './socials'
+import { contactLink, GITHUB_ICON_PATH, socialLink } from './socials'
 import { locale, strings } from './strings'
 import {
     countDays,
@@ -65,6 +65,7 @@ export const getSite = createServerFn({ method: 'GET' })
             headerLinks: headerLinks(),
             footerColumns: footerColumns(),
             socials: config.socials.map(socialLink),
+            contacts: config.footer.contacts.map(contactLink),
             githubIconPath: GITHUB_ICON_PATH,
             year: new Date().getFullYear(),
             browserBaseUrl,

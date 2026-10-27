@@ -26,6 +26,12 @@ export interface SocialIconLink {
     path: string
 }
 
+// A footer contact line: the label as written, with its icon resolved the
+// same way (mailto: / tel: get their own glyphs).
+export interface ContactLink extends SocialIconLink {
+    label: string
+}
+
 // The config minus what the browser has no use for: `api.base_url` is the
 // key-authed endpoint, and `strings` arrives already merged (Site.strings).
 export type PublicConfig = Omit<SiteConfig, 'api' | 'strings'>
@@ -40,6 +46,7 @@ export interface Site {
     headerLinks: NavLink[]
     footerColumns: FooterColumn[]
     socials: SocialIconLink[]
+    contacts: ContactLink[]
     githubIconPath: string
     // The © year, fixed where the page was rendered so the browser never
     // disagrees with the server's HTML.

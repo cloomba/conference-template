@@ -6,7 +6,7 @@ import { SocialLink } from '@/components/ui/SocialLink'
 import { useSite, useT } from '@/lib/site'
 
 export function SiteFooter() {
-    const { config, footerColumns, socials, year } = useSite()
+    const { config, footerColumns, socials, contacts, year } = useSite()
     const { t } = useT()
 
     return (
@@ -28,6 +28,29 @@ export function SiteFooter() {
                         </Link>
                         {config.site.description && (
                             <p className='mt-3 text-sm text-text-muted'>{config.site.description}</p>
+                        )}
+                        {contacts.length > 0 && (
+                            <ul className='mt-4 space-y-1.5 text-sm'>
+                                {contacts.map((contact) => (
+                                    <li key={contact.href}>
+                                        <a
+                                            href={contact.href}
+                                            rel='noopener'
+                                            className='inline-flex items-center gap-2 text-text-muted transition-colors hover:text-text'
+                                        >
+                                            <svg
+                                                aria-hidden='true'
+                                                className='size-4 shrink-0'
+                                                viewBox='0 0 24 24'
+                                                fill='currentColor'
+                                            >
+                                                <path d={contact.path}></path>
+                                            </svg>
+                                            {contact.label}
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
                         )}
                         {socials.length > 0 && (
                             <div className='mt-4 flex gap-1'>

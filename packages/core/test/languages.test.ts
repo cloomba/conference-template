@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest'
 import { baseLanguage, languageLinks } from '../src/languages'
 
 const builds = [
-    { language: 'uk', label: 'UA', url: 'https://usbf.example.com' },
-    { language: 'sk', label: 'SK', url: 'https://usbf-sk.example.com/' },
+    { language: 'uk', label: 'UA', url: 'https://uk.example.com' },
+    { language: 'sk', label: 'SK', url: 'https://sk.example.com/' },
 ]
 
 describe('baseLanguage', () => {
@@ -17,14 +17,8 @@ describe('baseLanguage', () => {
 describe('languageLinks', () => {
     it('links the same path on every build and marks this one', () => {
         expect(languageLinks(builds, 'sk', '/agenda/')).toEqual([
-            { language: 'uk', label: 'UA', href: 'https://usbf.example.com/agenda/', current: false, isDefault: true },
-            {
-                language: 'sk',
-                label: 'SK',
-                href: 'https://usbf-sk.example.com/agenda/',
-                current: true,
-                isDefault: false,
-            },
+            { language: 'uk', label: 'UA', href: 'https://uk.example.com/agenda/', current: false, isDefault: true },
+            { language: 'sk', label: 'SK', href: 'https://sk.example.com/agenda/', current: true, isDefault: false },
         ])
     })
 

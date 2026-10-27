@@ -2,26 +2,19 @@ import { describe, expect, it } from 'vitest'
 
 import { extractLocaleOrAll, extractLocaleOrFirst, splitLocaleSections } from '../src/locale-sections'
 
-const sectioned = [
-    'Ukraine–Slovakia Business Forum',
-    'Partnership. Investment. Recovery',
-    '',
-    '# uk',
-    'USBF — міжнародний бізнес-форум.',
-    '',
-    '# sk',
-    'USBF — medzinárodné biznis fórum.',
-].join('\n')
+const preamble = 'Fauna Forum\nTwo days of talks, workshops, and the Evening Howl'
 
-const preamble = 'Ukraine–Slovakia Business Forum\nPartnership. Investment. Recovery'
+const sectioned = [preamble, '', '# uk', 'Один водопій — усі види.', '', '# sk', 'Jedno napájadlo, všetky druhy.'].join(
+    '\n'
+)
 
 describe('splitLocaleSections', () => {
     it('splits a preamble and one section per language', () => {
         expect(splitLocaleSections(sectioned)).toEqual({
             preamble,
             sections: [
-                { locale: 'uk', body: 'USBF — міжнародний бізнес-форум.' },
-                { locale: 'sk', body: 'USBF — medzinárodné biznis fórum.' },
+                { locale: 'uk', body: 'Один водопій — усі види.' },
+                { locale: 'sk', body: 'Jedno napájadlo, všetky druhy.' },
             ],
         })
     })
@@ -36,7 +29,7 @@ describe('splitLocaleSections', () => {
 
 describe('extractLocaleOrAll', () => {
     it("shows the preamble plus the site's language", () => {
-        expect(extractLocaleOrAll(sectioned, 'sk')).toBe(`${preamble}\n\nUSBF — medzinárodné biznis fórum.`)
+        expect(extractLocaleOrAll(sectioned, 'sk')).toBe(`${preamble}\n\nJedno napájadlo, všetky druhy.`)
     })
 
     it('shows the whole body when neither the language nor English is there', () => {
@@ -50,6 +43,6 @@ describe('extractLocaleOrAll', () => {
 
 describe('extractLocaleOrFirst', () => {
     it('never returns more than one language', () => {
-        expect(extractLocaleOrFirst(sectioned, 'de')).toBe(`${preamble}\n\nUSBF — міжнародний бізнес-форум.`)
+        expect(extractLocaleOrFirst(sectioned, 'de')).toBe(`${preamble}\n\nОдин водопій — усі види.`)
     })
 })

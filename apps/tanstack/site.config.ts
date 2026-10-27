@@ -142,6 +142,14 @@ export default defineConfig({
         terms_href: 'https://cloomba.com/legal/terms',
         // Extra line under the © notice:
         text: 'Fauna Forum is a fictional conference — the live demo of the Cloomba conference template.',
+        // Contact lines under the blurb — icon + label, the label as written.
+        // The icon comes from the href: mailto: → mail, tel: → phone, t.me /
+        // wa.me → Telegram / WhatsApp, any other site → its brand or a globe:
+        // contacts: [
+        //     { label: 'team@fauna-forum.example', href: 'mailto:team@fauna-forum.example' },
+        //     { label: '+1 555 0100', href: 'tel:+15550100' },
+        //     { label: 'WhatsApp +1 555 0100', href: 'https://wa.me/15550100' },
+        // ],
     },
     // Wording and translation — edit strings.ts, not this line. It ships
     // empty, so out of the box every label is the shipped table for your

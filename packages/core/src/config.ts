@@ -173,6 +173,11 @@ export const siteConfigSchema = z.object({
             privacy_href: z.string().min(1).optional(),
             terms_href: z.string().min(1).optional(),
             text: z.string().optional(),
+            // Contact lines under the footer blurb — icon + label, the label
+            // shown as written ("+421 900 000 000", "hello@example.com"). The
+            // icon comes from the href: mailto: → mail, tel: → phone, any other
+            // URL → its brand (Telegram t.me, WhatsApp wa.me, …), else a globe.
+            contacts: z.array(linkSchema).default([]),
         })
         .prefault({}),
     // UI label overrides, merged over the theme's own English table:

@@ -32,6 +32,13 @@ describe('parseSiteConfig', () => {
         expect(() => parseSiteConfig({ ...minimal, sections: ['hero', 'merch'] })).toThrow(/sections/)
     })
 
+    it('has no footer contacts by default and refuses one without an href', () => {
+        expect(parseSiteConfig(minimal).footer.contacts).toEqual([])
+        expect(() => parseSiteConfig({ ...minimal, footer: { contacts: [{ label: '+1 555 0100' }] } })).toThrow(
+            /contacts/
+        )
+    })
+
     it('has no language builds by default and rejects a relative alternate URL', () => {
         expect(parseSiteConfig(minimal).site.alternates).toEqual([])
         expect(() =>
