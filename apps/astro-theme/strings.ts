@@ -1,13 +1,17 @@
 // Your site's wording — the ONE file to edit when you translate, or when you
 // just want to say something differently. Everything you set here is merged
-// over the shipped English, so you change what you care about and the rest
-// stays as it was:
+// over the labels shipped for your `site.language`, so you change what you
+// care about and the rest stays as it was:
 //
-//     final = { ...en, ...these }
+//     final = { ...en, ...shipped[language], ...these }
 //
-// The complete key list is strings.en.json, right next to this file — 83 keys,
-// the whole vocabulary of the template. Your editor autocompletes every one of
-// them and underlines a typo, thanks to the `satisfies` at the bottom.
+// Ukrainian and Slovak ship complete (strings.uk.json, strings.sk.json) — for
+// those, this file is only for rewording. For any other language, the
+// examples below show the shape (in Slovak).
+//
+// The complete key list is strings.en.json, right next to this file — the
+// whole vocabulary of the template. Your editor autocompletes every key and
+// underlines a typo, thanks to the `satisfies` at the bottom.
 //
 // Nothing here can break the build. A key that doesn't exist, isn't a string,
 // or is empty is skipped with a warning and the English is used instead.

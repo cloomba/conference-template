@@ -4,7 +4,7 @@ import { useT } from '@/lib/site'
 import type { AgendaPreviewData } from '@/lib/views'
 
 export function AgendaPreview({ agenda }: { agenda: AgendaPreviewData | null }) {
-    const { t, tn } = useT()
+    const { t } = useT()
     if (!agenda) return null
 
     return (
@@ -12,7 +12,7 @@ export function AgendaPreview({ agenda }: { agenda: AgendaPreviewData | null }) 
             <SectionHeading
                 title={t('nav.agenda')}
                 href='/agenda'
-                linkLabel={agenda.dayCount > 1 ? tn('agenda.all_days', agenda.dayCount) : t('agenda.full_agenda')}
+                linkLabel={agenda.dayCount > 1 ? t('agenda.all_days') : t('agenda.full_agenda')}
             />
             <p className='mb-6 text-sm text-text-muted'>{agenda.dayHeading}</p>
             <ol className='divide-y divide-text/10 overflow-hidden rounded-card border border-text/10'>

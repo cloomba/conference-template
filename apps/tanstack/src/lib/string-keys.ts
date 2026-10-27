@@ -5,6 +5,8 @@
 import type { CldrForm } from '@cloomba/core'
 
 import en from '../../strings.en.json'
+import sk from '../../strings.sk.json'
+import uk from '../../strings.uk.json'
 
 export const EN_STRINGS: Record<string, string> = en
 
@@ -23,3 +25,23 @@ export type PluralFormKey = `${PluralKey}.${CldrForm}`
 // The authoring shape for strings.ts: every key optional, all autocompleted,
 // and a typo underlined before any build runs.
 export type StringOverrides = Partial<Record<StringKey | PluralFormKey, string>>
+
+// A shipped translation covers every English key and adds only legal ones (the
+// extra plural forms). The compiler checks both, so a key added to
+// strings.en.json without its translations fails `yarn typecheck`.
+type ShippedTable<T> =
+    Exclude<StringKey, keyof T> extends never
+        ? Exclude<keyof T, StringKey | PluralFormKey> extends never
+            ? T
+            : never
+        : never
+
+const shipped = <T>(table: ShippedTable<T>): Record<string, string> => table as Record<string, string>
+
+// The translations this theme ships, by base language. `site.language` picks
+// one (`sk`, `uk-UA` → `uk`); strings.ts overrides it, and English fills any
+// key both leave out.
+export const SHIPPED_STRINGS: Record<string, Record<string, string>> = {
+    sk: shipped<typeof sk>(sk),
+    uk: shipped<typeof uk>(uk),
+}

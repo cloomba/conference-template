@@ -57,11 +57,10 @@
     "agenda.add_to_calendar_inline": "Add to your calendar (iCal)",
     "agenda.all_stages": "All stages",
     "agenda.full_agenda": "Full agenda",
-    "agenda.all_days.one": "All {count} day",
-    "agenda.all_days.other": "All {count} days",
+    "agenda.all_days": "All days",
 
     "speakers.meta_description": "Speakers at {site}.",
-    "speakers.all_count": "All {count}",
+    "speakers.all": "All",
     "speakers.unnamed": "Speaker",
     "speakers.sessions_heading": "Sessions",
     "speakers.cfp_title": "Your name belongs up here",

@@ -7,7 +7,8 @@
 import { defineConfig } from '@cloomba/core'
 
 // Your wording, in its own file — see strings.ts. Ships empty ({}), so the
-// template renders its English until you put something there.
+// template renders the labels shipped for `site.language` — Ukrainian and
+// Slovak ship complete — and English for any other language.
 import strings from './strings'
 
 // This file is read on the server only (src/server/config.ts) and reaches the
@@ -27,7 +28,8 @@ export default defineConfig({
         url: 'https://tanstack.cloomba.com',
         // Meta description + footer blurb.
         description: 'The gathering of every species — two days of talks, workshops, and the Evening Howl.',
-        // BCP 47 tag for <html lang> and date/number formatting.
+        // BCP 47 tag for <html lang>, date/number formatting, and the shipped
+        // labels when there is a table for it (strings.uk.json, strings.sk.json).
         language: 'en',
         // Social-share preview (og:image) for pages without their own — the
         // event cover wins on the home page. Raster only (no SVG); ships as a
@@ -133,7 +135,8 @@ export default defineConfig({
         text: 'Fauna Forum is a fictional conference — the live demo of the Cloomba conference template.',
     },
     // Wording and translation — edit strings.ts, not this line. It ships
-    // empty, so out of the box every label is the shipped English.
+    // empty, so out of the box every label is the shipped table for your
+    // language (English, Ukrainian or Slovak).
     strings,
 
     // Shown in the footer and used for mailto CTAs.

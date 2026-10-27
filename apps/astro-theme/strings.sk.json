@@ -1,0 +1,106 @@
+{
+    "meta.page_title": "{title} — {site}",
+
+    "a11y.skip_to_content": "Preskočiť na obsah",
+    "a11y.menu": "Menu",
+    "a11y.toggle_theme": "Prepnúť vzhľad",
+    "a11y.filter_by_stage": "Filtrovať podľa pódia",
+    "a11y.jump_to_day": "Prejsť na deň",
+    "a11y.website": "Webstránka",
+
+    "common.register": "Zaregistrovať sa",
+    "common.become_a_sponsor": "Staňte sa sponzorom",
+    "common.see_all": "Zobraziť všetko",
+    "common.learn_more": "Zistiť viac",
+
+    "nav.about": "O podujatí",
+    "nav.agenda": "Program",
+    "nav.speakers": "Rečníci",
+    "nav.sponsors": "Sponzori",
+    "nav.tickets": "Vstupenky",
+    "nav.news": "Novinky",
+    "nav.add_to_calendar": "Pridať do kalendára (iCal)",
+    "nav.contact_us": "Kontaktujte nás",
+    "nav.ios_app": "Aplikácia pre iOS",
+    "nav.android_app": "Aplikácia pre Android",
+    "nav.privacy": "Pravidlá ochrany súkromia",
+    "nav.terms": "Zmluvné podmienky",
+    "nav.column_explore": "Preskúmať",
+    "nav.column_attend": "Účasť",
+    "nav.column_more": "Viac",
+
+    "footer.copyright": "© {year} {site}",
+    "footer.powered_by": "Beží na Cloomba",
+
+    "promo.title": "Organizujete podujatie?",
+    "promo.body": "Celý tento web — program, rečníci, vstupenky, registrácia — je šablóna s otvoreným zdrojovým kódom, ktorá beží na Cloomba.",
+    "promo.tagline": "Ten váš môže takto vyzerať už do víkendu.",
+    "promo.how_it_works": "Ako to funguje",
+    "promo.github": "GitHub",
+    "promo.cloomba": "cloomba.com",
+
+    "hero.view_agenda": "Zobraziť program",
+
+    "stats.speakers": "Rečníci",
+    "stats.sessions": "Prednášky",
+    "stats.sponsors": "Sponzori",
+    "stats.days.one": "Deň",
+    "stats.days.few": "Dni",
+    "stats.days.other": "Dní",
+    "stats.registered": "Registrovaných",
+
+    "about.heading": "Jedno napájadlo, všetky druhy",
+    "about.cta": "O konferencii",
+    "about.page_title": "O podujatí {site}",
+
+    "agenda.meta_description": "Program podujatia {site}.",
+    "agenda.times_local": "Všetky časy sú uvedené v miestnom čase podujatia.",
+    "agenda.add_to_calendar_inline": "Pridajte si do kalendára (iCal)",
+    "agenda.all_stages": "Všetky pódiá",
+    "agenda.full_agenda": "Celý program",
+    "agenda.all_days": "Všetky dni",
+
+    "speakers.meta_description": "Rečníci podujatia {site}.",
+    "speakers.all": "Všetci",
+    "speakers.unnamed": "Rečník",
+    "speakers.sessions_heading": "Prednášky",
+    "speakers.cfp_title": "Tu patrí vaše meno",
+    "speakers.cfp_body": "Výzva na prednášky je otvorená — všetky druhy, každá úroveň skúseností, mentori pre nováčikov.",
+    "speakers.cfp_label": "Navrhnúť prednášku",
+
+    "sponsors.meta_description": "Sponzori podujatia {site}.",
+    "sponsors.cta_title": "Tu patrí vaše logo",
+    "sponsors.cta_body": "Sponzorské úrovne pre brloh každej veľkosti — a každá z nich pomáha udržať Community Pass zadarmo.",
+    "sponsors.pause": "Pozastaviť posúvanie log",
+
+    "team.title": "Tím",
+
+    "tickets.meta_description": "Registrácia na podujatie {site}.",
+    "tickets.free": "Zdarma",
+    "tickets.price_from": "od {price}",
+    "tickets.price_on_request": "Cena na vyžiadanie",
+    "tickets.sold_out": "Vypredané",
+    "tickets.spots_left.one": "Zostáva už len {count} miesto",
+    "tickets.spots_left.few": "Zostávajú už len {count} miesta",
+    "tickets.spots_left.other": "Zostáva už len {count} miest",
+    "tickets.register_heading": "Registrácia",
+    "tickets.embed_title": "Registrácia na podujatie {site}",
+
+    "venue.title": "Miesto konania",
+    "venue.directions": "Ako sa tam dostať →",
+
+    "faq.title": "Časté otázky",
+
+    "news.all": "Všetky novinky",
+
+    "cta.heading": "Buďte pri tom, keď sa zíde celé kráľovstvo",
+
+    "nownext.now": "Teraz",
+    "nownext.until": "do {time}",
+    "nownext.next": "Nasleduje",
+    "nownext.at": "o {time}",
+
+    "error.not_found_title": "Stránka sa nenašla",
+    "error.not_found_body": "Stránka, ktorú hľadáte, neexistuje alebo bola presunutá.",
+    "error.not_found_cta": "Späť na úvodnú stránku"
+}

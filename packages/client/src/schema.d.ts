@@ -15,21 +15,24 @@ export interface paths {
          * List your events
          * @description Your own events, newest start date first. Returns the base event
          *     shape — guest counts and registration questions are detail-only
-         *     (see `GET /events/{slug}`).
+         *     (see `GET /events/{slug}`). A `read_public` key lists only public
+         *     events that are published or completed.
          */
         get: operations['listEvents']
         put?: never
         /**
          * Create an event
          * @description Creates an event you organize. **Requires a key with the `read_write`
-         *     scope**, and the key must be account-wide — a key restricted to specific
-         *     events cannot create new ones (`api_scope_forbidden`).
+         *     scope.** A key with calendar access creates the event into its calendar;
+         *     a key with **Selected events** access cannot create events
+         *     (`api_scope_forbidden`).
          *
          *     Send `external_id` and this becomes an **upsert**: if one of your events
          *     already carries that id, it is updated instead and the response is `200`
          *     rather than `201`. That makes a retry or a repeated sync safe, and means
          *     you never have to store or guess our `slug`. Without `external_id`, every
-         *     call creates a new event.
+         *     call creates a new event. The event it matches must be one the key
+         *     reaches, or the call answers `403 api_scope_forbidden`.
          *
          *     The event is created with a single free "Standard" ticket tier. Set
          *     `status` to `published` to make it live immediately.
@@ -54,6 +57,9 @@ export interface paths {
          *     capacity (`spots_remaining`, `null` when uncapped), and the
          *     registration-question schema (`registration_questions`). Attendee
          *     answers correlate to these questions by `label`.
+         *
+         *     A `read_public` key reads the event as a signed-out visitor sees it
+         *     (see Scopes): a draft or private event answers `403 api_scope_forbidden`.
          */
         get: operations['getEvent']
         put?: never
@@ -63,17 +69,46 @@ export interface paths {
         head?: never
         /**
          * Update an event
-         * @description Partial update — only the fields you send are changed. **Requires the Pro
-         *     plan and a key with the `read_write` scope.**
+         * @description Partial update — only the fields you send are changed. **Requires a key
+         *     with the `read_write` scope.**
          *
          *     Changing `starts_at` / `ends_at` reschedules attendee reminders and
          *     refreshes issued wallet passes; changing `capacity` reconciles the
          *     waitlist. Attendees are not emailed — announce changes with an event
          *     update in the app.
          *
-         *     Cancelling an event is not part of this endpoint.
+         *     `status` moves between `draft` and `published` only. A cancelled event
+         *     answers `409 event_cancelled` and a completed one `422 event_ended` when
+         *     `status` is sent; every other field can still be edited on both. To
+         *     cancel an event, use `POST /events/{slug}/cancel`.
          */
         patch: operations['updateEvent']
+        trace?: never
+    }
+    '/events/{slug}/cancel': {
+        parameters: {
+            query?: never
+            header?: never
+            path?: never
+            cookie?: never
+        }
+        get?: never
+        put?: never
+        /**
+         * Cancel an event
+         * @description Cancels the event. **Requires a key with the `read_write` scope.**
+         *
+         *     This is the same cancel as in the app, and it acts on every guest: paid
+         *     tickets are refunded, every other registration is cancelled, and each
+         *     guest receives a cancellation email in their language. `message`, when
+         *     sent, appears in that email above the refund line. A cancelled event
+         *     stays readable, with `status: cancelled`.
+         */
+        post: operations['cancelEvent']
+        delete?: never
+        options?: never
+        head?: never
+        patch?: never
         trace?: never
     }
     '/events/{slug}/attendees': {
@@ -137,7 +172,8 @@ export interface paths {
          *     and `image_url` falling back to that account's profile). `tier` is
          *     only meaningful for `kind = sponsor`; every other kind reports the
          *     default `community`. Attached materials — slides, recordings,
-         *     documents — come through in `files`.
+         *     documents — come through in `files`; a `read_public` key gets none,
+         *     since they are for the event's guests.
          */
         get: operations['listFeatured']
         put?: never
@@ -188,6 +224,9 @@ export interface paths {
          *     `url` is the delivery URL for the original file; append resize
          *     parameters as needed. `poster_url` and `duration` are set for videos
          *     only. Each item reports the account that uploaded it.
+         *
+         *     The wall is for the event's guests unless the organizer opens it to
+         *     everyone, so a `read_public` key gets an empty list until then.
          */
         get: operations['listMedia']
         put?: never
@@ -274,8 +313,9 @@ export interface paths {
         }
         /**
          * List the bundled cover images
-         * @description The stock cover library. Use a `key` from this list as `preset_key` when
-         *     setting a cover, for an event with no artwork of its own.
+         * @description The stock cover library. Use a `key` from `items` or from any entry in
+         *     `groups` as `preset_key` when setting a cover, for an event with no
+         *     artwork of its own.
          */
         get: operations['listCoverPresets']
         put?: never
@@ -304,6 +344,10 @@ export interface paths {
          *     `https://cloomba.com/t/<key>` URL a ticket QR may carry — the
          *     server reads the key out of any of them. A string that is none
          *     of these answers `400 validation_failed`.
+         *
+         *     Only a confirmed registration can be checked in; one that is
+         *     pending, waitlisted, cancelled or refunded answers
+         *     `409 rsvp_not_checkinable`.
          */
         post: operations['checkIn']
         delete?: never
@@ -312,8 +356,278 @@ export interface paths {
         patch?: never
         trace?: never
     }
+    '/events/{slug}/uncheck-in': {
+        parameters: {
+            query?: never
+            header?: never
+            path?: never
+            cookie?: never
+        }
+        get?: never
+        put?: never
+        /**
+         * Undo a check-in
+         * @description Undoes the check-in of the one scanned admission — for a mis-scan at
+         *     the door. **Requires a key with the `read_write` scope.** Takes the
+         *     same `qr_token` as check-in and answers the same shape. Sending a
+         *     token that is not checked in changes nothing and answers its
+         *     current state.
+         */
+        post: operations['uncheckIn']
+        delete?: never
+        options?: never
+        head?: never
+        patch?: never
+        trace?: never
+    }
+    '/calendars/{slug}/memberships': {
+        parameters: {
+            query?: never
+            header?: never
+            path?: never
+            cookie?: never
+        }
+        /**
+         * List a calendar's memberships
+         * @description Every membership of the calendar, oldest first — ended ones too
+         *     (`declined`, `removed`, `expired`), so a `since` poll sees a member
+         *     leave. **Requires a key whose access is this calendar**, held by its
+         *     owner or an admin; any other key answers `403 api_scope_forbidden`, and
+         *     so does a `read_public` key.
+         */
+        get: operations['listMemberships']
+        put?: never
+        post?: never
+        delete?: never
+        options?: never
+        head?: never
+        patch?: never
+        trace?: never
+    }
+    '/calendars/{slug}/memberships/{hash}': {
+        parameters: {
+            query?: never
+            header?: never
+            path?: never
+            cookie?: never
+        }
+        /**
+         * Get one membership
+         * @description One membership by its `hash` — the value `membership.*` webhooks carry
+         *     as `membership_hash`. Same key requirement as the list.
+         */
+        get: operations['getMembership']
+        put?: never
+        post?: never
+        delete?: never
+        options?: never
+        head?: never
+        patch?: never
+        trace?: never
+    }
 }
-export type webhooks = Record<string, never>
+export interface webhooks {
+    'event.published': {
+        parameters: {
+            query?: never
+            header?: never
+            path?: never
+            cookie?: never
+        }
+        get?: never
+        put?: never
+        /**
+         * An event was published
+         * @description A draft became published — when it was created or on a later save.
+         *     `data.event` is the event as `GET /events/{slug}` returns it.
+         */
+        post: operations['eventPublished']
+        delete?: never
+        options?: never
+        head?: never
+        patch?: never
+        trace?: never
+    }
+    'event.updated': {
+        parameters: {
+            query?: never
+            header?: never
+            path?: never
+            cookie?: never
+        }
+        get?: never
+        put?: never
+        /**
+         * An event was changed
+         * @description Any other saved change to an event — its details, its cover, or a draft
+         *     being edited. `data.event` is the event as `GET /events/{slug}` returns
+         *     it.
+         */
+        post: operations['eventUpdated']
+        delete?: never
+        options?: never
+        head?: never
+        patch?: never
+        trace?: never
+    }
+    'event.cancelled': {
+        parameters: {
+            query?: never
+            header?: never
+            path?: never
+            cookie?: never
+        }
+        get?: never
+        put?: never
+        /**
+         * An event was cancelled
+         * @description The organizer cancelled the event — in the app or with
+         *     `POST /events/{slug}/cancel`. Guests are refunded and emailed by
+         *     Cloomba; each registration change also arrives as `rsvp.updated`.
+         */
+        post: operations['eventCancelled']
+        delete?: never
+        options?: never
+        head?: never
+        patch?: never
+        trace?: never
+    }
+    'event.deleted': {
+        parameters: {
+            query?: never
+            header?: never
+            path?: never
+            cookie?: never
+        }
+        get?: never
+        put?: never
+        /**
+         * An event was deleted
+         * @description The event is gone from every read, so `data.event` names it by the
+         *     `slug` it had.
+         */
+        post: operations['eventDeleted']
+        delete?: never
+        options?: never
+        head?: never
+        patch?: never
+        trace?: never
+    }
+    'rsvp.created': {
+        parameters: {
+            query?: never
+            header?: never
+            path?: never
+            cookie?: never
+        }
+        get?: never
+        put?: never
+        /**
+         * Someone registered
+         * @description A new registration, in whatever status it starts — `confirmed`,
+         *     `pending_approval`, `pending_payment` or `waitlist`. A guest who
+         *     cancelled and registers again arrives as `rsvp.updated`. The
+         *     organizer's and staff's own tickets are not registrations and never
+         *     arrive.
+         */
+        post: operations['rsvpCreated']
+        delete?: never
+        options?: never
+        head?: never
+        patch?: never
+        trace?: never
+    }
+    'rsvp.updated': {
+        parameters: {
+            query?: never
+            header?: never
+            path?: never
+            cookie?: never
+        }
+        get?: never
+        put?: never
+        /**
+         * A registration changed
+         * @description A registration's status or payment changed (an approval, a payment,
+         *     a move off the waitlist, a cancellation or refund), it was removed, or
+         *     a ticket after the party's first was checked in or a check-in was
+         *     undone. `previous_status` is the status before the change.
+         */
+        post: operations['rsvpUpdated']
+        delete?: never
+        options?: never
+        head?: never
+        patch?: never
+        trace?: never
+    }
+    'rsvp.checked_in': {
+        parameters: {
+            query?: never
+            header?: never
+            path?: never
+            cookie?: never
+        }
+        get?: never
+        put?: never
+        /**
+         * A guest arrived
+         * @description The party's first ticket was checked in — at the door in the app, or
+         *     with `POST /events/{slug}/check-in`. Later tickets of the same
+         *     registration arrive as `rsvp.updated`.
+         */
+        post: operations['rsvpCheckedIn']
+        delete?: never
+        options?: never
+        head?: never
+        patch?: never
+        trace?: never
+    }
+    'membership.created': {
+        parameters: {
+            query?: never
+            header?: never
+            path?: never
+            cookie?: never
+        }
+        get?: never
+        put?: never
+        /**
+         * Someone joined a calendar
+         * @description A new membership on the webhook's calendar — an application
+         *     (`pending`), a join waiting for payment (`pending_payment`), or a
+         *     member seated at once (`active`). Needs a webhook with calendar
+         *     access.
+         */
+        post: operations['membershipCreated']
+        delete?: never
+        options?: never
+        head?: never
+        patch?: never
+        trace?: never
+    }
+    'membership.updated': {
+        parameters: {
+            query?: never
+            header?: never
+            path?: never
+            cookie?: never
+        }
+        get?: never
+        put?: never
+        /**
+         * A membership changed
+         * @description A membership's status, tier, `valid_until` (a renewal) or `cancel_at`
+         *     changed, or it was removed. `previous_status` is the status before
+         *     the change. Needs a webhook with calendar access.
+         */
+        post: operations['membershipUpdated']
+        delete?: never
+        options?: never
+        head?: never
+        patch?: never
+        trace?: never
+    }
+}
 export interface components {
     schemas: {
         /**
@@ -327,7 +641,14 @@ export interface components {
          * @description Where the event happens.
          * @enum {string}
          */
-        EventFormat: 'in_person' | 'online' | 'hybrid'
+        EventFormat: 'in_person' | 'online'
+        /**
+         * @description The refund rule for card-paid tickets. `until_start` — a guest who cancels
+         *     is refunded until the event starts. `until_date` — until a date the
+         *     organizer picked (see `refund_deadline`). `none` — no refunds.
+         * @enum {string}
+         */
+        RefundPolicy: 'until_start' | 'until_date' | 'none'
         /**
          * @description Registration status.
          * @enum {string}
@@ -360,7 +681,7 @@ export interface components {
         /** @enum {string} */
         MediaKind: 'image' | 'video'
         /**
-         * @description `hidden` tiers are not offered on the public event page.
+         * @description `hidden` tiers are shown on the event page as locked and open only with a coupon code bound to the tier.
          * @enum {string}
          */
         TicketTypeVisibility: 'public' | 'hidden'
@@ -374,7 +695,7 @@ export interface components {
          * @enum {string}
          */
         TicketPriceKind: 'fixed' | 'request' | 'variable'
-        /** @description Physical location. All fields are null for a purely online event. */
+        /** @description Physical location. All fields are null for a purely online event. For a `read_public` key on an event whose organizer hides the exact location, `name`, `address`, `lat` and `lng` are null. */
         Location: {
             name: string | null
             address: string | null
@@ -405,19 +726,50 @@ export interface components {
             /** Format: date-time */
             starts_at: string
             /** Format: date-time */
-            ends_at: string | null
+            ends_at: string
             /**
              * @description IANA timezone; render `starts_at` / `ends_at` in this zone for wall-clock time.
              * @example Europe/Bratislava
              */
             timezone: string
             location: components['schemas']['Location']
-            /** Format: uri */
+            /**
+             * Format: uri
+             * @description The join link. Always `null` for a `read_public` key.
+             */
             online_url: string | null
             /** @description Admission capacity; `null` when uncapped. */
             capacity: number | null
-            /** @description Whether free registrations need organizer approval. */
+            /**
+             * @description Lowercase topic tags, such as `tech` or `music`.
+             * @example [
+             *       "tech",
+             *       "coffee"
+             *     ]
+             */
+            categories: string[]
+            /**
+             * @description The event's languages, as ISO 639-1 codes.
+             * @example [
+             *       "pl",
+             *       "en"
+             *     ]
+             */
+            languages: string[]
+            /** @description Whether registrations wait for the organizer's approval — free and card-paid alike; a card-paid guest is charged after approval. On a self-collected event that holds the seat until payment, marking the registration paid is the gate instead. */
             require_approval: boolean
+            /** @description The registration form asks for first and last name; attendee rows then carry `first_name` and `last_name`. */
+            split_name: boolean
+            /** @description Guests may bring un-named companions on free tickets. */
+            allow_plus_ones: boolean
+            /** @description The most companions one guest may bring when `allow_plus_ones` is on. */
+            max_plus_ones_per_rsvp: number
+            refund_policy: components['schemas']['RefundPolicy']
+            /**
+             * Format: date-time
+             * @description Until when a guest who cancels a card-paid ticket is refunded — never later than the start. `null` means no refunds.
+             */
+            refund_deadline: string | null
             /**
              * @description Your own id for this event, if you supplied one when writing it. `null` for events created in the Cloomba app. Lets you correlate a listing back to your records without storing our `slug`.
              * @example yolk-1042
@@ -430,12 +782,30 @@ export interface components {
              * @description The event's public page.
              */
             url: string
+            /**
+             * Format: uri
+             * @description The event's short link, once someone has made one in the app; `null` before that, and always `null` for a private event.
+             * @example https://cloo.mba/x7Kp2Q
+             */
+            short_url: string | null
+            /** @description The calendar presenting the event, or `null` for a personal event. */
+            calendar: components['schemas']['CalendarRef'] | null
             /** @description Set when the event is a listing that links out to another site — it has no registration, tickets, chat or media on Cloomba. `null` for every other event. */
             external: components['schemas']['ExternalListing'] | null
             /** Format: date-time */
             created_at: string
             /** Format: date-time */
             updated_at: string
+        }
+        /** @description The calendar an event is presented by. */
+        CalendarRef: {
+            slug: string
+            name: string
+            /**
+             * Format: uri
+             * @description The calendar's public page.
+             */
+            url: string
         }
         /** @description Where a listing-only event lives. */
         ExternalListing: {
@@ -502,7 +872,7 @@ export interface components {
             visibility?: components['schemas']['EventVisibility']
             /** @description Positive integer, or `null` for uncapped. */
             capacity?: number | null
-            /** @description `draft` or `published` only. **Defaults to `draft`** — omit it and the event is created but not publicly visible. Send `published` to make it live immediately. Cancelling is not part of this endpoint. */
+            /** @description `draft` or `published` only. **Defaults to `draft`** — omit it and the event is created but not publicly visible. Send `published` to make it live immediately. To cancel an event, use `POST /events/{slug}/cancel`. */
             status?: components['schemas']['EventStatus']
             /**
              * @description Your own id for this event — whatever your system calls it. Optional,
@@ -550,12 +920,23 @@ export interface components {
             } | null
         }
         CoverPresetList: {
+            /** @description The general covers, suited to any event. */
+            items: components['schemas']['CoverPreset'][]
+            /** @description Covers for a particular occasion, one entry per theme. */
+            groups: components['schemas']['CoverPresetGroup'][]
+        }
+        CoverPresetGroup: {
+            /** @description Stable identifier, such as `celebration`. */
+            key: string
+            /** @description The theme's English name. */
+            name: string
             items: components['schemas']['CoverPreset'][]
         }
         /**
          * @description Registration tallies by status. `guests` counts registrations;
          *     `tickets` counts admissions (a confirmed order holds one row per
-         *     admission; a pending request counts `1 + plus_ones`).
+         *     admission; a pending request counts `1 + plus_ones`). For a
+         *     `read_public` key only `confirmed` is filled; the others read `0`.
          */
         GuestCounts: {
             confirmed: components['schemas']['CountPair']
@@ -620,6 +1001,10 @@ export interface components {
             /** @description The consented per-registration email — never the account email. */
             email: string | null
             phone: string | null
+            /** @description The official first name, on an event with `split_name`; `null` otherwise, when `attendee.display_name` is the name. */
+            first_name: string | null
+            /** @description The official last name, on an event with `split_name`; `null` otherwise. */
+            last_name: string | null
             note: string | null
             plus_ones: number
             ticket_type: components['schemas']['TicketTypeRef']
@@ -630,6 +1015,16 @@ export interface components {
             coupon_code: string | null
             /** @description ISO 4217 currency code. */
             currency: string
+            /**
+             * Format: date-time
+             * @description When the payment arrived. On an event that issues tickets before payment a guest can be `confirmed` and still owe — `paid_at: null` is how to tell.
+             */
+            paid_at: string | null
+            /**
+             * Format: date-time
+             * @description For a guest approved and asked to pay: the checkout stays open until this time. `null` otherwise.
+             */
+            pay_by_at: string | null
             /** Format: date-time */
             checked_in_at: string | null
             ticket_count: number
@@ -639,7 +1034,11 @@ export interface components {
             /** Format: date-time */
             created_at: string
         }
-        /** @description The registration's check-in state after a successful check-in. */
+        ScannedToken: {
+            /** @description The scanned string — a registration token, a per-admission ticket token, or a ticket's share URL. */
+            qr_token: string
+        }
+        /** @description The registration's check-in state after a check-in or its undo. */
         CheckInResult: {
             qr_token: string
             status: components['schemas']['RsvpStatus']
@@ -824,6 +1223,197 @@ export interface components {
              */
             timestamp: string
         }
+        /**
+         * @description Where a membership stands. `pending` — waiting for the calendar's
+         *     approval. `pending_payment` — on a paid tier, not paid yet. `active` — a
+         *     member. `past_due` — a renewal payment failed; access lasts until
+         *     `valid_until`. `expired` — `valid_until` passed without a renewal.
+         *     `declined` — the application was turned down. `removed` — the calendar's
+         *     staff or the member ended it.
+         * @enum {string}
+         */
+        MembershipStatus: 'pending' | 'pending_payment' | 'active' | 'past_due' | 'expired' | 'declined' | 'removed'
+        /** @description One payment for a membership. */
+        MembershipPayment: {
+            /** @description What was charged, in cents, after `discount_cents`. A `0` with a `coupon_code` is a comp. */
+            amount_cents: number
+            /** @description ISO 4217 currency code. */
+            currency: string
+            /** @description Amount a coupon took off */
+            discount_cents: number
+            coupon_code: string | null
+            /**
+             * Format: date-time
+             * @description When the money arrived; `null` while the checkout is open.
+             */
+            paid_at: string | null
+            /** Format: date-time */
+            refunded_at: string | null
+            /**
+             * Format: date-time
+             * @description The `valid_until` this payment bought; `null` on a one-time tier.
+             */
+            covers_until: string | null
+        }
+        /** @description One person's membership of a calendar, as the calendar's staff see it. */
+        Membership: {
+            /** @description Stable public id of the membership. */
+            hash: string
+            status: components['schemas']['MembershipStatus']
+            /** @description The tier the membership is on. */
+            tier: {
+                /** @description Stable public id of the tier. */
+                hash: string
+                name: string
+            }
+            /** @description Who the membership belongs to. `username` is `null` for an address the calendar's staff added with no Cloomba account behind it. */
+            member: {
+                username: string | null
+                display_name: string | null
+            }
+            /** @description The email the membership is tied to — the member's account address, or the one staff added. The calendar's staff see the same in the app. */
+            email: string | null
+            /**
+             * Format: date-time
+             * @description When access ends unless renewed; `null` for a free or one-time tier.
+             */
+            valid_until: string | null
+            /** @description A subscription renews the membership by itself. */
+            recurring: boolean
+            /**
+             * Format: date-time
+             * @description Set when the membership ends at `valid_until` instead of renewing.
+             */
+            cancel_at: string | null
+            /** @description Answers to the calendar's membership questions, typed like an attendee's. */
+            answers: components['schemas']['Answer'][]
+            /** @description Newest first. */
+            payments: components['schemas']['MembershipPayment'][]
+            /** Format: date-time */
+            approved_at: string | null
+            /** Format: date-time */
+            created_at: string
+            /** Format: date-time */
+            updated_at: string
+        }
+        MembershipList: {
+            items: components['schemas']['Membership'][]
+            /** @description Total memberships matching the query. */
+            total: number
+            limit: number
+            offset: number
+            /**
+             * Format: date-time
+             * @description Server time for this query. Store it and pass it back as `since` on your next call to fetch only what changed — this keeps your own clock out of the contract.
+             */
+            timestamp: string
+        }
+        /**
+         * @description What changed. A webhook receives only the types it lists.
+         * @enum {string}
+         */
+        WebhookType:
+            | 'event.published'
+            | 'event.updated'
+            | 'event.cancelled'
+            | 'event.deleted'
+            | 'rsvp.created'
+            | 'rsvp.updated'
+            | 'rsvp.checked_in'
+            | 'membership.created'
+            | 'membership.updated'
+        /** @description The body of every webhook delivery. */
+        WebhookEnvelope: {
+            /**
+             * Format: uuid
+             * @description The change's id — the same on every retry and for every webhook that receives it. Deduplicate on it.
+             */
+            id: string
+            type: components['schemas']['WebhookType']
+            /**
+             * Format: date-time
+             * @description When the change happened.
+             */
+            occurred_at: string
+            /** @description `true` on a **Send test** from the app, which carries made-up data. Absent otherwise. */
+            test?: boolean
+            /** @description Depends on `type`. Built when the delivery is sent, so every attempt carries the current state. */
+            data: Record<string, never>
+        }
+        /** @description The event a registration belongs to. The whole event is `GET /events/{slug}`. */
+        WebhookEventRef: {
+            slug: string
+            title: string
+            /** Format: date-time */
+            starts_at: string
+            timezone: string
+        }
+        /** @description The calendar a membership belongs to. */
+        WebhookCalendarRef: {
+            slug: string
+            name: string
+        }
+        /** @description `event.published`, `event.updated` and `event.cancelled`. */
+        EventWebhook: components['schemas']['WebhookEnvelope'] & {
+            /** @enum {string} */
+            type?: 'event.published' | 'event.updated' | 'event.cancelled'
+            data?: {
+                event: components['schemas']['EventDetail']
+            }
+        }
+        /** @description `event.deleted`. */
+        EventDeletedWebhook: components['schemas']['WebhookEnvelope'] & {
+            /** @enum {string} */
+            type?: 'event.deleted'
+            data?: {
+                event: {
+                    /** @description The slug the event had. */
+                    slug: string
+                }
+            }
+        }
+        /** @description `rsvp.created` and `rsvp.checked_in`. */
+        RegistrationWebhook: components['schemas']['WebhookEnvelope'] & {
+            /** @enum {string} */
+            type?: 'rsvp.created' | 'rsvp.checked_in'
+            data?: components['schemas']['RegistrationWebhookData']
+        }
+        /** @description `rsvp.updated`. */
+        RegistrationUpdatedWebhook: components['schemas']['WebhookEnvelope'] & {
+            /** @enum {string} */
+            type?: 'rsvp.updated'
+            data?: components['schemas']['RegistrationWebhookData'] & {
+                previous_status: components['schemas']['RsvpStatus']
+            }
+        }
+        RegistrationWebhookData: {
+            event: components['schemas']['WebhookEventRef']
+            /** @description The registration's token — present even when `attendee` is `null`. */
+            qr_token: string
+            /** @description The registration as `GET /events/{slug}/attendees/{qr_token}` returns it; `null` once it is removed or erased. */
+            attendee: components['schemas']['Attendee'] | null
+        }
+        /** @description `membership.created`. */
+        MembershipWebhook: components['schemas']['WebhookEnvelope'] & {
+            /** @enum {string} */
+            type?: 'membership.created'
+            data?: components['schemas']['MembershipWebhookData']
+        }
+        /** @description `membership.updated`. */
+        MembershipUpdatedWebhook: components['schemas']['WebhookEnvelope'] & {
+            /** @enum {string} */
+            type?: 'membership.updated'
+            data?: components['schemas']['MembershipWebhookData'] & {
+                previous_status: components['schemas']['MembershipStatus']
+            }
+        }
+        MembershipWebhookData: {
+            calendar: components['schemas']['WebhookCalendarRef']
+            /** @description The membership's `hash` — present even when `membership` is `null`. */
+            membership_hash: string
+            /** @description The membership as `GET /calendars/{slug}/memberships/{hash}` returns it; `null` once it is gone. */
+            membership: components['schemas']['Membership'] | null
+        }
         /** @description Error body. Branch on `code`, never on `message`. */
         Error: {
             /** @enum {string} */
@@ -834,11 +1424,20 @@ export interface components {
                 | 'api_pro_required'
                 | 'event_not_found'
                 | 'rsvp_not_found'
+                | 'calendar_not_found'
+                | 'membership_not_found'
                 | 'validation_failed'
                 | 'rate_limited'
+                | 'slug_taken'
+                | 'external_id_taken'
+                | 'event_cancelled'
+                | 'event_ended'
+                | 'event_is_external'
+                | 'rsvp_not_checkinable'
+                | 'cover_fetch_failed'
             /** @description Human-readable */
             message: string
-            /** @description Optional structured context (e.g. `fields` for validation errors). */
+            /** @description Optional structured context (e.g. `errors` for validation errors). */
             details?: Record<string, never>
         }
     }
@@ -860,8 +1459,9 @@ export interface components {
         }
         /**
          * @description The key can't reach this resource — an event outside the key's
-         *     scope, an attendee endpoint with a `read_public` key, or a write
-         *     with a `read`-only key (all `api_scope_forbidden`).
+         *     access, an attendee endpoint with a `read_public` key, a write
+         *     with a `read`-only key, or a calendar's memberships with a key whose
+         *     access is not that calendar (all `api_scope_forbidden`).
          *
          *     `api_pro_required` means the account is not currently eligible to
          *     write; see Developers in your account.
@@ -895,6 +1495,28 @@ export interface components {
                 'application/json': components['schemas']['Error']
             }
         }
+        /** @description No such calendar (`calendar_not_found`). */
+        CalendarNotFound: {
+            headers: {
+                [name: string]: unknown
+            }
+            content: {
+                /**
+                 * @example {
+                 *       "code": "calendar_not_found",
+                 *       "message": "Calendar not found."
+                 *     }
+                 */
+                'application/json': components['schemas']['Error']
+            }
+        }
+        /** @description Any `2xx` acknowledges the delivery; its body is ignored. Any other status, a `3xx` included, or no answer within 10 seconds is retried (see Webhooks in the introduction). */
+        WebhookAccepted: {
+            headers: {
+                [name: string]: unknown
+            }
+            content?: never
+        }
         /** @description No registration matches that token (`rsvp_not_found`). */
         RsvpNotFound: {
             headers: {
@@ -910,7 +1532,22 @@ export interface components {
                 'application/json': components['schemas']['Error']
             }
         }
-        /** @description The request is invalid (`validation_failed`). `details.fields` names the offending fields. */
+        /** @description The event is a listing that links out to another site, so it has no guests to check in (`event_is_external`). */
+        EventIsExternal: {
+            headers: {
+                [name: string]: unknown
+            }
+            content: {
+                /**
+                 * @example {
+                 *       "code": "event_is_external",
+                 *       "message": "This event is listed from another site; open it there."
+                 *     }
+                 */
+                'application/json': components['schemas']['Error']
+            }
+        }
+        /** @description The request is invalid (`validation_failed`). `details.errors` maps each offending field to one reason code — `required`, `too_long`, `too_short`, `too_many`, `invalid_email`, `invalid_url`, `mismatch`, `before_start`, `in_past`, `already_exists`, `self`, `aspect_ratio`, `unsupported_type`, or `invalid`; `message` says the same in English, one sentence per field. */
         ValidationFailed: {
             headers: {
                 [name: string]: unknown
@@ -919,10 +1556,10 @@ export interface components {
                 /**
                  * @example {
                  *       "code": "validation_failed",
-                 *       "message": "The request is invalid.",
+                 *       "message": "Status must be one of: confirmed, pending_payment, cancelled, refunded, waitlist, pending_approval, rejected.",
                  *       "details": {
-                 *         "fields": {
-                 *           "status": "must be one of: confirmed, pending_payment, cancelled, refunded, waitlist, pending_approval, rejected"
+                 *         "errors": {
+                 *           "status": "invalid"
                  *         }
                  *       }
                  *     }
@@ -947,8 +1584,15 @@ export interface components {
         }
     }
     parameters: {
-        /** @description The event's URL slug. */
+        /** @description The event's URL slug, or its `hash`. */
         Slug: string
+        /** @description The calendar's URL slug, as in `https://cloomba.com/c/{slug}`. */
+        CalendarSlug: string
+        /**
+         * @description `t=<unix seconds>,v1=<hex HMAC-SHA256>` — the HMAC of `<t>.<raw body>`, keyed with the webhook's signing secret. See "Verifying the signature" in the introduction.
+         * @example t=1791374401,v1=9b1d…
+         */
+        CloombaSignature: string
         /** @description Return only rows changed after this time (compared against the row's `updated_at`, so check-ins and approvals are included). Pass back the `timestamp` value from your previous response. Deletions are not conveyed — a consumer needing exact deletion semantics wants webhooks. */
         Since: string
         /** @description Page size (default 50, max 100). */
@@ -1058,7 +1702,7 @@ export interface operations {
             query?: never
             header?: never
             path: {
-                /** @description The event's URL slug. */
+                /** @description The event's URL slug, or its `hash`. */
                 slug: components['parameters']['Slug']
             }
             cookie?: never
@@ -1085,7 +1729,7 @@ export interface operations {
             query?: never
             header?: never
             path: {
-                /** @description The event's URL slug. */
+                /** @description The event's URL slug, or its `hash`. */
                 slug: components['parameters']['Slug']
             }
             cookie?: never
@@ -1115,7 +1759,7 @@ export interface operations {
             401: components['responses']['Unauthorized']
             403: components['responses']['Forbidden']
             404: components['responses']['EventNotFound']
-            /** @description The requested `slug` is already in use (`slug_taken`), or another of your events already carries the requested `external_id` (`external_id_taken`). */
+            /** @description The requested `slug` is already in use (`slug_taken`), another of your events already carries the requested `external_id` (`external_id_taken`), or `status` was sent for a cancelled event (`event_cancelled`). */
             409: {
                 headers: {
                     [name: string]: unknown
@@ -1125,6 +1769,76 @@ export interface operations {
                      * @example {
                      *       "code": "slug_taken",
                      *       "message": "That event URL is already taken."
+                     *     }
+                     */
+                    'application/json': components['schemas']['Error']
+                }
+            }
+            /** @description `status` was sent for a completed event (`event_ended`). */
+            422: {
+                headers: {
+                    [name: string]: unknown
+                }
+                content: {
+                    /**
+                     * @example {
+                     *       "code": "event_ended",
+                     *       "message": "This event has ended."
+                     *     }
+                     */
+                    'application/json': components['schemas']['Error']
+                }
+            }
+            429: components['responses']['RateLimited']
+        }
+    }
+    cancelEvent: {
+        parameters: {
+            query?: never
+            header?: never
+            path: {
+                /** @description The event's URL slug, or its `hash`. */
+                slug: components['parameters']['Slug']
+            }
+            cookie?: never
+        }
+        requestBody?: {
+            content: {
+                /**
+                 * @example {
+                 *       "message": "The venue flooded overnight — we will announce a new date."
+                 *     }
+                 */
+                'application/json': {
+                    /** @description A note to the guests, shown in the cancellation email. */
+                    message?: string | null
+                }
+            }
+        }
+        responses: {
+            /** @description The cancelled event. */
+            200: {
+                headers: {
+                    [name: string]: unknown
+                }
+                content: {
+                    'application/json': components['schemas']['Event']
+                }
+            }
+            400: components['responses']['ValidationFailed']
+            401: components['responses']['Unauthorized']
+            403: components['responses']['Forbidden']
+            404: components['responses']['EventNotFound']
+            /** @description The event is already cancelled (`event_cancelled`). */
+            409: {
+                headers: {
+                    [name: string]: unknown
+                }
+                content: {
+                    /**
+                     * @example {
+                     *       "code": "event_cancelled",
+                     *       "message": "This event has already been cancelled."
                      *     }
                      */
                     'application/json': components['schemas']['Error']
@@ -1150,7 +1864,7 @@ export interface operations {
             }
             header?: never
             path: {
-                /** @description The event's URL slug. */
+                /** @description The event's URL slug, or its `hash`. */
                 slug: components['parameters']['Slug']
             }
             cookie?: never
@@ -1178,7 +1892,7 @@ export interface operations {
             query?: never
             header?: never
             path: {
-                /** @description The event's URL slug. */
+                /** @description The event's URL slug, or its `hash`. */
                 slug: components['parameters']['Slug']
                 /** @description The registration token or a per-admission ticket token. */
                 qr_token: string
@@ -1213,7 +1927,7 @@ export interface operations {
             }
             header?: never
             path: {
-                /** @description The event's URL slug. */
+                /** @description The event's URL slug, or its `hash`. */
                 slug: components['parameters']['Slug']
             }
             cookie?: never
@@ -1241,7 +1955,7 @@ export interface operations {
             query?: never
             header?: never
             path: {
-                /** @description The event's URL slug. */
+                /** @description The event's URL slug, or its `hash`. */
                 slug: components['parameters']['Slug']
             }
             cookie?: never
@@ -1278,7 +1992,7 @@ export interface operations {
             }
             header?: never
             path: {
-                /** @description The event's URL slug. */
+                /** @description The event's URL slug, or its `hash`. */
                 slug: components['parameters']['Slug']
             }
             cookie?: never
@@ -1306,7 +2020,7 @@ export interface operations {
             query?: never
             header?: never
             path: {
-                /** @description The event's URL slug. */
+                /** @description The event's URL slug, or its `hash`. */
                 slug: components['parameters']['Slug']
             }
             cookie?: never
@@ -1333,7 +2047,7 @@ export interface operations {
             query?: never
             header?: never
             path: {
-                /** @description The event's URL slug. */
+                /** @description The event's URL slug, or its `hash`. */
                 slug: components['parameters']['Slug']
             }
             cookie?: never
@@ -1385,7 +2099,7 @@ export interface operations {
             query?: never
             header?: never
             path: {
-                /** @description The event's URL slug. */
+                /** @description The event's URL slug, or its `hash`. */
                 slug: components['parameters']['Slug']
             }
             cookie?: never
@@ -1434,17 +2148,14 @@ export interface operations {
             query?: never
             header?: never
             path: {
-                /** @description The event's URL slug. */
+                /** @description The event's URL slug, or its `hash`. */
                 slug: components['parameters']['Slug']
             }
             cookie?: never
         }
         requestBody: {
             content: {
-                'application/json': {
-                    /** @description The scanned string — a registration token, a per-admission ticket token, or a ticket's share URL. */
-                    qr_token: string
-                }
+                'application/json': components['schemas']['ScannedToken']
             }
         }
         responses: {
@@ -1461,7 +2172,337 @@ export interface operations {
             401: components['responses']['Unauthorized']
             403: components['responses']['Forbidden']
             404: components['responses']['RsvpNotFound']
+            /** @description The registration is not confirmed (`rsvp_not_checkinable`). */
+            409: {
+                headers: {
+                    [name: string]: unknown
+                }
+                content: {
+                    /**
+                     * @example {
+                     *       "code": "rsvp_not_checkinable",
+                     *       "message": "Only a confirmed RSVP can be checked in."
+                     *     }
+                     */
+                    'application/json': components['schemas']['Error']
+                }
+            }
+            422: components['responses']['EventIsExternal']
             429: components['responses']['RateLimited']
+        }
+    }
+    uncheckIn: {
+        parameters: {
+            query?: never
+            header?: never
+            path: {
+                /** @description The event's URL slug, or its `hash`. */
+                slug: components['parameters']['Slug']
+            }
+            cookie?: never
+        }
+        requestBody: {
+            content: {
+                'application/json': components['schemas']['ScannedToken']
+            }
+        }
+        responses: {
+            /** @description The updated check-in state. */
+            200: {
+                headers: {
+                    [name: string]: unknown
+                }
+                content: {
+                    'application/json': components['schemas']['CheckInResult']
+                }
+            }
+            400: components['responses']['ValidationFailed']
+            401: components['responses']['Unauthorized']
+            403: components['responses']['Forbidden']
+            404: components['responses']['RsvpNotFound']
+            422: components['responses']['EventIsExternal']
+            429: components['responses']['RateLimited']
+        }
+    }
+    listMemberships: {
+        parameters: {
+            query?: {
+                /** @description Page size (default 100, max 500). */
+                limit?: components['parameters']['Limit100']
+                /** @description Number of items to skip. */
+                offset?: components['parameters']['Offset']
+                /** @description Return only rows changed after this time (compared against the row's `updated_at`, so check-ins and approvals are included). Pass back the `timestamp` value from your previous response. Deletions are not conveyed — a consumer needing exact deletion semantics wants webhooks. */
+                since?: components['parameters']['Since']
+                /**
+                 * @description Optional filter by membership status. An unknown value returns
+                 *     `400 validation_failed` rather than an empty list.
+                 */
+                status?: components['schemas']['MembershipStatus']
+            }
+            header?: never
+            path: {
+                /** @description The calendar's URL slug, as in `https://cloomba.com/c/{slug}`. */
+                slug: components['parameters']['CalendarSlug']
+            }
+            cookie?: never
+        }
+        requestBody?: never
+        responses: {
+            /** @description A page of memberships. */
+            200: {
+                headers: {
+                    [name: string]: unknown
+                }
+                content: {
+                    'application/json': components['schemas']['MembershipList']
+                }
+            }
+            400: components['responses']['ValidationFailed']
+            401: components['responses']['Unauthorized']
+            403: components['responses']['Forbidden']
+            404: components['responses']['CalendarNotFound']
+            429: components['responses']['RateLimited']
+        }
+    }
+    getMembership: {
+        parameters: {
+            query?: never
+            header?: never
+            path: {
+                /** @description The calendar's URL slug, as in `https://cloomba.com/c/{slug}`. */
+                slug: components['parameters']['CalendarSlug']
+                /** @description The membership's `hash`. */
+                hash: string
+            }
+            cookie?: never
+        }
+        requestBody?: never
+        responses: {
+            /** @description The membership. */
+            200: {
+                headers: {
+                    [name: string]: unknown
+                }
+                content: {
+                    'application/json': components['schemas']['Membership']
+                }
+            }
+            401: components['responses']['Unauthorized']
+            403: components['responses']['Forbidden']
+            /** @description No such calendar (`calendar_not_found`) or membership (`membership_not_found`). */
+            404: {
+                headers: {
+                    [name: string]: unknown
+                }
+                content: {
+                    /**
+                     * @example {
+                     *       "code": "membership_not_found",
+                     *       "message": "Membership not found."
+                     *     }
+                     */
+                    'application/json': components['schemas']['Error']
+                }
+            }
+            429: components['responses']['RateLimited']
+        }
+    }
+    eventPublished: {
+        parameters: {
+            query?: never
+            header: {
+                /**
+                 * @description `t=<unix seconds>,v1=<hex HMAC-SHA256>` — the HMAC of `<t>.<raw body>`, keyed with the webhook's signing secret. See "Verifying the signature" in the introduction.
+                 * @example t=1791374401,v1=9b1d…
+                 */
+                'Cloomba-Signature': components['parameters']['CloombaSignature']
+            }
+            path?: never
+            cookie?: never
+        }
+        requestBody: {
+            content: {
+                'application/json': components['schemas']['EventWebhook']
+            }
+        }
+        responses: {
+            '2XX': components['responses']['WebhookAccepted']
+        }
+    }
+    eventUpdated: {
+        parameters: {
+            query?: never
+            header: {
+                /**
+                 * @description `t=<unix seconds>,v1=<hex HMAC-SHA256>` — the HMAC of `<t>.<raw body>`, keyed with the webhook's signing secret. See "Verifying the signature" in the introduction.
+                 * @example t=1791374401,v1=9b1d…
+                 */
+                'Cloomba-Signature': components['parameters']['CloombaSignature']
+            }
+            path?: never
+            cookie?: never
+        }
+        requestBody: {
+            content: {
+                'application/json': components['schemas']['EventWebhook']
+            }
+        }
+        responses: {
+            '2XX': components['responses']['WebhookAccepted']
+        }
+    }
+    eventCancelled: {
+        parameters: {
+            query?: never
+            header: {
+                /**
+                 * @description `t=<unix seconds>,v1=<hex HMAC-SHA256>` — the HMAC of `<t>.<raw body>`, keyed with the webhook's signing secret. See "Verifying the signature" in the introduction.
+                 * @example t=1791374401,v1=9b1d…
+                 */
+                'Cloomba-Signature': components['parameters']['CloombaSignature']
+            }
+            path?: never
+            cookie?: never
+        }
+        requestBody: {
+            content: {
+                'application/json': components['schemas']['EventWebhook']
+            }
+        }
+        responses: {
+            '2XX': components['responses']['WebhookAccepted']
+        }
+    }
+    eventDeleted: {
+        parameters: {
+            query?: never
+            header: {
+                /**
+                 * @description `t=<unix seconds>,v1=<hex HMAC-SHA256>` — the HMAC of `<t>.<raw body>`, keyed with the webhook's signing secret. See "Verifying the signature" in the introduction.
+                 * @example t=1791374401,v1=9b1d…
+                 */
+                'Cloomba-Signature': components['parameters']['CloombaSignature']
+            }
+            path?: never
+            cookie?: never
+        }
+        requestBody: {
+            content: {
+                'application/json': components['schemas']['EventDeletedWebhook']
+            }
+        }
+        responses: {
+            '2XX': components['responses']['WebhookAccepted']
+        }
+    }
+    rsvpCreated: {
+        parameters: {
+            query?: never
+            header: {
+                /**
+                 * @description `t=<unix seconds>,v1=<hex HMAC-SHA256>` — the HMAC of `<t>.<raw body>`, keyed with the webhook's signing secret. See "Verifying the signature" in the introduction.
+                 * @example t=1791374401,v1=9b1d…
+                 */
+                'Cloomba-Signature': components['parameters']['CloombaSignature']
+            }
+            path?: never
+            cookie?: never
+        }
+        requestBody: {
+            content: {
+                'application/json': components['schemas']['RegistrationWebhook']
+            }
+        }
+        responses: {
+            '2XX': components['responses']['WebhookAccepted']
+        }
+    }
+    rsvpUpdated: {
+        parameters: {
+            query?: never
+            header: {
+                /**
+                 * @description `t=<unix seconds>,v1=<hex HMAC-SHA256>` — the HMAC of `<t>.<raw body>`, keyed with the webhook's signing secret. See "Verifying the signature" in the introduction.
+                 * @example t=1791374401,v1=9b1d…
+                 */
+                'Cloomba-Signature': components['parameters']['CloombaSignature']
+            }
+            path?: never
+            cookie?: never
+        }
+        requestBody: {
+            content: {
+                'application/json': components['schemas']['RegistrationUpdatedWebhook']
+            }
+        }
+        responses: {
+            '2XX': components['responses']['WebhookAccepted']
+        }
+    }
+    rsvpCheckedIn: {
+        parameters: {
+            query?: never
+            header: {
+                /**
+                 * @description `t=<unix seconds>,v1=<hex HMAC-SHA256>` — the HMAC of `<t>.<raw body>`, keyed with the webhook's signing secret. See "Verifying the signature" in the introduction.
+                 * @example t=1791374401,v1=9b1d…
+                 */
+                'Cloomba-Signature': components['parameters']['CloombaSignature']
+            }
+            path?: never
+            cookie?: never
+        }
+        requestBody: {
+            content: {
+                'application/json': components['schemas']['RegistrationWebhook']
+            }
+        }
+        responses: {
+            '2XX': components['responses']['WebhookAccepted']
+        }
+    }
+    membershipCreated: {
+        parameters: {
+            query?: never
+            header: {
+                /**
+                 * @description `t=<unix seconds>,v1=<hex HMAC-SHA256>` — the HMAC of `<t>.<raw body>`, keyed with the webhook's signing secret. See "Verifying the signature" in the introduction.
+                 * @example t=1791374401,v1=9b1d…
+                 */
+                'Cloomba-Signature': components['parameters']['CloombaSignature']
+            }
+            path?: never
+            cookie?: never
+        }
+        requestBody: {
+            content: {
+                'application/json': components['schemas']['MembershipWebhook']
+            }
+        }
+        responses: {
+            '2XX': components['responses']['WebhookAccepted']
+        }
+    }
+    membershipUpdated: {
+        parameters: {
+            query?: never
+            header: {
+                /**
+                 * @description `t=<unix seconds>,v1=<hex HMAC-SHA256>` — the HMAC of `<t>.<raw body>`, keyed with the webhook's signing secret. See "Verifying the signature" in the introduction.
+                 * @example t=1791374401,v1=9b1d…
+                 */
+                'Cloomba-Signature': components['parameters']['CloombaSignature']
+            }
+            path?: never
+            cookie?: never
+        }
+        requestBody: {
+            content: {
+                'application/json': components['schemas']['MembershipUpdatedWebhook']
+            }
+        }
+        responses: {
+            '2XX': components['responses']['WebhookAccepted']
         }
     }
 }

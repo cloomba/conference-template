@@ -32,7 +32,9 @@ apps/tanstack     the template in React on TanStack Start + Tailwind — SSR on 
                   Node server (default) or prerendered static files.
 ```
 
-Each app owns its `site.config.ts`, `strings.en.json` + `strings.ts`,
+Each app owns its `site.config.ts`, `strings.en.json` (+ the shipped
+`strings.uk.json` / `strings.sk.json`, which must keep every English key — the
+typecheck enforces it) + `strings.ts`,
 `global.css` tokens and `src/content/` — a fork deletes the app it doesn't use.
 A change to the design or to a page lands in BOTH apps.
 

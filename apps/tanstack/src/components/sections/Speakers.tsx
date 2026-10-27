@@ -13,7 +13,7 @@ export function Speakers({ speakers }: { speakers: Person[] }) {
             <SectionHeading
                 title={t('nav.speakers')}
                 href={speakers.length > preview.length ? '/speakers' : undefined}
-                linkLabel={t('speakers.all_count', { count: speakers.length })}
+                linkLabel={t('speakers.all')}
             />
             <ul className='grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4'>
                 {preview.map((speaker) => (

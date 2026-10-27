@@ -1,0 +1,108 @@
+{
+    "meta.page_title": "{title} — {site}",
+
+    "a11y.skip_to_content": "Перейти до вмісту",
+    "a11y.menu": "Меню",
+    "a11y.toggle_theme": "Змінити тему оформлення",
+    "a11y.filter_by_stage": "Фільтр за сценою",
+    "a11y.jump_to_day": "Перейти до дня",
+    "a11y.website": "Вебсайт",
+
+    "common.register": "Зареєструватися",
+    "common.become_a_sponsor": "Стати спонсором",
+    "common.see_all": "Показати все",
+    "common.learn_more": "Докладніше",
+
+    "nav.about": "Про подію",
+    "nav.agenda": "Програма",
+    "nav.speakers": "Спікери",
+    "nav.sponsors": "Спонсори",
+    "nav.tickets": "Квитки",
+    "nav.news": "Новини",
+    "nav.add_to_calendar": "Додати до календаря (iCal)",
+    "nav.contact_us": "Зв’язатися з нами",
+    "nav.ios_app": "Застосунок для iOS",
+    "nav.android_app": "Застосунок для Android",
+    "nav.privacy": "Політика конфіденційності",
+    "nav.terms": "Умови використання",
+    "nav.column_explore": "Огляд",
+    "nav.column_attend": "Участь",
+    "nav.column_more": "Ще",
+
+    "footer.copyright": "© {year} {site}",
+    "footer.powered_by": "Працює на Cloomba",
+
+    "promo.title": "Організовуєте подію?",
+    "promo.body": "Увесь цей сайт — програма, спікери, квитки, реєстрація — це шаблон із відкритим кодом, що працює на Cloomba.",
+    "promo.tagline": "Ваш може виглядати так уже до вихідних.",
+    "promo.how_it_works": "Як це працює",
+    "promo.github": "GitHub",
+    "promo.cloomba": "cloomba.com",
+
+    "hero.view_agenda": "Переглянути програму",
+
+    "stats.speakers": "Спікери",
+    "stats.sessions": "Сесії",
+    "stats.sponsors": "Спонсори",
+    "stats.days.one": "День",
+    "stats.days.few": "Дні",
+    "stats.days.many": "Днів",
+    "stats.days.other": "Дня",
+    "stats.registered": "Зареєстровано",
+
+    "about.heading": "Один водопій — усі види",
+    "about.cta": "Про конференцію",
+    "about.page_title": "Про {site}",
+
+    "agenda.meta_description": "Програма {site}.",
+    "agenda.times_local": "Увесь час указано за місцевим часом місця проведення.",
+    "agenda.add_to_calendar_inline": "Додайте до свого календаря (iCal)",
+    "agenda.all_stages": "Усі сцени",
+    "agenda.full_agenda": "Повна програма",
+    "agenda.all_days": "Усі дні",
+
+    "speakers.meta_description": "Спікери {site}.",
+    "speakers.all": "Усі",
+    "speakers.unnamed": "Спікер",
+    "speakers.sessions_heading": "Сесії",
+    "speakers.cfp_title": "Тут має бути ваше ім’я",
+    "speakers.cfp_body": "Прийом заявок на доповіді відкрито — усі види, будь-який досвід, наставники для новачків.",
+    "speakers.cfp_label": "Запропонувати доповідь",
+
+    "sponsors.meta_description": "Спонсори {site}.",
+    "sponsors.cta_title": "Тут має бути ваш логотип",
+    "sponsors.cta_body": "Спонсорські рівні для лігва будь-якого розміру — і кожен рівень допомагає зберегти Community Pass безкоштовним.",
+    "sponsors.pause": "Зупинити прокручування логотипів",
+
+    "team.title": "Команда",
+
+    "tickets.meta_description": "Реєстрація на {site}.",
+    "tickets.free": "Безкоштовно",
+    "tickets.price_from": "від {price}",
+    "tickets.price_on_request": "Ціна за запитом",
+    "tickets.sold_out": "Розпродано",
+    "tickets.spots_left.one": "Залишилося лише {count} місце",
+    "tickets.spots_left.few": "Залишилося лише {count} місця",
+    "tickets.spots_left.many": "Залишилося лише {count} місць",
+    "tickets.spots_left.other": "Залишилося лише {count} місця",
+    "tickets.register_heading": "Реєстрація",
+    "tickets.embed_title": "Реєстрація на {site}",
+
+    "venue.title": "Місце проведення",
+    "venue.directions": "Як дістатися →",
+
+    "faq.title": "Часті питання",
+
+    "news.all": "Усі новини",
+
+    "cta.heading": "Будьте поруч, коли збереться все царство",
+
+    "nownext.now": "Зараз",
+    "nownext.until": "до {time}",
+    "nownext.next": "Далі",
+    "nownext.at": "о {time}",
+
+    "error.not_found_title": "Сторінку не знайдено",
+    "error.not_found_body": "Сторінки, яку ви шукаєте, не існує або її переміщено.",
+    "error.not_found_cta": "Повернутися на головну"
+}

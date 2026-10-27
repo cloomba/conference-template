@@ -52,22 +52,26 @@ import Base from '@/layouts/Base.astro'
             <p>
                 Your own writing (markdown pages, and everything from your Cloomba event) is already in whatever
                 language you wrote it. What's left is the template's own furniture — <em>Agenda</em>, <em>Register</em>,
-                <em>All stages</em>, <em>Sold out</em> — 84 short labels, all listed in one file:
+                <em>All stages</em>, <em>Sold out</em> — 83 short labels, all listed in one file:
                 <code>strings.en.json</code>.
+            </p>
+            <p>
+                Ukrainian and Slovak ship complete, in <code>strings.uk.json</code> and <code>strings.sk.json</code>:
+                set{' '}
+                <code>language</code> to <code>'uk'</code> or <code>'sk'</code> and every label follows.
             </p>
             <p>
                 You override them in <code>strings.ts</code>, which ships empty and is already wired into the config —
                 so translating never means editing <code>site.config.ts</code>. What you put there is merged over the
-                English, so you translate what matters and leave the rest:
+                labels for your language, so you translate or reword what matters and leave the rest:
             </p>
-            <pre><code>{`// strings.ts
+            <pre><code>{`// strings.ts — a Slovak site that says "Partneri", not "Sponzori"
 export default {
-    'nav.sponsors': 'Sponzori',
-    'common.register': 'Registrovať sa',
-    'agenda.all_stages': 'Všetky pódiá',
+    'nav.sponsors': 'Partneri',
+    'stats.sponsors': 'Partneri',
 } satisfies StringOverrides`}</code></pre>
             <p>
-                That <code>satisfies</code> is what makes your editor autocomplete all 84 keys and underline a misspelled
+                That <code>satisfies</code> is what makes your editor autocomplete all 83 keys and underline a misspelled
                 one before you ever run a build. A plain <code>.json</code> file works just as well if you're handing the
                 file to a translator — you lose only the editor checking.
             </p>
@@ -79,13 +83,13 @@ export default {
             </p>
             <p>
                 A key you misspell, leave empty, or give a non-string value is ignored with a build warning and the
-                English word is used instead. Nothing about wording can stop your site from deploying — a mislabeled
+                shipped word is used instead. Nothing about wording can stop your site from deploying — a mislabeled
                 page beats a failed deploy.
             </p>
             <p>
-                Set <code>language</code> too (<code>'sk'</code>, <code>'uk'</code>, …). That one doesn't change any
-                words — it drives <code>&lt;html lang&gt;</code> plus the dates, times, and prices, which are formatted by
-                the browser's own locale data and so already read correctly in every language.
+                Set <code>language</code> too (<code>'sk'</code>, <code>'uk'</code>, …). For Ukrainian and Slovak it
+                picks the shipped labels; for every language it drives <code>&lt;html lang&gt;</code> plus the dates, times,
+                and prices, which are formatted by the browser's own locale data and so already read correctly in every language.
             </p>
 
             <h2>Images inside markdown pages</h2>
