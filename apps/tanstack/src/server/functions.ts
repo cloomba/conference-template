@@ -15,7 +15,7 @@ import { detailSlug, sessionPath } from '@/lib/slugs'
 import type { AgendaPage, MarkdownPage, NewsPost, SessionPage, SpeakerPage } from '@/lib/views'
 
 import { config } from './config'
-import { getNews, getOrdered } from './content'
+import { getNews, getOrdered, hasPage } from './content'
 import { callsOpen, loadEvent, loadFeatured, loadSessions, loadSpeakers, loadTicketTypes } from './data'
 import { browserBaseUrl, embedOrigin } from './env'
 import { conferenceEventNode, jsonLdText, sessionEventNode } from './jsonld'
@@ -108,6 +108,7 @@ export const getHome = createServerFn({ method: 'GET' })
             tiers: toPublicTiers(ticketTypes.items),
             features: getOrdered('features'),
             figures: getOrdered('figures'),
+            sponsorPage: hasPage('become-a-sponsor'),
             highlights: getOrdered('highlights'),
             faq: getOrdered('faq'),
             news: getNews().slice(0, 3).map(toNewsTeaser),
@@ -178,7 +179,7 @@ export const getSpeakers = createServerFn({ method: 'GET' })
     .middleware(middleware)
     .handler(async () => ({
         speakers: (await loadSpeakers()).map(toPerson),
-        cfpOpen: await callsOpen(),
+        cfpOpen: hasPage('call-for-papers') && (await callsOpen()),
     }))
 
 export const getSpeaker = createServerFn({ method: 'GET' })
@@ -218,7 +219,7 @@ export const getSponsors = createServerFn({ method: 'GET' })
     .middleware(middleware)
     .handler(async () => ({
         tiers: toSponsorTiers((await loadFeatured()).items.filter((entry) => entry.kind === 'sponsor')),
-        callOpen: await callsOpen(),
+        callOpen: hasPage('become-a-sponsor') && (await callsOpen()),
     }))
 
 // Registration runs INSIDE the Cloomba embed — the attendee signs in and pays

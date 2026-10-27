@@ -5,9 +5,10 @@ import Sponsors from '@/components/sections/Sponsors.astro'
 import Base from '@/layouts/Base.astro'
 import { config } from '@/lib/config'
 import { callsOpen } from '@/lib/data'
+import { hasPage } from '@/lib/nav'
 import { t } from '@/lib/strings'
 
-const sponsorCallOpen = await callsOpen()
+const sponsorCallOpen = (await hasPage('become-a-sponsor')) && (await callsOpen())
 ---
 
 <Base title={t('nav.sponsors')} description={t('sponsors.meta_description', { site: config.site.name })}>

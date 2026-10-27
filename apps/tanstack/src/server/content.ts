@@ -76,5 +76,9 @@ const parseCollection = <C extends ContentCollection>(collection: C): ContentEnt
 export const getOrdered = <C extends 'pages' | 'faq' | 'highlights' | 'features' | 'figures'>(collection: C) =>
     [...getCollection(collection)].sort((a, b) => a.data.order - b.data.order)
 
+// Whether a custom page exists — a banner or button that links to one
+// (/call-for-papers, /become-a-sponsor) shows only when it does.
+export const hasPage = (id: string) => getCollection('pages').some((page) => page.id === id)
+
 // News, newest first.
 export const getNews = () => [...getCollection('news')].sort((a, b) => b.data.date.getTime() - a.data.date.getTime())

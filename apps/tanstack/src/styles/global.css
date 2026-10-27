@@ -184,6 +184,21 @@ body {
     max-width: 100%;
     border-radius: var(--t-radius);
 }
+.prose-content table {
+    /* Block, so a wide table scrolls sideways instead of widening the page. */
+    display: block;
+    overflow-x: auto;
+    border-collapse: collapse;
+    margin: 1rem 0;
+}
+.prose-content th,
+.prose-content td {
+    border-bottom: 1px solid color-mix(in oklab, var(--t-text) 10%, transparent);
+    padding: 0.5rem 0.75rem;
+}
+.prose-content th {
+    font-weight: 600;
+}
 
 /* Theme toggle icon swap — mirrors themeCss()'s three-state logic: explicit
    data-theme wins, otherwise prefers-color-scheme decides. CSS rather than

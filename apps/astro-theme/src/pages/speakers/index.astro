@@ -4,11 +4,12 @@ import PageHeader from '@/components/PageHeader.astro'
 import Base from '@/layouts/Base.astro'
 import { config } from '@/lib/config'
 import { callsOpen, loadSpeakers } from '@/lib/data'
+import { hasPage } from '@/lib/nav'
 import { speakerPath } from '@/lib/slugs'
 import { t } from '@/lib/strings'
 
 const speakers = await loadSpeakers()
-const cfpOpen = await callsOpen()
+const cfpOpen = (await hasPage('call-for-papers')) && (await callsOpen())
 ---
 
 <Base title={t('nav.speakers')} description={t('speakers.meta_description', { site: config.site.name })}>

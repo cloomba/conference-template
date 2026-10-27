@@ -29,6 +29,11 @@ export const navPages = async (slot: 'header' | 'footer'): Promise<NavLink[]> =>
         .map((page) => ({ label: page.data.title, href: `/${page.id}` }))
 }
 
+// Whether a custom page exists — a banner or button that links to one
+// (/call-for-papers, /become-a-sponsor) shows only when it does.
+export const hasPage = async (id: string): Promise<boolean> =>
+    (await getCollection('pages')).some((page) => page.id === id)
+
 export const headerLinks = async (): Promise<NavLink[]> => {
     if (config.header) return config.header.links
     const fromSections = config.sections.flatMap((section) => SECTION_LINKS[section] ?? [])

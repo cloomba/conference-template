@@ -2,9 +2,12 @@
 import { formatDateSpan } from '@cloomba/core'
 
 import { loadEvent } from '@/lib/data'
+import { hasPage } from '@/lib/nav'
 import { locale, t } from '@/lib/strings'
 
 const event = await loadEvent()
+// The sponsor button shows only when the site has a /become-a-sponsor page.
+const sponsorPage = await hasPage('become-a-sponsor')
 const dates = formatDateSpan(
     new Date(event.starts_at),
     new Date(event.ends_at ?? event.starts_at),
@@ -27,12 +30,16 @@ const place = [event.location.city, event.location.country].filter(Boolean).join
             >
                 {t('common.register')}
             </a>
-            <a
-                href='/become-a-sponsor'
-                class='rounded-card border border-primary-content/40 px-6 py-3 font-medium transition hover:bg-primary-content/10 motion-safe:hover:-translate-y-0.5'
-            >
-                {t('common.become_a_sponsor')}
-            </a>
+            {
+                sponsorPage && (
+                    <a
+                        href='/become-a-sponsor'
+                        class='rounded-card border border-primary-content/40 px-6 py-3 font-medium transition hover:bg-primary-content/10 motion-safe:hover:-translate-y-0.5'
+                    >
+                        {t('common.become_a_sponsor')}
+                    </a>
+                )
+            }
         </div>
     </div>
 </section>

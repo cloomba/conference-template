@@ -2,7 +2,8 @@ import { SiteLink } from '@/components/ui/SiteLink'
 import { useT } from '@/lib/site'
 import type { EventSummary } from '@/lib/views'
 
-export function Cta({ event }: { event: EventSummary }) {
+// The sponsor button shows only when the site has a /become-a-sponsor page.
+export function Cta({ event, sponsorPage }: { event: EventSummary; sponsorPage: boolean }) {
     const { t } = useT()
     return (
         <section className='mx-auto max-w-5xl px-4 py-14'>
@@ -19,12 +20,14 @@ export function Cta({ event }: { event: EventSummary }) {
                     >
                         {t('common.register')}
                     </SiteLink>
-                    <SiteLink
-                        href='/become-a-sponsor'
-                        className='rounded-card border border-primary-content/40 px-6 py-3 font-medium transition hover:bg-primary-content/10 motion-safe:hover:-translate-y-0.5'
-                    >
-                        {t('common.become_a_sponsor')}
-                    </SiteLink>
+                    {sponsorPage && (
+                        <SiteLink
+                            href='/become-a-sponsor'
+                            className='rounded-card border border-primary-content/40 px-6 py-3 font-medium transition hover:bg-primary-content/10 motion-safe:hover:-translate-y-0.5'
+                        >
+                            {t('common.become_a_sponsor')}
+                        </SiteLink>
+                    )}
                 </div>
             </div>
         </section>

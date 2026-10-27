@@ -41,7 +41,7 @@ const SECTIONS: Record<SectionName, (home: Home) => ReactNode> = {
     venue: (home) => <Venue location={home.event.location} />,
     faq: (home) => <Faq faq={home.faq} />,
     news: (home) => <News news={home.news} />,
-    cta: (home) => <Cta event={home.event} />,
+    cta: (home) => <Cta event={home.event} sponsorPage={home.sponsorPage} />,
 }
 
 export const Route = createFileRoute('/')({
