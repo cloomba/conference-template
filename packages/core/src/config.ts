@@ -61,6 +61,8 @@ export const SECTION_NAMES = [
     // Quick numbers computed from the event: speakers / sessions / sponsors /
     // days (+ registered guests once there are some).
     'stats',
+    // Numbers you write yourself, from src/content/figures/ — one row per file.
+    'figures',
     // Teaser split ([image][text]) linking to the full /about page.
     'about',
     // Three-up cards from src/content/features/.
@@ -141,7 +143,7 @@ export const siteConfigSchema = z.object({
                 .object({
                     display: z.string().min(1).default(SYSTEM_FONT_STACK),
                     body: z.string().min(1).default(SYSTEM_FONT_STACK),
-                    // Google Fonts family names to load (e.g. ["Fraunces"]) —
+                    // Google Fonts family names to load (e.g. ["Source Serif 4"]) —
                     // referenced from the stacks above.
                     google: z.array(z.string().min(1)).default([]),
                 })

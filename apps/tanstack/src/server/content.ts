@@ -73,7 +73,7 @@ const parseCollection = <C extends ContentCollection>(collection: C): ContentEnt
 }
 
 // Collections that carry an `order` field, sorted by it.
-export const getOrdered = <C extends 'pages' | 'faq' | 'highlights' | 'features'>(collection: C) =>
+export const getOrdered = <C extends 'pages' | 'faq' | 'highlights' | 'features' | 'figures'>(collection: C) =>
     [...getCollection(collection)].sort((a, b) => a.data.order - b.data.order)
 
 // News, newest first.

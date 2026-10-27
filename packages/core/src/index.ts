@@ -24,7 +24,14 @@ export {
     normalizeLocale,
 } from './format'
 export { resolveStrings, translate, translatePlural, CLDR_FORMS, type CldrForm, type StringTable } from './strings'
-export { baseLanguage, languageLinks, CLOOMBA_LOCALES, type LanguageAlternate, type LanguageLink } from './languages'
+export {
+    baseLanguage,
+    fontSubsetsFor,
+    languageLinks,
+    CLOOMBA_LOCALES,
+    type LanguageAlternate,
+    type LanguageLink,
+} from './languages'
 export {
     extractLocaleOrAll,
     extractLocaleOrFirst,

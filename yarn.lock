@@ -813,10 +813,10 @@
     "@eslint/core" "^1.2.1"
     levn "^0.4.1"
 
-"@fontsource-variable/fraunces@^5.3.0":
-  version "5.3.0"
-  resolved "https://registry.yarnpkg.com/@fontsource-variable/fraunces/-/fraunces-5.3.0.tgz#6c8a69a0dcac753643a04e068ed2ad5689e99229"
-  integrity sha512-9BYGySn4AHEJdgp9Z28tQ3X+laJMEOITXkQarZXeloWQZDq5oOvXJ3kDA8c7MGIfpogIaZfjrQBqmda8POOCKA==
+"@fontsource-variable/source-serif-4@^5.3.1":
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/@fontsource-variable/source-serif-4/-/source-serif-4-5.3.1.tgz#8a9d91b025ded436a2b0d80842a328b321b56b0e"
+  integrity sha512-4Rtay22SC4lMvw11r/+9kxANB6P3M0X8s1NudBC2v0J1KU2y3DcMoNcT3lBoZ/CqLirzf+StlO6UlJilyrvaUg==
 
 "@humanfs/core@^0.19.2":
   version "0.19.2"

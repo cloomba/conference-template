@@ -24,4 +24,17 @@ describe('contentSchemas', () => {
     it('requires the question on an FAQ entry', () => {
         expect(contentSchemas.faq.safeParse({ order: 1 }).success).toBe(false)
     })
+
+    it('keeps figure values as written, a bare number included, and needs at least one', () => {
+        const figures = contentSchemas.figures.parse({
+            title: 'Last year',
+            items: [
+                { value: '1,200+', label: 'Attendees' },
+                { value: 48, label: 'Talks' },
+            ],
+        })
+        expect(figures.items.map((item) => item.value)).toEqual(['1,200+', '48'])
+        expect(figures.order).toBe(0)
+        expect(contentSchemas.figures.safeParse({ title: 'Last year', items: [] }).success).toBe(false)
+    })
 })

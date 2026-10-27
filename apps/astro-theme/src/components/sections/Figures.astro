@@ -1,0 +1,37 @@
+---
+import { getCollection, render } from 'astro:content'
+
+import SectionHeading from '@/components/ui/SectionHeading.astro'
+
+// Numbers you write yourself, from src/content/figures/ — one row per file, in
+// the Stats card: the file's title as the heading, its numbers, and its body as
+// a note under them. The numbers wrap and center, so a row of three or five
+// never leaves one stranded in a grid column.
+const entries = (await getCollection('figures')).sort((a, b) => a.data.order - b.data.order)
+const rendered = await Promise.all(entries.map(async (entry) => ({ entry, Content: (await render(entry)).Content })))
+---
+
+{
+    rendered.length > 0 && (
+        <section class='mx-auto max-w-5xl space-y-12 px-4 py-14'>
+            {rendered.map(({ entry, Content }) => (
+                <div>
+                    <SectionHeading title={entry.data.title} />
+                    <dl class='flex flex-wrap justify-center gap-x-6 gap-y-8 rounded-card border border-text/10 p-8 text-center'>
+                        {entry.data.items.map((item) => (
+                            <div class='w-[calc(50%-0.75rem)] sm:w-40'>
+                                <dd class='font-display text-4xl font-bold text-primary'>{item.value}</dd>
+                                <dt class='mt-1 text-sm text-text-muted'>{item.label}</dt>
+                            </div>
+                        ))}
+                    </dl>
+                    {entry.body?.trim() && (
+                        <div class='prose-content mt-4 max-w-3xl text-sm text-text-muted'>
+                            <Content />
+                        </div>
+                    )}
+                </div>
+            ))}
+        </section>
+    )
+}

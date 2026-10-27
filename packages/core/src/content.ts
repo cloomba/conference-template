@@ -42,6 +42,16 @@ export const contentSchemas = {
         icon: z.string().optional(),
         order: z.number().default(0),
     }),
+    // Home-page figures — numbers you write yourself (last year's attendance,
+    // who comes), one row per file: a title, the numbers, and the body as an
+    // optional note under them. `stats` counts from the event instead.
+    figures: z.object({
+        title: z.string(),
+        // `value` is shown as written — "100+", "10–12", "200 000+"; a bare
+        // YAML number is taken as text too.
+        items: z.array(z.object({ value: z.coerce.string(), label: z.string() })).min(1),
+        order: z.number().default(0),
+    }),
 }
 
 export type ContentCollection = keyof typeof contentSchemas

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { baseLanguage, languageLinks } from '../src/languages'
+import { baseLanguage, fontSubsetsFor, languageLinks } from '../src/languages'
 
 const builds = [
     { language: 'uk', label: 'UA', url: 'https://uk.example.com' },
@@ -11,6 +11,15 @@ describe('baseLanguage', () => {
     it('keeps only the language subtag', () => {
         expect(baseLanguage('uk-UA')).toBe('uk')
         expect(baseLanguage('sk')).toBe('sk')
+    })
+})
+
+describe('fontSubsetsFor', () => {
+    it("picks the language's script, Latin always alongside", () => {
+        expect(fontSubsetsFor('en')).toEqual(['latin'])
+        expect(fontSubsetsFor('sk')).toEqual(['latin', 'latin-ext'])
+        expect(fontSubsetsFor('uk-UA')).toEqual(['cyrillic', 'latin'])
+        expect(fontSubsetsFor('el')).toEqual(['greek', 'latin'])
     })
 })
 

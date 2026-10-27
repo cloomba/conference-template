@@ -71,13 +71,16 @@ export default defineConfig({
         // persists. 'light' / 'dark' pin one palette, no toggle.
         mode: 'auto',
         fonts: {
-            // The display font ships self-hosted (see src/styles/global.css).
-            display: "'Fraunces Variable', Georgia, serif",
+            // The display face is Source Serif 4, as on cloomba.com — self-hosted,
+            // with Latin, Cyrillic and Greek (src/routes/__root.tsx).
+            // To use another font, see "Changing the heading font" in
+            // https://demo.cloomba.com/cloomba-for-conferences/customization/
+            display: "'Source Serif 4', ui-serif, Georgia, serif",
             // Body defaults to the system stack:
             // body: "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
             // Google Fonts families to load instead of self-hosting
             // (adds a fonts.googleapis.com request):
-            // google: ['Fraunces'],
+            // google: ['Source Serif 4'],
         },
         // Corner radius for cards, buttons, images.
         // radius: '0.75rem',
@@ -112,6 +115,7 @@ export default defineConfig({
         'hero', //       cover/fallback image, title, dates, CTAs
         'stats', //      speakers/sessions/sponsors/days, computed from the event
         'about', //      teaser split (first description paragraph) → /about
+        'figures', //    numbers you write yourself, from src/content/figures/
         'features', //   3-up cards from src/content/features/
         'agenda', //     first-day preview → /agenda
         'speakers', //   grid → /speakers

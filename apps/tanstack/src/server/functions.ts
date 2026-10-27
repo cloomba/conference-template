@@ -107,6 +107,7 @@ export const getHome = createServerFn({ method: 'GET' })
             hosts: ofKind('host').map(toHost),
             tiers: toPublicTiers(ticketTypes.items),
             features: getOrdered('features'),
+            figures: getOrdered('figures'),
             highlights: getOrdered('highlights'),
             faq: getOrdered('faq'),
             news: getNews().slice(0, 3).map(toNewsTeaser),

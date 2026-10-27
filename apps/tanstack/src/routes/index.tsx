@@ -7,6 +7,7 @@ import { AgendaPreview } from '@/components/sections/AgendaPreview'
 import { Cta } from '@/components/sections/Cta'
 import { Faq } from '@/components/sections/Faq'
 import { Features } from '@/components/sections/Features'
+import { Figures } from '@/components/sections/Figures'
 import { Hero } from '@/components/sections/Hero'
 import { Highlights } from '@/components/sections/Highlights'
 import { News } from '@/components/sections/News'
@@ -28,6 +29,7 @@ type Home = Awaited<ReturnType<typeof getHome>>
 const SECTIONS: Record<SectionName, (home: Home) => ReactNode> = {
     hero: (home) => <Hero event={home.event} />,
     stats: (home) => <Stats stats={home.stats} />,
+    figures: (home) => <Figures figures={home.figures} />,
     about: (home) => <About teaserHtml={home.aboutHtml} />,
     features: (home) => <Features features={home.features} />,
     agenda: (home) => <AgendaPreview agenda={home.agenda} />,

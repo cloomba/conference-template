@@ -42,4 +42,9 @@ const features = defineCollection({
     schema: contentSchemas.features,
 })
 
-export const collections = { pages, faq, news, highlights, features }
+const figures = defineCollection({
+    loader: glob({ pattern: '**/*.md', base: `${root}/figures` }),
+    schema: contentSchemas.figures,
+})
+
+export const collections = { pages, faq, news, highlights, features, figures }

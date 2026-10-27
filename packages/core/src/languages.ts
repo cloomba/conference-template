@@ -13,6 +13,17 @@ export const CLOOMBA_LOCALES = ['en', 'cs', 'de', 'el', 'es', 'fr', 'it', 'nl', 
 // through normalizeLocale — this only splits it.
 export const baseLanguage = (locale: string): string => locale.split('-')[0].toLowerCase()
 
+// The font subsets (fontsource's names) a site's text needs at first paint —
+// what the apps preload for the display face: the language's script, plus
+// `latin` for the names and numbers every language keeps, plus `latin-ext` for
+// a Latin-script language beyond English (Slovak č, Czech ř, Polish ł).
+export const fontSubsetsFor = (locale: string): string[] => {
+    const { language, script } = new Intl.Locale(locale).maximize()
+    if (script === 'Cyrl') return ['cyrillic', 'latin']
+    if (script === 'Grek') return ['greek', 'latin']
+    return language === 'en' ? ['latin'] : ['latin', 'latin-ext']
+}
+
 export interface LanguageAlternate {
     // BCP 47 tag of that build's `site.language`.
     language: string
