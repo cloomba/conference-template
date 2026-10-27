@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { CallBanner } from '@/components/CallBanner'
+import { ComingSoon } from '@/components/ComingSoon'
 import { PageHeader } from '@/components/PageHeader'
 import { SiteLink } from '@/components/ui/SiteLink'
 import { headT, pageHead, siteOf } from '@/lib/head'
@@ -28,6 +29,7 @@ function SpeakerList() {
         <>
             <PageHeader title={t('nav.speakers')} />
             <div className='mx-auto max-w-5xl px-4 py-8'>
+                {speakers.length === 0 && <ComingSoon />}
                 <ul className='grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4'>
                     {speakers.map((speaker) => (
                         <li key={speaker.hash}>

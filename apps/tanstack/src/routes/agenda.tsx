@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { DayGrid } from '@/components/agenda/DayGrid'
 import { NowNext } from '@/components/agenda/NowNext'
+import { ComingSoon } from '@/components/ComingSoon'
 import { PageHeader } from '@/components/PageHeader'
 import { SiteLink } from '@/components/ui/SiteLink'
 import { headT, pageHead, siteOf } from '@/lib/head'
@@ -114,6 +115,12 @@ function Agenda() {
                         at: strings['nownext.at'],
                     }}
                 />
+
+                {agenda.days.length === 0 && (
+                    <div className='mt-12'>
+                        <ComingSoon />
+                    </div>
+                )}
 
                 {agenda.days.map((day) => (
                     <section key={day.key} className='mt-12' id={day.key}>

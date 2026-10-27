@@ -2,6 +2,7 @@
 import { formatDayHeading, formatTimeRange, groupByDay, groupByLocation } from '@cloomba/core'
 
 import DayGrid from '@/components/agenda/DayGrid.astro'
+import ComingSoon from '@/components/ComingSoon.astro'
 import NowNext from '@/components/islands/NowNext'
 import PageHeader from '@/components/PageHeader.astro'
 import Base from '@/layouts/Base.astro'
@@ -108,6 +109,14 @@ const filterCss =
                 locale={locale}
                 strings={nowNextStrings}
             />
+
+            {
+                days.length === 0 && (
+                    <div class='mt-12'>
+                        <ComingSoon />
+                    </div>
+                )
+            }
 
             {
                 days.map((day) => {

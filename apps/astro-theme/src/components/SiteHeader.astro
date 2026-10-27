@@ -10,16 +10,19 @@ const links = await headerLinks()
 
 <header class='sticky top-0 z-40 bg-surface/90 backdrop-blur'>
     <div class='mx-auto flex h-14 max-w-5xl items-center gap-6 px-4'>
-        <a href='/' class='flex items-center gap-2.5 font-display text-lg font-semibold tracking-tight'>
+        <a
+            href='/'
+            class='flex shrink-0 items-center gap-2.5 font-display text-lg font-semibold tracking-tight whitespace-nowrap'
+        >
             {config.site.logo && <img draggable='false' src={config.site.logo} alt='' class='h-7 w-auto' />}
             {config.site.name}
         </a>
         {/* Right side as ONE wrapper so ml-auto works with the desktop nav hidden. */}
         <div class='ml-auto flex items-center gap-2'>
-            <nav class='hidden items-center gap-5 text-sm sm:flex'>
+            <nav class='hidden items-center gap-5 text-sm lg:flex'>
                 {
                     links.map((link) => (
-                        <a href={link.href} class='text-text-muted transition-colors hover:text-text'>
+                        <a href={link.href} class='whitespace-nowrap text-text-muted transition-colors hover:text-text'>
                             {link.label}
                         </a>
                     ))
@@ -34,7 +37,7 @@ const links = await headerLinks()
             <button
                 type='button'
                 popovertarget='mobile-menu'
-                class='flex size-9 cursor-pointer items-center justify-center rounded-card hover:bg-surface-alt sm:hidden'
+                class='flex size-9 cursor-pointer items-center justify-center rounded-card hover:bg-surface-alt lg:hidden'
                 aria-label={t('a11y.menu')}
             >
                 <svg class='size-5' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'>

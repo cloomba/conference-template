@@ -17,18 +17,21 @@ export function SiteHeader() {
     return (
         <header className='sticky top-0 z-40 bg-surface/90 backdrop-blur'>
             <div className='mx-auto flex h-14 max-w-5xl items-center gap-6 px-4'>
-                <Link to='/' className='flex items-center gap-2.5 font-display text-lg font-semibold tracking-tight'>
+                <Link
+                    to='/'
+                    className='flex shrink-0 items-center gap-2.5 font-display text-lg font-semibold tracking-tight whitespace-nowrap'
+                >
                     {config.site.logo && <img draggable={false} src={config.site.logo} alt='' className='h-7 w-auto' />}
                     {config.site.name}
                 </Link>
                 {/* Right side as ONE wrapper so ml-auto works with the desktop nav hidden. */}
                 <div className='ml-auto flex items-center gap-2'>
-                    <nav className='hidden items-center gap-5 text-sm sm:flex'>
+                    <nav className='hidden items-center gap-5 text-sm lg:flex'>
                         {headerLinks.map((link) => (
                             <SiteLink
                                 key={link.href}
                                 href={link.href}
-                                className='text-text-muted transition-colors hover:text-text'
+                                className='whitespace-nowrap text-text-muted transition-colors hover:text-text'
                             >
                                 {link.label}
                             </SiteLink>
@@ -42,7 +45,7 @@ export function SiteHeader() {
                     <button
                         type='button'
                         popoverTarget='mobile-menu'
-                        className='flex size-9 cursor-pointer items-center justify-center rounded-card hover:bg-surface-alt sm:hidden'
+                        className='flex size-9 cursor-pointer items-center justify-center rounded-card hover:bg-surface-alt lg:hidden'
                         aria-label={t('a11y.menu')}
                     >
                         <svg className='size-5' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
