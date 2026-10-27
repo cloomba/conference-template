@@ -31,6 +31,15 @@ export default defineConfig({
         // BCP 47 tag for <html lang>, date/number formatting, and the shipped
         // labels when there is a table for it (strings.uk.json, strings.sk.json).
         language: 'en',
+        // A site in several languages: the same repo built once per language,
+        // each build on its own hostname — no language in any path. List every
+        // build, this one included, in the order the header's switch shows them;
+        // the first is the default. Each build reads src/content/<language>/
+        // when that folder exists, and every page gets hreflang tags:
+        // alternates: [
+        //     { language: 'uk', label: 'UA', url: 'https://uk.example.com' },
+        //     { language: 'sk', label: 'SK', url: 'https://sk.example.com' },
+        // ],
         // Social-share preview (og:image) for pages without their own — the
         // event cover wins on the home page. Raster only (no SVG); ships as a
         // rasterized hero scene:

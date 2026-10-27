@@ -92,6 +92,21 @@ export default {
                 and prices, which are formatted by the browser's own locale data and so already read correctly in every language.
             </p>
 
+            <h2>One site, several languages</h2>
+            <p>
+                A site in two or more languages is built once per language from the same repo, and each build is
+                deployed on its own hostname — so no language ever appears in a path. List every build in <code
+                    >site.alternates</code
+                >, the current one included: the header shows a switch to the same page on each, every page carries{' '}
+                <code>hreflang</code> tags, and the first build is the default.
+            </p>
+            <p>
+                Each build reads its markdown from <code>src/content/&lt;language&gt;/</code> when that folder exists — keep
+                the same file names in each, so every page has its twin. Your Cloomba event can speak both languages too:
+                give its description a <code># uk</code> and a <code># sk</code> section, and each build shows its own, with
+                anything above the first heading shared. The registration widget opens in the build's language.
+            </p>
+
             <h2>Images inside markdown pages</h2>
             <p>
                 Drop the image next to the markdown file and reference it relatively —

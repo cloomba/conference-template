@@ -8,7 +8,7 @@
 // To change wording or translate, edit apps/tanstack/strings.ts. Anything
 // neither table has stays English.
 
-import { normalizeLocale, resolveStrings, translate, translatePlural } from '@cloomba/core'
+import { baseLanguage, normalizeLocale, resolveStrings, translate, translatePlural } from '@cloomba/core'
 
 import { EN_STRINGS, SHIPPED_STRINGS, type PluralKey, type StringKey } from '@/lib/string-keys'
 
@@ -20,7 +20,7 @@ import { config } from './config'
 export const locale = normalizeLocale(config.site.language)
 
 export const strings = resolveStrings(EN_STRINGS, {
-    ...SHIPPED_STRINGS[locale.split('-')[0]],
+    ...SHIPPED_STRINGS[baseLanguage(locale)],
     ...config.strings,
 })
 

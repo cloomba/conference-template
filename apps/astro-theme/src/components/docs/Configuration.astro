@@ -30,7 +30,8 @@ import Base from '@/layouts/Base.astro'
                 <li>
                     <strong>site</strong> — name, logo, a wide <code>hero_image</code> (without one the hero shows the event's
                     cover as a square), absolute URL (canonical tags + sitemap), description,
-                    <code>language</code>, and <code>noindex</code> for staging deploys. Note that <code>language</code> sets
+                    <code>language</code>, <code>alternates</code> for a site built once per language, and{' '}
+                    <code>noindex</code> for staging deploys. Note that <code>language</code> sets
                     <code>&lt;html lang&gt;</code>, formats dates, times and prices, and picks the shipped labels where
                     the template has them (Ukrainian, Slovak); every other wording change is <code>strings</code> below.
                 </li>

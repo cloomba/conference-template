@@ -4,6 +4,7 @@ import { useRef } from 'react'
 import { SiteLink } from '@/components/ui/SiteLink'
 import { useSite, useT } from '@/lib/site'
 
+import { LanguageSwitch } from './LanguageSwitch'
 import { ThemeToggle } from './ThemeToggle'
 
 export function SiteHeader() {
@@ -33,6 +34,7 @@ export function SiteHeader() {
                             </SiteLink>
                         ))}
                     </nav>
+                    <LanguageSwitch />
                     {config.theme.mode === 'auto' && <ThemeToggle />}
                     {/* Native popover: light-dismiss (outside click / Esc) with no
                         state to manage. Fixed position works because the header is

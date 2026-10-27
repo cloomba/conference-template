@@ -4,7 +4,7 @@
 //
 //     head: ({ matches, loaderData }) => pageHead(siteOf(matches), { title: …, path: '/agenda' })
 
-import { translate } from '@cloomba/core'
+import { languageLinks, translate } from '@cloomba/core'
 
 import type { Site } from './site'
 import type { StringKey } from './string-keys'
@@ -56,6 +56,16 @@ export const pageHead = (site: Site | undefined, page: PageMeta) => {
         }
     })()
 
+    // A site built once per language names this page on every build — itself
+    // included, as search engines require — plus the default as x-default.
+    const languages = languageLinks(config.site.alternates, site.locale, withTrailingSlash(page.path))
+    const alternates = [
+        ...languages.map((link) => ({ rel: 'alternate', hrefLang: link.language, href: link.href })),
+        ...languages
+            .filter((link) => link.isDefault)
+            .map((link) => ({ rel: 'alternate', hrefLang: 'x-default', href: link.href })),
+    ]
+
     return {
         meta: [
             { title },
@@ -71,6 +81,6 @@ export const pageHead = (site: Site | undefined, page: PageMeta) => {
             ...(description ? [{ name: 'twitter:description', content: description }] : []),
             ...(ogImage ? [{ name: 'twitter:image', content: ogImage }] : []),
         ],
-        links: canonical ? [{ rel: 'canonical', href: canonical }] : [],
+        links: [...(canonical ? [{ rel: 'canonical', href: canonical }] : []), ...alternates],
     }
 }

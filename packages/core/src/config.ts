@@ -7,6 +7,8 @@
 import { z } from 'zod'
 
 import { contrastRatio, hexToOklch, normalizeHex, oklchToHex } from './color'
+import { normalizeLocale } from './format'
+import { baseLanguage, CLOOMBA_LOCALES } from './languages'
 
 // --- Theme tokens -----------------------------------------------------------
 
@@ -94,6 +96,14 @@ export const siteConfigSchema = z.object({
         description: z.string().optional(),
         // BCP 47 tag for <html lang> and Intl formatting.
         language: z.string().default('en'),
+        // A site in several languages is built once per language, each build
+        // deployed on its own hostname — no language in any path. List EVERY
+        // build, this one included, in the order the header's switch shows
+        // them; the first is the default (hreflang x-default). Empty = a
+        // one-language site: no switch, no hreflang.
+        alternates: z
+            .array(z.object({ language: z.string().min(1), label: z.string().min(1), url: z.url() }))
+            .default([]),
         // Social-share preview image (og:image / twitter:image) for pages
         // without one of their own. Raster only (crawlers reject SVG); made
         // absolute against `url` at build. Ships as a rasterized hero scene.
@@ -317,6 +327,8 @@ export const themeCss = (theme: SiteConfig['theme']): string => {
 // when the site pins a mode. Auto mode sends no `theme` — the widget follows
 // the page's `color-scheme` (themeCss), the visitor's toggle included. The
 // embed accepts 6-digit hex only, so a primary in any other notation isn't sent.
+// `locale` is the site's language when Cloomba speaks it, so the widget reads
+// in the page's language rather than the visitor's own Cloomba setting.
 export const registrationEmbedUrl = (config: SiteConfig, origin: string): string => {
     const { light, dark } = resolveTokens(config.theme)
     const params = new URLSearchParams()
@@ -325,6 +337,8 @@ export const registrationEmbedUrl = (config: SiteConfig, origin: string): string
     if (accent) params.set('accent', accent)
     if (accentDark) params.set('accent_dark', accentDark)
     if (config.theme.mode !== 'auto') params.set('theme', config.theme.mode)
+    const language = baseLanguage(normalizeLocale(config.site.language))
+    if ((CLOOMBA_LOCALES as readonly string[]).includes(language)) params.set('locale', language)
     const query = params.toString()
     return `${origin}/embed/e/${encodeURIComponent(config.event.slug)}${query ? `?${query}` : ''}`
 }

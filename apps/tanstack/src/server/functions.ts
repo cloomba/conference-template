@@ -4,7 +4,7 @@
 // wrote for it ('static' mode). Handler bodies never reach the browser bundle,
 // and neither does anything only they import (the key, the site config).
 
-import { registrationEmbedUrl, themeCss } from '@cloomba/core'
+import { baseLanguage, extractLocaleOrAll, extractLocaleOrFirst, registrationEmbedUrl, themeCss } from '@cloomba/core'
 import { createServerFn } from '@tanstack/react-start'
 import { staticFunctionMiddleware } from '@tanstack/start-static-server-functions'
 
@@ -84,8 +84,12 @@ export const getHome = createServerFn({ method: 'GET' })
         const ofKind = (kind: string) => featured.items.filter((entry) => entry.kind === kind)
         const speakers = ofKind('speaker')
         const sponsors = ofKind('sponsor')
-        // The About teaser: the description's FIRST paragraph.
-        const teaser = event.description?.split(/\n\s*\n/)[0] ?? null
+        // The About teaser: the FIRST paragraph of the description in the
+        // site's language (a Cloomba description can carry a section per
+        // language — `# uk`, `# sk`).
+        const teaser = event.description
+            ? (extractLocaleOrAll(event.description, baseLanguage(locale)).split(/\n\s*\n/)[0] ?? null)
+            : null
         return {
             event: toEventSummary(event),
             stats: {
@@ -113,7 +117,9 @@ export const getHome = createServerFn({ method: 'GET' })
                     event,
                     speakers,
                     ticketTypes: ticketTypes.items,
-                    description: plainText(event.description),
+                    description: plainText(
+                        event.description && extractLocaleOrFirst(event.description, baseLanguage(locale))
+                    ),
                 }),
             }),
         }
@@ -231,7 +237,9 @@ export const getAbout = createServerFn({ method: 'GET' })
     .handler(async () => {
         const [event, featured] = await Promise.all([loadEvent(), loadFeatured()])
         return {
-            descriptionHtml: event.description ? renderMarkdown(event.description) : null,
+            descriptionHtml: event.description
+                ? renderMarkdown(extractLocaleOrAll(event.description, baseLanguage(locale)))
+                : null,
             hosts: featured.items.filter((entry) => entry.kind === 'host').map(toHost),
         }
     })

@@ -7,7 +7,7 @@
 // To change wording or translate, edit apps/astro-theme/strings.ts. Anything
 // neither table has stays English.
 
-import { normalizeLocale, resolveStrings, translate, translatePlural } from '@cloomba/core'
+import { baseLanguage, normalizeLocale, resolveStrings, translate, translatePlural } from '@cloomba/core'
 
 import { config } from './config'
 import { EN_STRINGS, SHIPPED_STRINGS, type PluralKey, type StringKey } from './string-keys'
@@ -18,7 +18,7 @@ import { EN_STRINGS, SHIPPED_STRINGS, type PluralKey, type StringKey } from './s
 export const locale = normalizeLocale(config.site.language)
 
 const table = resolveStrings(EN_STRINGS, {
-    ...SHIPPED_STRINGS[locale.split('-')[0]],
+    ...SHIPPED_STRINGS[baseLanguage(locale)],
     ...config.strings,
 })
 

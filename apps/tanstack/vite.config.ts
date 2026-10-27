@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
@@ -18,10 +18,19 @@ const staticPages = async (mode: string) => {
     for (const [key, value] of Object.entries(loadEnv(mode, process.cwd(), ''))) process.env[key] ??= value
     const { loadSessions, loadSpeakers } = await import('./src/server/data.ts')
     const { pagePaths } = await import('./src/lib/page-paths.ts')
-    const ids = (folder: string) =>
-        readdirSync(new URL(`./src/content/${folder}`, import.meta.url))
+    const { config } = await import('./src/server/config.ts')
+    const { baseLanguage, normalizeLocale } = await import('@cloomba/core')
+    // The content folder rule of src/server/content.ts, applied to the disk:
+    // src/content/<language>/ when the site keeps one per language.
+    const localized = `./src/content/${baseLanguage(normalizeLocale(config.site.language))}/`
+    const root = existsSync(new URL(localized, import.meta.url)) ? localized : './src/content/'
+    const ids = (folder: string) => {
+        const dir = new URL(`${root}${folder}`, import.meta.url)
+        if (!existsSync(dir)) return []
+        return readdirSync(dir)
             .filter((file) => file.endsWith('.md'))
             .map((file) => file.slice(0, -'.md'.length))
+    }
     const [sessions, speakers] = await Promise.all([loadSessions(), loadSpeakers()])
     return pagePaths({ pages: ids('pages'), news: ids('news'), sessions, speakers }).map((path) => ({ path }))
 }

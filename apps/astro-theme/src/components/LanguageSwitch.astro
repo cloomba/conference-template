@@ -1,0 +1,34 @@
+---
+import { languageLinks } from '@cloomba/core'
+
+import { config } from '@/lib/config'
+import { locale, t } from '@/lib/strings'
+
+// The site's language builds (site.alternates): this one as plain text, the
+// others as links to the same page on their own hostname. Plain anchors —
+// another build is another site, so switching is a full page load.
+const links = languageLinks(config.site.alternates, locale, Astro.url.pathname)
+---
+
+{
+    links.length > 0 && (
+        <nav aria-label={t('a11y.language')} class='flex items-center text-sm'>
+            {links.map((link) =>
+                link.current ? (
+                    <span lang={link.language} aria-current='true' class='px-1.5 py-1 font-semibold text-text'>
+                        {link.label}
+                    </span>
+                ) : (
+                    <a
+                        href={link.href}
+                        hreflang={link.language}
+                        lang={link.language}
+                        class='px-1.5 py-1 text-text-muted transition-colors hover:text-text'
+                    >
+                        {link.label}
+                    </a>
+                )
+            )}
+        </nav>
+    )
+}

@@ -7,15 +7,26 @@
 // rendered HTML into its JSON. A front-matter mistake fails the build (or the
 // request, in dev) with the file name and the problem.
 
-import { contentSchemas, type ContentCollection } from '@cloomba/core'
+import { baseLanguage, contentSchemas, type ContentCollection } from '@cloomba/core'
 import { parse as parseYaml } from 'yaml'
 
 import { renderContent } from './markdown'
+import { locale } from './strings'
 
 const FILES = import.meta.glob('../content/**/*.md', { query: '?raw', import: 'default', eager: true }) as Record<
     string,
     string
 >
+
+// A site built once per language (site.alternates) keeps one content folder
+// per language — src/content/uk/, src/content/sk/ — with the same file names in
+// each, and every build reads its own. A one-language site keeps its
+// collections straight under src/content/. The static prerender list
+// (vite.config.ts) applies the same rule to the files on disk.
+const language = baseLanguage(locale)
+const ROOT = Object.keys(FILES).some((path) => path.startsWith(`../content/${language}/`))
+    ? `../content/${language}/`
+    : '../content/'
 
 const FRONT_MATTER = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?/
 
@@ -42,7 +53,7 @@ export const getCollection = <C extends ContentCollection>(collection: C): Conte
 }
 
 const parseCollection = <C extends ContentCollection>(collection: C): ContentEntry<C>[] => {
-    const prefix = `../content/${collection}/`
+    const prefix = `${ROOT}${collection}/`
     return Object.entries(FILES)
         .filter(([path]) => path.startsWith(prefix))
         .map(([path, source]) => {
@@ -54,7 +65,7 @@ const parseCollection = <C extends ContentCollection>(collection: C): ContentEnt
                 const problems = result.error.issues.map(
                     (issue) => `${issue.path.join('.') || '(root)'}: ${issue.message}`
                 )
-                throw new Error(`src/content/${collection}/${id}.md — ${problems.join('; ')}`)
+                throw new Error(`src/${prefix.slice('../'.length)}${id}.md — ${problems.join('; ')}`)
             }
             const body = match ? source.slice(match[0].length) : source
             return { id, data: result.data as ContentData<C>, html: renderContent(body) }

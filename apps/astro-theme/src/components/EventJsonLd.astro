@@ -1,7 +1,10 @@
 ---
+import { baseLanguage, extractLocaleOrFirst } from '@cloomba/core'
+
 import { loadEvent, loadSpeakers, loadTicketTypes } from '@/lib/data'
 import { conferenceEventNode } from '@/lib/jsonld'
 import { plainText } from '@/lib/markdown'
+import { locale } from '@/lib/strings'
 
 // schema.org Event structured data — what Google builds event rich results
 // from (name, dates, venue, ticket offers, speakers). Rendered on the home
@@ -15,7 +18,7 @@ const jsonLd = {
         event,
         speakers,
         ticketTypes: ticketTypes.items,
-        description: plainText(event.description),
+        description: plainText(event.description && extractLocaleOrFirst(event.description, baseLanguage(locale))),
     }),
 }
 ---

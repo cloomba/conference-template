@@ -105,6 +105,11 @@ apps/tanstack     the template in React on TanStack Start (SSR or static) + Tail
   empty and is already wired in, so translating never means touching
   `site.config.ts`. Your entries merge over the labels for your language, and
   anything neither has stays English.
+- **Several languages:** build the site once per language and deploy each
+  build on its own hostname — no language in any path. `site.alternates`
+  lists the builds; each gets a header switch, hreflang tags, its own
+  `src/content/<language>/`, the matching `# uk` / `# sk` section of the
+  Cloomba description, and the registration widget in its language.
 
 ## License
 

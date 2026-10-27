@@ -1,5 +1,5 @@
 ---
-import { themeCss } from '@cloomba/core'
+import { languageLinks, themeCss } from '@cloomba/core'
 import frauncesLatinExtUrl from '@fontsource-variable/fraunces/files/fraunces-latin-ext-wght-normal.woff2?url'
 import frauncesLatinUrl from '@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2?url'
 
@@ -8,7 +8,7 @@ import DemoBanner from '@/components/DemoBanner.astro'
 import SiteFooter from '@/components/SiteFooter.astro'
 import SiteHeader from '@/components/SiteHeader.astro'
 import { config } from '@/lib/config'
-import { t } from '@/lib/strings'
+import { locale, t } from '@/lib/strings'
 
 import '@/styles/global.css'
 
@@ -46,6 +46,11 @@ const { title, description = config.site.description, ogImage } = Astro.props
 const pageTitle = title ? t('meta.page_title', { title, site: config.site.name }) : config.site.name
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString() : undefined
 
+// A site built once per language names this page on every build — itself
+// included, as search engines require — plus the default as x-default.
+const languages = languageLinks(config.site.alternates, locale, Astro.url.pathname)
+const defaultLanguage = languages.find((link) => link.isDefault)
+
 // Social preview: the page's own image (event cover) wins, else the site
 // default. Crawlers require ABSOLUTE URLs — a relative path resolves against
 // the site URL, and without one we omit the tag rather than emit a broken one.
@@ -77,6 +82,8 @@ const fontsHref = config.theme.fonts.google.length
         {description && <meta name='description' content={description} />}
         {config.site.noindex && <meta name='robots' content='noindex, nofollow' />}
         {canonical && <link rel='canonical' href={canonical} />}
+        {languages.map((link) => <link rel='alternate' hreflang={link.language} href={link.href} />)}
+        {defaultLanguage && <link rel='alternate' hreflang='x-default' href={defaultLanguage.href} />}
         <meta property='og:title' content={pageTitle} />
         {description && <meta property='og:description' content={description} />}
         {canonical && <meta property='og:url' content={canonical} />}

@@ -1,12 +1,17 @@
 ---
+import { baseLanguage, extractLocaleOrAll } from '@cloomba/core'
+
 import { loadEvent } from '@/lib/data'
 import { renderMarkdown } from '@/lib/markdown'
-import { t } from '@/lib/strings'
+import { locale, t } from '@/lib/strings'
 
-// Home teaser: the description's FIRST paragraph as an [image][text] split,
-// linking to the full /about page.
+// Home teaser: the FIRST paragraph of the description in the site's language
+// (a Cloomba description can carry a section per language — `# uk`, `# sk`)
+// as an [image][text] split, linking to the full /about page.
 const event = await loadEvent()
-const teaser = event.description?.split(/\n\s*\n/)[0] ?? null
+const teaser = event.description
+    ? (extractLocaleOrAll(event.description, baseLanguage(locale)).split(/\n\s*\n/)[0] ?? null)
+    : null
 ---
 
 {

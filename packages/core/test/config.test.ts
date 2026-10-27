@@ -31,6 +31,16 @@ describe('parseSiteConfig', () => {
     it('rejects an unknown section name', () => {
         expect(() => parseSiteConfig({ ...minimal, sections: ['hero', 'merch'] })).toThrow(/sections/)
     })
+
+    it('has no language builds by default and rejects a relative alternate URL', () => {
+        expect(parseSiteConfig(minimal).site.alternates).toEqual([])
+        expect(() =>
+            parseSiteConfig({
+                ...minimal,
+                site: { name: 'X', alternates: [{ language: 'sk', label: 'SK', url: '/sk' }] },
+            })
+        ).toThrow(/alternates/)
+    })
 })
 
 describe('color', () => {
@@ -193,5 +203,15 @@ describe('registrationEmbedUrl', () => {
         const url = new URL(registrationEmbedUrl(config, origin))
         expect(url.searchParams.get('accent')).toBe('#00aa55')
         expect(url.searchParams.has('accent_dark')).toBe(false)
+    })
+
+    it("sends the site's base language when Cloomba speaks it, and nothing otherwise", () => {
+        const localeOf = (language: string) =>
+            new URL(
+                registrationEmbedUrl(parseSiteConfig({ ...minimal, site: { name: 'X', language } }), origin)
+            ).searchParams.get('locale')
+        expect(localeOf('uk-UA')).toBe('uk')
+        expect(localeOf('sk')).toBe('sk')
+        expect(localeOf('ja')).toBeNull()
     })
 })
