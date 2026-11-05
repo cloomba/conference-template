@@ -120,6 +120,8 @@ export default defineConfig({
         'agenda', //     first-day preview → /agenda
         'speakers', //   grid → /speakers
         'highlights', // alternating image/text splits from src/content/highlights/
+        'organizers', // logos from the event's credits
+        'partners', //   logos from the event's credits
         'sponsors', //   tier-grouped logos → /sponsors
         'team', //       featured entries with kind 'host'
         'tickets', //    tier cards with live availability → /tickets
@@ -185,4 +187,7 @@ export default defineConfig({
     // The /cloomba-for-conferences/* documentation pages. Off by default — they
     // document the template, so only the demo publishes them.
     cloomba_docs: true,
+    // A line on /agenda linking to the event on Cloomba, where guests star sessions,
+    // get reminders and open the slides. Off by default; this demo opts in.
+    cloomba_agenda_link: true,
 })

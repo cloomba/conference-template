@@ -60,6 +60,7 @@
     "agenda.meta_description": "Program podujatia {site}.",
     "agenda.times_local": "Všetky časy sú uvedené v miestnom čase podujatia.",
     "agenda.add_to_calendar_inline": "Pridajte si do kalendára (iCal)",
+    "agenda.on_cloomba": "On Cloomba, guests star sessions, get a reminder before each one and open the slides.",
     "agenda.all_stages": "Všetky pódiá",
     "agenda.full_agenda": "Celý program",
     "agenda.all_days": "Všetky dni",
@@ -71,12 +72,17 @@
     "speakers.cfp_title": "Tu patrí vaše meno",
     "speakers.cfp_body": "Výzva na prednášky je otvorená — všetky druhy, každá úroveň skúseností, mentori pre nováčikov.",
     "speakers.cfp_label": "Navrhnúť prednášku",
+    "speakers.call_title": "Výzva na príspevky",
+    "speakers.call_label": "Odoslať návrh",
+    "speakers.call_open_until": "Otvorené do {date}",
 
     "sponsors.meta_description": "Sponzori podujatia {site}.",
     "sponsors.cta_title": "Tu patrí vaše logo",
     "sponsors.cta_body": "Sponzorské úrovne pre brloh každej veľkosti — a každá z nich pomáha udržať Community Pass zadarmo.",
     "sponsors.pause": "Pozastaviť posúvanie log",
 
+    "credits.organizers": "Organizátori",
+    "credits.partners": "Partneri",
     "team.title": "Tím",
 
     "tickets.meta_description": "Registrácia na podujatie {site}.",

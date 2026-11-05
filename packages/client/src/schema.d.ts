@@ -22,13 +22,12 @@ export interface paths {
         put?: never
         /**
          * Create an event
-         * @description Creates an event you organize. **Requires a key with the `read_write`
-         *     scope.** A key with calendar access creates the event into its calendar;
-         *     a key with **Selected events** access cannot create events
-         *     (`api_scope_forbidden`).
+         * @description Creates an event you organize, into the key's calendar. **Requires a key
+         *     with the `read_write` scope**, made by an owner of that calendar who still
+         *     owns it (`api_scope_forbidden` otherwise).
          *
-         *     Send `external_id` and this becomes an **upsert**: if one of your events
-         *     already carries that id, it is updated instead and the response is `200`
+         *     Send `external_id` and this becomes an **upsert**: if an event of the key's
+         *     calendar already carries that id, it is updated instead and the response is `200`
          *     rather than `201`. That makes a retry or a repeated sync safe, and means
          *     you never have to store or guess our `slug`. Without `external_id`, every
          *     call creates a new event. The event it matches must be one the key
@@ -56,7 +55,8 @@ export interface paths {
          * @description The base event shape plus guest counts (`guest_counts`), remaining
          *     capacity (`spots_remaining`, `null` when uncapped), and the
          *     registration-question schema (`registration_questions`). Attendee
-         *     answers correlate to these questions by `label`.
+         *     answers correlate to these questions by `label`. `open_cfp` is the
+         *     event's open call for papers, with a link to its page.
          *
          *     A `read_public` key reads the event as a signed-out visitor sees it
          *     (see Scopes): a draft or private event answers `403 api_scope_forbidden`.
@@ -103,6 +103,9 @@ export interface paths {
          *     guest receives a cancellation email in their language. `message`, when
          *     sent, appears in that email above the refund line. A cancelled event
          *     stays readable, with `status: cancelled`.
+         *
+         *     An event can be cancelled only before it starts; a recurring series, while
+         *     a session is still ahead.
          */
         post: operations['cancelEvent']
         delete?: never
@@ -153,6 +156,39 @@ export interface paths {
         patch?: never
         trace?: never
     }
+    '/events/{slug}/credits': {
+        parameters: {
+            query?: never
+            header?: never
+            path?: never
+            cookie?: never
+        }
+        /**
+         * List speakers, organizers, partners, sponsors, and other credits
+         * @description The event's featured people and organizations — speakers, hosts,
+         *     organizers, partners, sponsors, and the rest of the kind set — in
+         *     display order: people first, then organizers, partners and sponsors.
+         *     One resource covers every kind; use `?kind=` to narrow it to one
+         *     kind or a few.
+         *
+         *     A person is either off-platform (its own `name`, `bio`, and
+         *     `image_url`) or a Cloomba account (`username` set, with `name` and
+         *     `image_url` falling back to that account's profile). Organizers,
+         *     partners and sponsors are organizations and never a Cloomba
+         *     account. `tier` is only meaningful for `kind = sponsor`; every other
+         *     kind reports the default `community`. Attached materials — slides,
+         *     recordings, documents — come through in `files`; a `read_public` key
+         *     gets none, since they are for the event's guests.
+         */
+        get: operations['listCredits']
+        put?: never
+        post?: never
+        delete?: never
+        options?: never
+        head?: never
+        patch?: never
+        trace?: never
+    }
     '/events/{slug}/featured': {
         parameters: {
             query?: never
@@ -161,19 +197,11 @@ export interface paths {
             cookie?: never
         }
         /**
-         * List speakers, sponsors, and other featured entries
-         * @description The event's featured people and organizations — speakers, hosts,
-         *     sponsors, and the rest of the kind set — in display order. One
-         *     resource covers every kind; use `?kind=` to narrow it to speakers or
-         *     sponsors.
-         *
-         *     An entry is either an off-platform person (its own `name`, `bio`,
-         *     and `image_url`) or a Cloomba account (`username` set, with `name`
-         *     and `image_url` falling back to that account's profile). `tier` is
-         *     only meaningful for `kind = sponsor`; every other kind reports the
-         *     default `community`. Attached materials — slides, recordings,
-         *     documents — come through in `files`; a `read_public` key gets none,
-         *     since they are for the event's guests.
+         * List speakers, sponsors, and other featured entries (use /credits)
+         * @deprecated
+         * @description The earlier path of `GET /events/{slug}/credits`. It returns the same
+         *     entries except organizers and partners, and its `?kind=` takes a
+         *     single value. New integrations read `/credits`.
          */
         get: operations['listFeatured']
         put?: never
@@ -195,7 +223,7 @@ export interface paths {
          * List the agenda
          * @description The event's agenda sessions in running order, each carrying its
          *     speakers. A speaker's `hash` is the same handle
-         *     `GET /events/{slug}/featured` returns, so the two lists join —
+         *     `GET /events/{slug}/credits` returns, so the two lists join —
          *     useful for keeping an external schedule page in sync.
          *
          *     `location` is free text: a room, track, or stage.
@@ -217,16 +245,16 @@ export interface paths {
             cookie?: never
         }
         /**
-         * List wall photos and videos
-         * @description Photos and videos posted to the event's media wall, newest first.
+         * List the event's photos and videos
+         * @description Photos and videos posted to the event, newest first.
          *     Use `?kind=image` for photos only.
          *
          *     `url` is the delivery URL for the original file; append resize
          *     parameters as needed. `poster_url` and `duration` are set for videos
          *     only. Each item reports the account that uploaded it.
          *
-         *     The wall is for the event's guests unless the organizer opens it to
-         *     everyone, so a `read_public` key gets an empty list until then.
+         *     They are for the event's guests unless the organizer makes them
+         *     public, so a `read_public` key gets an empty list until then.
          */
         get: operations['listMedia']
         put?: never
@@ -391,9 +419,9 @@ export interface paths {
          * List a calendar's memberships
          * @description Every membership of the calendar, oldest first — ended ones too
          *     (`declined`, `removed`, `expired`), so a `since` poll sees a member
-         *     leave. **Requires a key whose access is this calendar**, held by its
-         *     owner or an admin; any other key answers `403 api_scope_forbidden`, and
-         *     so does a `read_public` key.
+         *     leave. **Requires a key of this calendar**, made by someone who is still
+         *     its owner or an admin; any other key answers `403 api_scope_forbidden`,
+         *     and so does a `read_public` key.
          */
         get: operations['listMemberships']
         put?: never
@@ -595,8 +623,7 @@ export interface webhooks {
          * Someone joined a calendar
          * @description A new membership on the webhook's calendar — an application
          *     (`pending`), a join waiting for payment (`pending_payment`), or a
-         *     member seated at once (`active`). Needs a webhook with calendar
-         *     access.
+         *     member seated at once (`active`).
          */
         post: operations['membershipCreated']
         delete?: never
@@ -618,7 +645,7 @@ export interface webhooks {
          * A membership changed
          * @description A membership's status, tier, `valid_until` (a renewal) or `cancel_at`
          *     changed, or it was removed. `previous_status` is the status before
-         *     the change. Needs a webhook with calendar access.
+         *     the change.
          */
         post: operations['membershipUpdated']
         delete?: never
@@ -664,9 +691,21 @@ export interface components {
         QuestionKind: 'text' | 'options' | 'checkbox' | 'terms' | 'website' | 'social' | 'company' | 'jobtitle'
         /**
          * @description The role a featured person or organization holds on the event.
+         *     `speaker` through `mentor` are people; `organizer`, `partner` and
+         *     `sponsor` are organizations.
          * @enum {string}
          */
-        FeaturedKind: 'speaker' | 'host' | 'performer' | 'panelist' | 'guest' | 'judge' | 'mentor' | 'sponsor'
+        FeaturedKind:
+            | 'speaker'
+            | 'host'
+            | 'performer'
+            | 'panelist'
+            | 'guest'
+            | 'judge'
+            | 'mentor'
+            | 'organizer'
+            | 'partner'
+            | 'sponsor'
         /**
          * @description Sponsorship level, highest first. Only meaningful for
          *     `kind = sponsor`; every other kind reports `community`.
@@ -797,7 +836,7 @@ export interface components {
             /** Format: date-time */
             updated_at: string
         }
-        /** @description The calendar an event is presented by. */
+        /** @description The calendar an event is presented by — a community, in the app. */
         CalendarRef: {
             slug: string
             name: string
@@ -830,6 +869,21 @@ export interface components {
             /** @description Capacity minus confirmed admissions; `null` when uncapped. */
             spots_remaining: number | null
             registration_questions: components['schemas']['RegistrationQuestion'][]
+            /** @description The event's open call for papers; `null` when none is open. */
+            open_cfp: {
+                /** @description What the call is for */
+                title: string
+                /**
+                 * Format: date-time
+                 * @description When it stops taking proposals; `null` when it stays open until closed by hand.
+                 */
+                closes_at: string | null
+                /**
+                 * Format: uri
+                 * @description The call's page on Cloomba, where people send their proposals.
+                 */
+                url: string
+            } | null
         }
         /** @description Venue fields to write. Every key is optional and only the ones you send are changed; send `"location": null` to clear the venue entirely. Mirrors the `Location` read shape, so you can read an event, edit a field and write it straight back. */
         LocationWrite: {
@@ -879,9 +933,9 @@ export interface components {
              *     at most 200 characters, and unique among your own events (two
              *     different organizers may both use `42`).
              *
-             *     On `POST` it makes the call repeatable: if one of your events already
-             *     carries this id, that event is updated and you get `200` instead of a
-             *     second event and `201`.
+             *     On `POST` it makes the call repeatable: if an event of the key's
+             *     calendar already carries this id, that event is updated and you get
+             *     `200` instead of a second event and `201`.
              *
              *     On `PATCH` it just sets the id. If a **different** one of your events
              *     already holds it, the request fails with `409 external_id_taken`.
@@ -1089,7 +1143,7 @@ export interface components {
         }
         /**
          * @description A speaker on an agenda session — the slim view of a featured entry.
-         *     `hash` matches the entry in `GET /events/{slug}/featured`.
+         *     `hash` matches the entry in `GET /events/{slug}/credits`.
          */
         SessionSpeaker: {
             hash: string
@@ -1116,7 +1170,7 @@ export interface components {
             position: number
             speakers: components['schemas']['SessionSpeaker'][]
         }
-        /** @description One photo or video from the event's media wall. */
+        /** @description One photo or video posted to the event. */
         MediaItem: {
             /** @description Stable public id of the media item. */
             ref: string
@@ -1188,7 +1242,7 @@ export interface components {
         }
         MediaList: {
             items: components['schemas']['MediaItem'][]
-            /** @description Total wall items matching the query. */
+            /** @description Total photos and videos matching the query. */
             total: number
             limit: number
             offset: number
@@ -1459,12 +1513,12 @@ export interface components {
         }
         /**
          * @description The key can't reach this resource — an event outside the key's
-         *     access, an attendee endpoint with a `read_public` key, a write
-         *     with a `read`-only key, or a calendar's memberships with a key whose
-         *     access is not that calendar (all `api_scope_forbidden`).
+         *     calendar, an attendee endpoint with a `read_public` key, a write
+         *     with a `read`-only key, or another calendar's memberships (all
+         *     `api_scope_forbidden`).
          *
-         *     `api_pro_required` means the account is not currently eligible to
-         *     write; see Developers in your account.
+         *     `api_pro_required` means the key's calendar is not currently eligible
+         *     to write.
          */
         Forbidden: {
             headers: {
@@ -1567,7 +1621,7 @@ export interface components {
                 'application/json': components['schemas']['Error']
             }
         }
-        /** @description Too many requests — 60/min per key or 10,000/day per account (`rate_limited`). */
+        /** @description Too many requests — 60/min per key or 10,000/day per calendar (`rate_limited`). */
         RateLimited: {
             headers: {
                 [name: string]: unknown
@@ -1829,7 +1883,10 @@ export interface operations {
             401: components['responses']['Unauthorized']
             403: components['responses']['Forbidden']
             404: components['responses']['EventNotFound']
-            /** @description The event is already cancelled (`event_cancelled`). */
+            /**
+             * @description The event is already cancelled (`event_cancelled`), or it has already
+             *     started (`event_started`).
+             */
             409: {
                 headers: {
                     [name: string]: unknown
@@ -1916,6 +1973,41 @@ export interface operations {
             429: components['responses']['RateLimited']
         }
     }
+    listCredits: {
+        parameters: {
+            query?: {
+                /**
+                 * @description Optional filter by role: one kind, or several separated by
+                 *     commas (`?kind=speaker,mentor`). An unknown value returns
+                 *     `400 validation_failed` rather than an empty list.
+                 */
+                kind?: components['schemas']['FeaturedKind'][]
+            }
+            header?: never
+            path: {
+                /** @description The event's URL slug, or its `hash`. */
+                slug: components['parameters']['Slug']
+            }
+            cookie?: never
+        }
+        requestBody?: never
+        responses: {
+            /** @description The event's credits. */
+            200: {
+                headers: {
+                    [name: string]: unknown
+                }
+                content: {
+                    'application/json': components['schemas']['FeaturedList']
+                }
+            }
+            400: components['responses']['ValidationFailed']
+            401: components['responses']['Unauthorized']
+            403: components['responses']['Forbidden']
+            404: components['responses']['EventNotFound']
+            429: components['responses']['RateLimited']
+        }
+    }
     listFeatured: {
         parameters: {
             query?: {
@@ -1999,7 +2091,7 @@ export interface operations {
         }
         requestBody?: never
         responses: {
-            /** @description A page of wall media. */
+            /** @description A page of photos and videos. */
             200: {
                 headers: {
                     [name: string]: unknown

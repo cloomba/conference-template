@@ -1,6 +1,6 @@
 import { SectionHeading } from '@/components/ui/SectionHeading'
 import { useT } from '@/lib/site'
-import type { Sponsor, SponsorTierGroup } from '@/lib/views'
+import type { Organization, Sponsor, SponsorTierGroup } from '@/lib/views'
 
 interface Props {
     tiers: SponsorTierGroup[]
@@ -17,24 +17,24 @@ const MARQUEE_MIN = 6
 // first copy scrolls out.
 const MARQUEE_COPIES = 4
 
-function Logo({ sponsor, copy = false }: { sponsor: Sponsor; copy?: boolean }) {
+export function Logo({ entry, copy = false }: { entry: Organization; copy?: boolean }) {
     return (
         <a
-            href={sponsor.link ?? undefined}
+            href={entry.link ?? undefined}
             rel='noopener'
             tabIndex={copy ? -1 : undefined}
             className='flex items-center gap-3 opacity-80 transition-opacity hover:opacity-100'
         >
-            {sponsor.image_url ? (
+            {entry.image_url ? (
                 <img
                     draggable={false}
-                    src={sponsor.image_url}
-                    alt={sponsor.name ?? ''}
+                    src={entry.image_url}
+                    alt={entry.name ?? ''}
                     className='max-h-12 w-auto max-w-40 object-contain'
                     loading='lazy'
                 />
             ) : (
-                <span className='font-display text-lg font-semibold'>{sponsor.name}</span>
+                <span className='font-display text-lg font-semibold'>{entry.name}</span>
             )}
         </a>
     )
@@ -62,7 +62,7 @@ function Marquee({ sponsors }: { sponsors: Sponsor[] }) {
                     >
                         {sponsors.map((sponsor) => (
                             <li key={sponsor.hash}>
-                                <Logo sponsor={sponsor} copy={index > 0} />
+                                <Logo entry={sponsor} copy={index > 0} />
                             </li>
                         ))}
                     </ul>
@@ -122,7 +122,7 @@ export function Sponsors({ tiers, plain = false }: Props) {
                         <ul className='flex flex-wrap items-center gap-x-10 gap-y-6'>
                             {sponsors.map((sponsor) => (
                                 <li key={sponsor.hash}>
-                                    <Logo sponsor={sponsor} />
+                                    <Logo entry={sponsor} />
                                 </li>
                             ))}
                         </ul>

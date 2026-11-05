@@ -70,13 +70,13 @@ yarn lint                   # eslint over packages/
   `apps/tanstack/src/server/env.ts`) — it is what makes a fresh clone run with
   no setup. It is publishable only because its scope (`read_public`) cannot
   reach the attendee endpoints. Never widen it, and never commit any other key.
-- **Cloomba's own surfaces are opt-in.** `cloomba_promo`, `cloomba_docs` and
-  `footer.show_app_links` all default to FALSE, and the legal hrefs have no
-  default at all; each app's `site.config.ts` turns them on because that file
-  configures the demo. A fork is somebody's real conference — anything that
-  advertises Cloomba, or points at Cloomba's policies, must be a choice they
-  made. No analytics id is ever committed (the demo reads `UMAMI_WEBSITE_ID`
-  from its build environment).
+- **Cloomba's own surfaces are opt-in.** `cloomba_promo`, `cloomba_docs`,
+  `cloomba_agenda_link` and `footer.show_app_links` all default to FALSE, and
+  the legal hrefs have no default at all; each app's `site.config.ts` turns
+  them on because that file configures the demo. A fork is somebody's real
+  conference — anything that advertises Cloomba, or points at Cloomba's
+  policies, must be a choice they made. No analytics id is ever committed (the
+  demo reads `UMAMI_WEBSITE_ID` from its build environment).
 - **Semantic tokens only in components** — `bg-surface`, `text-text`,
   `text-primary`, never raw colors and never `dark:` variants; light/dark is
   handled entirely by token values.

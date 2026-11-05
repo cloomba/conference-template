@@ -2,7 +2,7 @@
 
 An open-source conference website template powered by the
 [Cloomba](https://cloomba.com) public API. It builds a complete, fast site for
-your conference — agenda, speakers, sponsors, tickets, custom pages — while
+your conference — agenda, speakers, organizers, partners, sponsors, tickets, custom pages — while
 Cloomba runs registration, paid ticketing, and check-in behind it. Your site
 never touches payments or personal data.
 
@@ -55,7 +55,8 @@ an attendee list — which is why it can sit in a public repository at all.
    file: event slug, colors, fonts, section order, navigation. Validation runs
    at build, so a bad value fails with a readable message.
 
-Everything event-shaped (agenda, speakers, sponsors, ticket tiers, venue) is
+Everything event-shaped (agenda, speakers, organizers, partners, sponsors,
+ticket tiers, venue, an open call for papers) is
 edited on Cloomba — picked up on the next build, or within a minute by the
 TanStack app on a Node server. Editorial content — custom pages, FAQ, news — is
 markdown in the app's `src/content/`.
@@ -99,7 +100,7 @@ apps/tanstack     the template in React on TanStack Start (SSR or static) + Tail
 - **Content:** editorial pages, FAQ, and news are markdown files in the app's
   `src/content/`; everything event-shaped is edited on Cloomba.
 - **Language and wording:** every UI label the template renders lives in the
-  app's `strings.en.json` — 87 of them. Ukrainian and Slovak ship complete
+  app's `strings.en.json`. Ukrainian and Slovak ship complete
   (`strings.uk.json`, `strings.sk.json`) and apply when `site.language` is `uk`
   or `sk`. Override the ones you want in the app's `strings.ts` — it ships
   empty and is already wired in, so translating never means touching

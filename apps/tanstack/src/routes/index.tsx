@@ -11,6 +11,7 @@ import { Figures } from '@/components/sections/Figures'
 import { Hero } from '@/components/sections/Hero'
 import { Highlights } from '@/components/sections/Highlights'
 import { News } from '@/components/sections/News'
+import { Organizations } from '@/components/sections/Organizations'
 import { Speakers } from '@/components/sections/Speakers'
 import { Sponsors } from '@/components/sections/Sponsors'
 import { Stats } from '@/components/sections/Stats'
@@ -35,6 +36,8 @@ const SECTIONS: Record<SectionName, (home: Home) => ReactNode> = {
     agenda: (home) => <AgendaPreview agenda={home.agenda} />,
     speakers: (home) => <Speakers speakers={home.speakers} />,
     highlights: (home) => <Highlights highlights={home.highlights} />,
+    organizers: (home) => <Organizations kind='organizer' items={home.organizers} />,
+    partners: (home) => <Organizations kind='partner' items={home.partners} />,
     sponsors: (home) => <Sponsors tiers={home.sponsorTiers} />,
     team: (home) => <Team hosts={home.hosts} />,
     tickets: (home) => <Tickets tiers={home.tiers} />,

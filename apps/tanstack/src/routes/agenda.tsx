@@ -67,6 +67,13 @@ function Agenda() {
                         {t('agenda.add_to_calendar_inline')}
                     </a>
                 </p>
+                {config.cloomba_agenda_link && (
+                    <p className='mt-1 text-sm'>
+                        <a href={agenda.eventUrl} rel='noopener' className='text-primary hover:underline'>
+                            {t('agenda.on_cloomba')}
+                        </a>
+                    </p>
+                )}
 
                 {agenda.rooms.length > 1 && (
                     <fieldset className='mt-6 flex flex-wrap gap-2'>

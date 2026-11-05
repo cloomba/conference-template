@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { PageHeader } from '@/components/PageHeader'
+import { Organizations } from '@/components/sections/Organizations'
 import { Team } from '@/components/sections/Team'
 import { Html } from '@/components/ui/Html'
 import { headT, pageHead, siteOf } from '@/lib/head'
@@ -17,7 +18,7 @@ export const Route = createFileRoute('/about')({
 })
 
 function About() {
-    const { descriptionHtml, hosts } = Route.useLoaderData()
+    const { descriptionHtml, hosts, organizers, partners } = Route.useLoaderData()
     const { config } = useSite()
     const { t } = useT()
     return (
@@ -27,6 +28,8 @@ function About() {
                 {descriptionHtml && <Html html={descriptionHtml} className='prose-content max-w-3xl' />}
             </article>
             <Team hosts={hosts} />
+            <Organizations kind='organizer' items={organizers} />
+            <Organizations kind='partner' items={partners} />
         </>
     )
 }

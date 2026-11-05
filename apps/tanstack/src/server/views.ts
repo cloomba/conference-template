@@ -26,6 +26,8 @@ import type {
     EventSummary,
     Host,
     NewsTeaser,
+    OpenCall,
+    Organization,
     Person,
     SessionLine,
     SponsorTierGroup,
@@ -86,6 +88,24 @@ export const toHost = (entry: Featured): Host => ({
     image_url: entry.image_url,
     bio: entry.bio,
     link: entry.link ? socialLink(entry.link) : null,
+})
+
+export const toOrganization = (entry: Featured): Organization => ({
+    hash: entry.hash,
+    name: entry.name,
+    link: entry.link,
+    image_url: entry.image_url,
+})
+
+export const toOpenCall = (call: NonNullable<EventDetail['open_cfp']>, timezone: string): OpenCall => ({
+    url: call.url,
+    line: [
+        call.title,
+        call.closes_at &&
+            t('speakers.call_open_until', { date: formatDayHeading(new Date(call.closes_at), timezone, locale) }),
+    ]
+        .filter(Boolean)
+        .join(' · '),
 })
 
 // Sponsors grouped by tier, tiers in their fixed order, empty tiers dropped.
@@ -214,6 +234,7 @@ export const toAgendaPage = (event: EventDetail, slots: SlotWithSpeakers[]): Age
         entries: day.slots.map((slot) => toAgendaEntry(slot, event.timezone)),
         grid: roomsOf(day.slots).length > 1 ? toDayGrid(day.slots, event.timezone) : null,
     })),
+    eventUrl: event.url,
 })
 
 // "Tuesday, November 3 · 09:00 – 10:00 · Main Hall"

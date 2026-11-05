@@ -21,7 +21,6 @@ anyway — the best sessions never do.
 
 ## How to submit
 
-Email your title, a short abstract (5–10 sentences), and a line about
-yourself to [team@fauna-forum.example](mailto:team@fauna-forum.example?subject=Talk%20proposal)
-with the subject **"Talk proposal"**. The committee reviews on a rolling
-basis; you'll hear back within two weeks.
+Send your title, a short abstract (5–10 sentences), and a line about
+yourself through [the call on Cloomba](https://cloomba.com/c/demo/cfp/NhFrKOoy7l).
+The committee reviews on a rolling basis; you'll hear back within two weeks.

@@ -1,0 +1,45 @@
+---
+import SectionHeading from '@/components/ui/SectionHeading.astro'
+import { loadFeatured } from '@/lib/data'
+import { t } from '@/lib/strings'
+
+interface Props {
+    kind: 'organizer' | 'partner'
+}
+const { kind } = Astro.props
+
+// The event's organizers or its partners: a row of logos, like the sponsors
+// without their tiers. No page of their own, and nothing at all when empty.
+const items = (await loadFeatured()).items.filter((f) => f.kind === kind)
+---
+
+{
+    items.length > 0 && (
+        <section class='mx-auto max-w-5xl px-4 py-14'>
+            <SectionHeading title={t(kind === 'organizer' ? 'credits.organizers' : 'credits.partners')} />
+            <ul class='flex flex-wrap items-center gap-x-10 gap-y-6'>
+                {items.map((item) => (
+                    <li>
+                        <a
+                            href={item.link ?? undefined}
+                            rel='noopener'
+                            class='flex items-center gap-3 opacity-80 transition-opacity hover:opacity-100'
+                        >
+                            {item.image_url ? (
+                                <img
+                                    draggable='false'
+                                    src={item.image_url}
+                                    alt={item.name ?? ''}
+                                    class='max-h-12 w-auto max-w-40 object-contain'
+                                    loading='lazy'
+                                />
+                            ) : (
+                                <span class='font-display text-lg font-semibold'>{item.name}</span>
+                            )}
+                        </a>
+                    </li>
+                ))}
+            </ul>
+        </section>
+    )
+}

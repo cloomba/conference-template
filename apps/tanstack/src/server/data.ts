@@ -43,7 +43,7 @@ const cached = <T>(load: () => Promise<T>): (() => Promise<T>) => {
 }
 
 export const loadEvent = cached(() => api.getEvent(config.event.slug))
-export const loadFeatured = cached(() => api.listFeatured(config.event.slug))
+export const loadFeatured = cached(() => api.listCredits(config.event.slug))
 export const loadTicketTypes = cached(() => api.listTicketTypes(config.event.slug))
 export const loadSessions = cached(async () => {
     const { items } = await api.listSessions(config.event.slug)

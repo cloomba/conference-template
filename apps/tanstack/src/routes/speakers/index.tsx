@@ -23,7 +23,7 @@ export const Route = createFileRoute('/speakers/')({
 })
 
 function SpeakerList() {
-    const { speakers, cfpOpen } = Route.useLoaderData()
+    const { speakers, openCall, cfpOpen } = Route.useLoaderData()
     const { t } = useT()
     return (
         <>
@@ -57,7 +57,15 @@ function SpeakerList() {
                         </li>
                     ))}
                 </ul>
-                {cfpOpen && (
+                {openCall && (
+                    <CallBanner
+                        title={t('speakers.call_title')}
+                        body={openCall.line}
+                        href={openCall.url}
+                        label={t('speakers.call_label')}
+                    />
+                )}
+                {!openCall && cfpOpen && (
                     <CallBanner
                         title={t('speakers.cfp_title')}
                         body={t('speakers.cfp_body')}

@@ -1,15 +1,25 @@
 ---
+import { formatDayHeading } from '@cloomba/core'
+
 import CallBanner from '@/components/CallBanner.astro'
 import ComingSoon from '@/components/ComingSoon.astro'
 import PageHeader from '@/components/PageHeader.astro'
 import Base from '@/layouts/Base.astro'
 import { config } from '@/lib/config'
-import { callsOpen, loadSpeakers } from '@/lib/data'
+import { callsOpen, loadEvent, loadSpeakers } from '@/lib/data'
 import { hasPage } from '@/lib/nav'
 import { speakerPath } from '@/lib/slugs'
-import { t } from '@/lib/strings'
+import { locale, t } from '@/lib/strings'
 
-const speakers = await loadSpeakers()
+const [speakers, event] = await Promise.all([loadSpeakers(), loadEvent()])
+const openCall = event.open_cfp
+const openCallLine = [
+    openCall?.title,
+    openCall?.closes_at &&
+        t('speakers.call_open_until', { date: formatDayHeading(new Date(openCall.closes_at), event.timezone, locale) }),
+]
+    .filter(Boolean)
+    .join(' · ')
 const cfpOpen = (await hasPage('call-for-papers')) && (await callsOpen())
 ---
 
@@ -45,7 +55,17 @@ const cfpOpen = (await hasPage('call-for-papers')) && (await callsOpen())
             }
         </ul>
         {
-            cfpOpen && (
+            openCall && (
+                <CallBanner
+                    title={t('speakers.call_title')}
+                    body={openCallLine}
+                    href={openCall.url}
+                    label={t('speakers.call_label')}
+                />
+            )
+        }
+        {
+            !openCall && cfpOpen && (
                 <CallBanner
                     title={t('speakers.cfp_title')}
                     body={t('speakers.cfp_body')}

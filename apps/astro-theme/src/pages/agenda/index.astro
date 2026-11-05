@@ -62,6 +62,15 @@ const filterCss =
                 {t('agenda.times_local')}{' '}
                 <a href='/agenda.ics' class='text-primary hover:underline'>{t('agenda.add_to_calendar_inline')}</a>
             </p>
+            {
+                config.cloomba_agenda_link && (
+                    <p class='mt-1 text-sm'>
+                        <a href={event.url} rel='noopener' class='text-primary hover:underline'>
+                            {t('agenda.on_cloomba')}
+                        </a>
+                    </p>
+                )
+            }
 
             {
                 allRooms.length > 1 && (

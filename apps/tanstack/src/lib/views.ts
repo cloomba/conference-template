@@ -65,13 +65,24 @@ export interface Host {
     link: SocialIconLink | null
 }
 
-export interface Sponsor {
+// An organizer, a partner or a sponsor: its logo, or its name when it has none.
+export interface Organization {
     hash: string
     name: string | null
-    // Already in display order; tiers in SPONSOR_TIER_ORDER.
-    tier: string
     link: string | null
     image_url: string | null
+}
+
+export interface Sponsor extends Organization {
+    // Already in display order; tiers in SPONSOR_TIER_ORDER.
+    tier: string
+}
+
+// A call for papers open on Cloomba. `line` is finished: its title, and
+// "Open until …" when it has a date.
+export interface OpenCall {
+    url: string
+    line: string
 }
 
 export interface SponsorTierGroup {
@@ -145,6 +156,8 @@ export interface AgendaPage {
     // Every room across the event, for the CSS-only stage filter.
     rooms: string[]
     days: AgendaDay[]
+    // The event's page on Cloomba.
+    eventUrl: string
 }
 
 // ── Detail pages ─────────────────────────────────────────────────────────

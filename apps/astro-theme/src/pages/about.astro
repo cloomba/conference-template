@@ -2,6 +2,7 @@
 import { baseLanguage, extractLocaleOrAll } from '@cloomba/core'
 
 import PageHeader from '@/components/PageHeader.astro'
+import Organizations from '@/components/sections/Organizations.astro'
 import Team from '@/components/sections/Team.astro'
 import Base from '@/layouts/Base.astro'
 import { config } from '@/lib/config'
@@ -23,4 +24,6 @@ const description = event.description ? extractLocaleOrAll(event.description, ba
         {description && <div class='prose-content max-w-3xl' set:html={renderMarkdown(description)} />}
     </article>
     <Team />
+    <Organizations kind='organizer' />
+    <Organizations kind='partner' />
 </Base>

@@ -72,6 +72,9 @@ export const SECTION_NAMES = [
     // Alternating [image][text] / [text][image] splits from
     // src/content/highlights/.
     'highlights',
+    // Logo rows from the event's credits, each with no page of its own.
+    'organizers',
+    'partners',
     'sponsors',
     // The organizing team — featured entries with kind 'host'.
     'team',
@@ -156,7 +159,18 @@ export const siteConfigSchema = z.object({
     // Section presence AND order on the home page.
     sections: z
         .array(z.enum(SECTION_NAMES))
-        .default(['hero', 'about', 'agenda', 'speakers', 'sponsors', 'tickets', 'venue', 'faq']),
+        .default([
+            'hero',
+            'about',
+            'agenda',
+            'speakers',
+            'organizers',
+            'partners',
+            'sponsors',
+            'tickets',
+            'venue',
+            'faq',
+        ]),
     // Header navigation. When absent, the theme derives links from the
     // enabled sections (plus custom pages with `nav: header`).
     header: z.object({ links: z.array(linkSchema) }).optional(),
@@ -208,6 +222,9 @@ export const siteConfigSchema = z.object({
     // they document the TEMPLATE, so they belong on the demo, not inside
     // somebody's conference site. See src/pages/cloomba-for-conferences/.
     cloomba_docs: z.boolean().default(false),
+    // A line on /agenda linking to the event on Cloomba, where guests star sessions,
+    // get reminders and open the slides. OFF by default, for the same reason.
+    cloomba_agenda_link: z.boolean().default(false),
     analytics: z
         .object({
             umami: z.object({ src: z.string().min(1), website_id: z.string().min(1) }).optional(),

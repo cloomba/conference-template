@@ -112,7 +112,10 @@ export const createClient = (options: CloombaClientOptions) => {
         /** Look up one registration by its token. */
         getAttendee: (slug: string, qrToken: string) =>
             request<Attendee>(slugPath(slug, `/attendees/${encodeURIComponent(qrToken)}`)),
-        /** Speakers, sponsors, hosts — optionally narrowed by kind. */
+        /** Speakers, hosts, organizers, partners, sponsors — optionally narrowed by kind. */
+        listCredits: (slug: string, query?: Query<'listCredits'>) =>
+            request<FeaturedList>(slugPath(slug, '/credits'), query),
+        /** @deprecated Leaves out organizers and partners — use `listCredits`. */
         listFeatured: (slug: string, query?: Query<'listFeatured'>) =>
             request<FeaturedList>(slugPath(slug, '/featured'), query),
         /** The agenda in running order, speakers nested on each session. */

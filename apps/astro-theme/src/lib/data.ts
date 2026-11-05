@@ -35,7 +35,7 @@ const memo = <T>(load: () => Promise<T>): (() => Promise<T>) => {
 }
 
 export const loadEvent = memo(() => api.getEvent(config.event.slug))
-export const loadFeatured = memo(() => api.listFeatured(config.event.slug))
+export const loadFeatured = memo(() => api.listCredits(config.event.slug))
 export const loadTicketTypes = memo(() => api.listTicketTypes(config.event.slug))
 export const loadSessions = memo(async () => {
     const { items } = await api.listSessions(config.event.slug)

@@ -61,6 +61,7 @@
     "agenda.meta_description": "Програма {site}.",
     "agenda.times_local": "Увесь час указано за місцевим часом місця проведення.",
     "agenda.add_to_calendar_inline": "Додайте до свого календаря (iCal)",
+    "agenda.on_cloomba": "On Cloomba, guests star sessions, get a reminder before each one and open the slides.",
     "agenda.all_stages": "Усі сцени",
     "agenda.full_agenda": "Повна програма",
     "agenda.all_days": "Усі дні",
@@ -72,12 +73,17 @@
     "speakers.cfp_title": "Тут має бути ваше ім’я",
     "speakers.cfp_body": "Прийом заявок на доповіді відкрито — усі види, будь-який досвід, наставники для новачків.",
     "speakers.cfp_label": "Запропонувати доповідь",
+    "speakers.call_title": "Заклик до доповідей",
+    "speakers.call_label": "Надіслати пропозицію",
+    "speakers.call_open_until": "Відкрито до {date}",
 
     "sponsors.meta_description": "Спонсори {site}.",
     "sponsors.cta_title": "Тут має бути ваш логотип",
     "sponsors.cta_body": "Спонсорські рівні для лігва будь-якого розміру — і кожен рівень допомагає зберегти Community Pass безкоштовним.",
     "sponsors.pause": "Зупинити прокручування логотипів",
 
+    "credits.organizers": "Організатори",
+    "credits.partners": "Партнери",
     "team.title": "Команда",
 
     "tickets.meta_description": "Реєстрація на {site}.",

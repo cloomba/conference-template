@@ -1,8 +1,9 @@
 import { SiteLink } from './ui/SiteLink'
 
 // A call-to-action banner under a listing page (call for papers on
-// /speakers, call for sponsors on /sponsors). Callers gate rendering with the
-// server's `callsOpen()` — the banners retire close to the event.
+// /speakers, call for sponsors on /sponsors). A call open on Cloomba shows for as
+// long as it is open and links there. The site's own pages are gated with the
+// server's `callsOpen()` — those banners retire close to the event.
 
 interface Props {
     title: string

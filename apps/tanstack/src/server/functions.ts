@@ -31,6 +31,8 @@ import {
     toEventSummary,
     toHost,
     toNewsTeaser,
+    toOpenCall,
+    toOrganization,
     toPerson,
     toPublicTiers,
     toSponsorTiers,
@@ -105,6 +107,8 @@ export const getHome = createServerFn({ method: 'GET' })
             speakers: speakers.map(toPerson),
             sponsorTiers: toSponsorTiers(sponsors),
             hosts: ofKind('host').map(toHost),
+            organizers: ofKind('organizer').map(toOrganization),
+            partners: ofKind('partner').map(toOrganization),
             tiers: toPublicTiers(ticketTypes.items),
             features: getOrdered('features'),
             figures: getOrdered('figures'),
@@ -177,10 +181,14 @@ export const getSession = createServerFn({ method: 'GET' })
 
 export const getSpeakers = createServerFn({ method: 'GET' })
     .middleware(middleware)
-    .handler(async () => ({
-        speakers: (await loadSpeakers()).map(toPerson),
-        cfpOpen: hasPage('call-for-papers') && (await callsOpen()),
-    }))
+    .handler(async () => {
+        const event = await loadEvent()
+        return {
+            speakers: (await loadSpeakers()).map(toPerson),
+            openCall: event.open_cfp ? toOpenCall(event.open_cfp, event.timezone) : null,
+            cfpOpen: hasPage('call-for-papers') && (await callsOpen()),
+        }
+    })
 
 export const getSpeaker = createServerFn({ method: 'GET' })
     .middleware(middleware)
@@ -244,6 +252,8 @@ export const getAbout = createServerFn({ method: 'GET' })
                 ? renderMarkdown(extractLocaleOrAll(event.description, baseLanguage(locale)))
                 : null,
             hosts: featured.items.filter((entry) => entry.kind === 'host').map(toHost),
+            organizers: featured.items.filter((entry) => entry.kind === 'organizer').map(toOrganization),
+            partners: featured.items.filter((entry) => entry.kind === 'partner').map(toOrganization),
         }
     })
 
